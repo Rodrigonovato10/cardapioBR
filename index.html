@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nosso Cardápio Digital</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .menu-category h2 {
+            border-bottom: 2px solid #FBBF24; /* Amarelo do Tailwind */
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem; 
+        }
+        .menu-item {
+            border-bottom: 1px dashed #E5E7EB; /* Cinza claro do Tailwind */
+            padding-bottom: 1.5rem; 
+            margin-bottom: 1.5rem; 
+            display: flex;
+            flex-direction: column; 
+        }
+        @media (min-width: 640px) { /* sm breakpoint do Tailwind */
+            .menu-item {
+                flex-direction: row; 
+                align-items: flex-start; 
+            }
+        }
+        .menu-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+        .menu-item-image {
+            width: 100%; 
+            max-width: 150px; 
+            height: 100px;
+            object-fit: cover;
+            border-radius: 0.375rem; /* rounded-md */
+            margin-bottom: 1rem; 
+        }
+        @media (min-width: 640px) {
+            .menu-item-image {
+                width: 120px; 
+                height: 80px; 
+                margin-right: 1rem; 
+                margin-bottom: 0; 
+            }
+        }
+        .menu-item-details {
+            flex-grow: 1;
+        }
+        .price {
+            color: #16A34A; /* Verde do Tailwind */
+            white-space: nowrap; 
+        }
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start; 
+            width: 100%;
+        }
+
+        /* Estilo para o modal de mensagem */
+        .modal {
+            display: none; 
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+            border-radius: 0.5rem;
+            text-align: center;
+        }
+        .modal-close-button {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-6 text-center">
+            <h1 class="text-3xl font-bold text-yellow-500">Nome do Restaurante</h1>
+            <p class="text-sm text-gray-600 mt-1">Seu Slogan ou uma mensagem de boas-vindas!</p>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-8">
+
+        <section id="entradas" class="menu-category mb-8 p-6 bg-white rounded-lg shadow">
+            <h2 class="text-2xl font-semibold text-yellow-600">Entradas</h2>
+            
+            <div class="menu-item">
+                <img src="https://placehold.co/150x100/FBBF24/333333?text=Bruschetta" alt="Foto da Bruschetta Clássica" class="menu-item-image" onerror="this.src='https://placehold.co/150x100/CCCCCC/333333?text=Imagem+Indisponível';">
+                <div class="menu-item-details">
+                    <div class="item-header">
+                        <h3 class="text-lg font-semibold">Bruschetta Clássica</h3>
+                        <span class="price text-lg font-semibold ml-4">R$ 25,00</span>
+                    </div>
+                    <p class="text-sm text-gray-600 mt-1">Pão italiano tostado com tomates frescos, alho, manjericão e azeite.</p>
+                </div>
+            </div>
+
+            <div class="menu-item">
+                <img src="https://placehold.co/150x100/FBBF24/333333?text=Dadinhos" alt="Foto dos Dadinhos de Tapioca" class="menu-item-image" onerror="this.src='https://placehold.co/150x100/CCCCCC/333333?text=Imagem+Indisponível';">
+                <div class="menu-item-details">
+                    <div class="item-header">
+                        <h3 class="text-lg font-semibold">Dadinhos de Tapioca</h3>
+                        <span class="price text-lg font-semibold ml-4">R$ 30,00</span>
+                    </div>
+                    <p class="text-sm text-gray-600 mt-1">Com queijo coalho, acompanhados de geleia de pimenta.</p>
+                </div>
+            </div>
+
+            <div class="menu-item">
+                <img src="https://placehold.co/150x100/FBBF24/333333?text=Carpaccio" alt="Foto do Carpaccio de Carne" class="menu-item-image" onerror="this.src='https://placehold.co/150x100/CCCCCC/333333?text=Imagem+Indisponível';">
+                <div class="menu-item-details">
+                    <div class="item-header">
+                        <h3 class="text-lg font-semibold">Carpaccio de Carne</h3>
+                        <span class="price text-lg font-semibold ml-4">R$ 35,00</span>
+                    </div>
+                    <p class="text-sm text-gray-600 mt-1">Finas fatias de carne crua, molho de alcaparras, mostarda e parmesão.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="pratos-principais" class="menu-category mb-8 p-6 bg-white rounded-lg shadow">
+            <h2 class="text-2xl font-semibold text-yellow-600">Pratos Principais</h2>
+            
+            <div class="menu-item">
+                <img src="https://placehold.co/150x100/FBBF24/333333?text=Filé+Mignon" alt="Foto do Filé Mignon ao Molho Madeira" class="menu-item-image" onerror="this.src='https://placehold.co/150x100/CCCCCC/333333?text=Imagem+Indisponível';">
+                <div class="menu-item-details">
+                    <div class="item-header">
+                         <h3 class="text-lg font-semibold">Filé Mignon ao Molho Madeira</h3>
+                        <span class="price text-lg font-semibold ml-4">R$ 75,00</span>
+                    </div>
+                    <p class="text-sm text-gray-600 mt-1">Acompanha arroz à piamontese e batatas noisette.</p>
+                </div>
+            </div>
+
+            <div class="menu-item">
+                <img src="https://placehold.co/150x100/FBBF24/333333?text=Salmão" alt="Foto do Salmão Grelhado com Legumes" class="menu-item-image" onerror="this.src='https://placehold.co/150x100/CCCCCC/333333?text=Imagem+Indisponível';">
+                <div class="menu-item-details">
+                    <div class="item-header">
+                        <h3 class="text-lg font-semibold">Salmão Grelhado com Legumes</h3>
+                        <span class="price text-lg font-semibold ml-4">R$ 80,00</span>
+                    </div>
+                    <p class="text-sm text-gray-600 mt-1">Salmão fresco grelhado na manteiga de ervas, servido com legumes da estação.</p>
+                </div>
+            </div>
+
+            <div class="menu-item">
+                <img src="https://placehold.co/150x100/FBBF24/333333?text=Risoto" alt="Foto do Risoto de Camarão" class="menu-item-image" onerror="this.src='https://placehold.co/150x100/CCCCCC/333333?text=Imagem+Indisponível';">
+                <div class="menu-item-details">
+                    <div class="item-header">
+                        <h3 class="text-lg font-semibold">Risoto de Camarão</h3>
+                        <span class="price text-lg font-semibold ml-4">R$ 85,00</span>
+                    </div>
+                    <p class="text-sm text-gray-600 mt-1">Arroz arbóreo cremoso com camarões frescos, tomate cereja e um toque de limão siciliano.</p>
+                </div>
+            </div>
+
+            <div class="menu-item">
+                <img src="https://placehold.co/150x100/FBBF24/333333?text=Lasanha" alt="Foto da Lasanha à Bolonhesa" class="menu-item-image" onerror="this.src='https://placehold.co/150x100/CCCCCC/333333?text=Imagem+Indisponível';">
+                <div class="menu-item-details">
+                    <div class="item-header">
+                        <h3 class="text-lg font-semibold">Lasanha à Bolonhesa</h3>
+                        <span class="price text-lg font-semibold ml-4">R$ 65,00</span>
+                    </div>
+                    <p class="text-sm text-gray-600 mt-1">Massa fresca, molho bolonhesa caseiro, molho branco e queijo gratinado.</p>
+                </div>
+            </div>
+
+            <div class="menu-item">
+                <img src="https://placehold.co/150x100/FBBF24/333333?text=Parmegiana" alt="Foto do Bife à Parmegiana" class="menu-item-image" onerror="this.src='https://placehold.co/150x100/CCCCCC/333333?text=Imagem+Indisponível';">
+                <div class="menu-item-details">
+                    <div class="item-header">
+                        <h3 class="text-lg font-semibold">Bife à Parmegiana</h3>
+                        <span class="price text-lg font-semibold ml-4">R$ 70,00</span>
+                    </div>
+                    <p class="text-sm text-gray-600 mt-1">Bife empanado, coberto com molho de tomate, presunto e queijo mussarela. Acompanha arroz e fritas.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="sobremesas" class="menu-category mb-8 p-6 bg-white rounded-lg shadow">
+            <h2 class="text-2xl font-semibold text-yellow-600">Sobremesas</h2>
+            
+            <div class="menu-item">
+                <img src="https://placehold.co/150x100/FBBF24/333333?text=Pudim" alt="Foto do Pudim de Leite Condensado" class="menu-item-image" onerror="this.src='https://placehold.co/150x100/CCCCCC/333333?text=Imagem+Indisponível';">
+                <div class="menu-item-details">
+                    <div class="item-header">
+                        <h3 class="text-lg font-semibold">Pudim de Leite Condensado</h3>
+                        <span class="price text-lg font-semibold ml-4">R$ 20,00</span>
+                    </div>
+                    <p class="text-sm text-gray-600 mt-1">Tradicional pudim caseiro com calda de caramelo.</p>
+                </div>
+            </div>
+
+            <div class="menu-item">
+                <img src="https://placehold.co/150x100/FBBF24/333333?text=Petit+Gateau" alt="Foto do Petit Gateau" class="menu-item-image" onerror="this.src='https://placehold.co/150x100/CCCCCC/333333?text=Imagem+Indisponível';">
+                <div class="menu-item-details">
+                    <div class="item-header">
+                        <h3 class="text-lg font-semibold">Petit Gateau</h3>
+                        <span class="price text-lg font-semibold ml-4">R$ 28,00</span>
+                    </div>
+                    <p class="text-sm text-gray-600 mt-1">Bolinho de chocolate com recheio cremoso, acompanhado de sorvete de creme.</p>
+                </div>
+            </div>
+
+            <div class="menu-item">
+                <img src="https://placehold.co/150x100/FBBF24/333333?text=Mousse" alt="Foto do Mousse de Maracujá" class="menu-item-image" onerror="this.src='https://placehold.co/150x100/CCCCCC/333333?text=Imagem+Indisponível';">
+                <div class="menu-item-details">
+                    <div class="item-header">
+                        <h3 class="text-lg font-semibold">Mousse de Maracujá</h3>
+                        <span class="price text-lg font-semibold ml-4">R$ 22,00</span>
+                    </div>
+                    <p class="text-sm text-gray-600 mt-1">Leve e refrescante, com calda de maracujá fresco.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="bebidas" class="menu-category p-6 bg-white rounded-lg shadow">
+            <h2 class="text-2xl font-semibold text-yellow-600">Bebidas</h2>
+            
+            <div class="menu-item">
+                <div class="menu-item-details w-full"> 
+                    <div class="item-header">
+                        <h3 class="text-lg font-semibold">Água Mineral</h3>
+                        <span class="price text-lg font-semibold ml-4">R$ 6,00</span>
+                    </div>
+                    <p class="text-sm text-gray-600 mt-1">Com ou sem gás.</p>
+                </div>
+            </div>
+
+            <div class="menu-item">
+                <div class="menu-item-details w-full">
+                    <div class="item-header">
+                        <h3 class="text-lg font-semibold">Refrigerante Lata</h3>
+                        <span class="price text-lg font-semibold ml-4">R$ 8,00</span>
+                    </div>
+                    <p class="text-sm text-gray-600 mt-1">Diversos sabores.</p>
+                </div>
+            </div>
+
+             <div class="menu-item">
+                <div class="menu-item-details w-full">
+                    <div class="item-header">
+                        <h3 class="text-lg font-semibold">Suco Natural</h3>
+                        <span class="price text-lg font-semibold ml-4">R$ 12,00</span>
+                    </div>
+                    <p class="text-sm text-gray-600 mt-1">Laranja, Limão, Abacaxi com Hortelã (Consulte outras opções).</p>
+                </div>
+            </div>
+
+            <div class="menu-item">
+                <div class="menu-item-details w-full">
+                    <div class="item-header">
+                        <h3 class="text-lg font-semibold">Cerveja Long Neck</h3>
+                        <span class="price text-lg font-semibold ml-4">R$ 15,00</span>
+                    </div>
+                    <p class="text-sm text-gray-600 mt-1">Nacional ou Importada (Consulte marcas disponíveis).</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-gray-800 text-white text-center py-8 mt-12">
+        <p>&copy; <span id="currentYear"></span> Nome do Restaurante. Todos os direitos reservados.</p>
+        <p class="text-sm mt-1">Endereço do Restaurante, Cidade - Estado</p>
+        <p class="text-sm mt-1">Telefone: (XX) XXXXX-XXXX</p>
+        <div class="mt-2">
+            <a href="#" class="text-yellow-400 hover:text-yellow-300 mx-2">Instagram</a>
+            <a href="#" class="text-yellow-400 hover:text-yellow-300 mx-2">Facebook</a>
+        </div>
+    </footer>
+
+    <div id="messageModal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close-button" onclick="closeModal()">&times;</span>
+            <p id="modalMessageText"></p>
+        </div>
+    </div>
+
+    <script>
+        // Define o ano atual no rodapé
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+        // Funções do Modal
+        const modal = document.getElementById('messageModal');
+        const modalMessageText = document.getElementById('modalMessageText');
+
+        function showModal(message) {
+            modalMessageText.textContent = message;
+            modal.style.display = "flex";
+        }
+
+        function closeModal() {
+            modal.style.display = "none";
+        }
+
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
+    </script>
+
+</body>
+</html>

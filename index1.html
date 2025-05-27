@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Nosso Cardápio Digital</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+
+        .glass-effect {
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        .menu-category h2 {
+            position: relative;
+            padding-bottom: 12px;
+            margin-bottom: 24px;
+        }
+        
+        .menu-category h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, #F59E0B, #FBBF24);
+            border-radius: 2px;
+        }
+
+        .menu-item {
+            position: relative;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .menu-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            border-color: #FBBF24;
+        }
+
+        .menu-item-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            background: linear-gradient(45deg, #f1f5f9, #e2e8f0);
+        }
+
+        @media (min-width: 640px) {
+            .menu-item {
+                display: flex;  
+            }
+            .menu-item-image {
+                width: 140px;
+                height: 100px;  
+                margin-right: 20px;
+                margin-bottom: 0;
+                flex-shrink: 0;  
+            }
+            .menu-item-details {
+                flex-grow: 1;  
+            }
+        }
+
+        .price {
+            background: linear-gradient(90deg, #059669, #10B981);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+        }
+
+        .floating-nav {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .nav-button {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #F59E0B, #FBBF24);
+            color: white;
+            border: none;
+            box-shadow: 0 4px 20px rgba(245, 158, 11, 0.4);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .nav-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 25px rgba(245, 158, 11, 0.6);
+        }
+        
+        .view-cart-button { /* Renamed from submit-order-button */
+            background: linear-gradient(135deg, #10B981, #059669);  
+            box-shadow: 0 4px 20px rgba(16, 185, 129, 0.4);
+        }
+
+        .view-cart-button:hover { /* Renamed */
+            box-shadow: 0 6px 25px rgba(16, 185, 129, 0.6);
+        }
+        
+        .my-orders-button {  
+            background: linear-gradient(135deg, #3B82F6, #2563EB);  
+            box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4);
+        }
+        .my-orders-button:hover {
+            box-shadow: 0 6px 25px rgba(59, 130, 246, 0.6);
+        }
+
+
+        .category-nav {
+            position: sticky;
+            top: 80px;  
+            z-index: 40;
+            margin-bottom: 20px;
+        }
+
+        .category-button {
+            padding: 8px 16px;
+            border-radius: 20px;
+            background: white;
+            border: 1px solid #e2e8f0;
+            margin-right: 8px;
+            margin-bottom: 8px;  
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .category-button.active {
+            background: linear-gradient(135deg, #F59E0B, #FBBF24);
+            color: white;
+            border-color: #F59E0B;
+        }
+        
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        .scrollbar-hide {
+            -ms-overflow-style: none;  
+            scrollbar-width: none;  
+        }
+
+        .fade-in {
+            animation: fadeIn 0.6s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .order-summary { /* This is now the "Cart View" */
+            position: fixed;
+            bottom: 0; /* Changed from 20px */
+            left: 0; /* Changed from 50% */
+            right: 0; /* Added */
+            transform: translateY(100%); /* Start off-screen at the bottom */
+            background: white;
+            border-top-left-radius: 20px; /* Rounded top corners */
+            border-top-right-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.2);  
+            transition: transform 0.4s ease-in-out;
+            z-index: 150; /* Higher z-index */
+            display: flex; /* Changed from none */
+            flex-direction: column;
+            width: 100%;  
+            max-width: 100%; /* Full width */
+            max-height: 75vh; /* Limit height */
+        }
+
+        .order-summary.show {
+            transform: translateY(0); /* Slide in from bottom */
+        }
+
+        .item-counter {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .counter-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px solid #F59E0B;
+            background: white;
+            color: #F59E0B;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;  
+        }
+
+        .counter-btn:hover {
+            background: #F59E0B;
+            color: white;
+        }
+
+        .counter-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        /* Modal Styles */
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            z-index: 190;  
+            display: none;  
+        }
+        .modal-content {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.95);
+            opacity: 0;
+            background-color: white;
+            padding: 24px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            z-index: 200;  
+            width: calc(100% - 40px);
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            display: none;  
+        }
+        .modal-backdrop.show, .modal-content.show {
+            display: block;  
+        }
+        .modal-content.show {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+        }
+
+        /* Styles for order status colors */
+        .status-pending { color: #F59E0B; } /* Laranja */
+        .status-in-progress { color: #3B82F6; } /* Azul */
+        .status-ready { color: #10B981; } /* Verde */
+
+        /* Animation for cart badge */
+        .badge-pop {
+            animation: badgePop 0.3s ease-out;
+        }
+
+        @keyframes badgePop {
+            0% { transform: scale(0.8); opacity: 0.5; }
+            50% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @media (max-width: 640px) {
+            .menu-item {
+                margin-bottom: 12px;
+                padding: 16px;
+                flex-direction: column;  
+            }
+            .menu-item-image {
+                width: 100%;  
+                height: 180px;  
+                margin-right: 0;
+                margin-bottom: 12px;  
+            }
+            
+            .container {
+                padding-left: 16px;
+                padding-right: 16px;
+            }
+            .order-summary {
+                padding: 16px; /* Slightly less padding on mobile for cart */
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <header class="glass-effect sticky top-0 z-50 border-b border-gray-200">
+        <div class="container mx-auto px-4 py-6 text-center">
+            <h1 class="text-3xl font-bold bg-gradient-to-r from-yellow-500 to-orange-500 bg-clip-text text-transparent">
+                Restaurante Sabor & Arte
+            </h1>
+            <p class="text-sm text-gray-600 mt-2 font-medium">Experiências gastronômicas únicas</p>
+        </div>
+    </header>
+
+    <div class="category-nav glass-effect px-4 py-3">
+        <div class="container mx-auto flex overflow-x-auto scrollbar-hide">
+            <button class="category-button active" onclick="scrollToSection('entradas', this)">Entradas</button>
+            <button class="category-button" onclick="scrollToSection('pratos-principais', this)">Principais</button>
+            <button class="category-button" onclick="scrollToSection('sobremesas', this)">Sobremesas</button>
+            <button class="category-button" onclick="scrollToSection('bebidas', this)">Bebidas</button>
+        </div>
+    </div>
+
+    <main class="container mx-auto px-4 py-6 mb-32"> 
+        <section id="entradas" class="menu-category mb-8 fade-in">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">🥗 Entradas</h2>
+            
+            <div class="menu-item" data-item-id="bruschetta">
+                <img src="https://images.unsplash.com/photo-1572441713132-51c75654db73?w=300&h=200&fit=crop&q=80" 
+                    alt="Bruschetta Clássica" class="menu-item-image" 
+                    onerror="this.onerror=null;this.src='https://placehold.co/300x200/FBBF24/333333?text=Bruschetta';">
+                <div class="menu-item-details flex-1">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="text-lg font-semibold text-gray-800">Bruschetta Clássica</h3>
+                        <span class="price text-xl font-bold">R$ 25,00</span>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-3 leading-relaxed">
+                        Pão italiano tostado com tomates frescos, alho, manjericão e azeite extra virgem.
+                    </p>
+                    <div class="item-counter">
+                        <button class="counter-btn" onclick="decrementItem('bruschetta')">−</button>
+                        <span class="font-semibold text-lg min-w-[20px] text-center" id="bruschetta-count">0</span>
+                        <button class="counter-btn" onclick="incrementItem('bruschetta')">+</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="menu-item" data-item-id="dadinhos">
+                <img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=300&h=200&fit=crop&q=80" 
+                    alt="Dadinhos de Tapioca" class="menu-item-image"
+                    onerror="this.onerror=null;this.src='https://placehold.co/300x200/FBBF24/333333?text=Dadinhos';">
+                <div class="menu-item-details flex-1">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="text-lg font-semibold text-gray-800">Dadinhos de Tapioca</h3>
+                        <span class="price text-xl font-bold">R$ 30,00</span>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-3 leading-relaxed">
+                        Cubinhos dourados de tapioca com queijo coalho, acompanhados de geleia de pimenta artesanal.
+                    </p>
+                    <div class="item-counter">
+                        <button class="counter-btn" onclick="decrementItem('dadinhos')">−</button>
+                        <span class="font-semibold text-lg min-w-[20px] text-center" id="dadinhos-count">0</span>
+                        <button class="counter-btn" onclick="incrementItem('dadinhos')">+</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="menu-item" data-item-id="carpaccio">
+                <img src="https://images.unsplash.com/photo-1594212699903-ec8a3eca50f5?w=300&h=200&fit=crop&q=80" 
+                    alt="Carpaccio de Carne" class="menu-item-image"
+                    onerror="this.onerror=null;this.src='https://placehold.co/300x200/FBBF24/333333?text=Carpaccio';">
+                <div class="menu-item-details flex-1">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="text-lg font-semibold text-gray-800">Carpaccio de Carne</h3>
+                        <span class="price text-xl font-bold">R$ 35,00</span>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-3 leading-relaxed">
+                        Finas fatias de carne premium, molho de alcaparras, mostarda dijon e lascas de parmesão.
+                    </p>
+                    <div class="item-counter">
+                        <button class="counter-btn" onclick="decrementItem('carpaccio')">−</button>
+                        <span class="font-semibold text-lg min-w-[20px] text-center" id="carpaccio-count">0</span>
+                        <button class="counter-btn" onclick="incrementItem('carpaccio')">+</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="pratos-principais" class="menu-category mb-8 fade-in">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">🍽️ Pratos Principais</h2>
+            
+            <div class="menu-item" data-item-id="file-mignon">
+                <img src="https://images.unsplash.com/photo-1558030006-450675393462?w=300&h=200&fit=crop&q=80" 
+                    alt="Filé Mignon ao Molho Madeira" class="menu-item-image"
+                    onerror="this.onerror=null;this.src='https://placehold.co/300x200/FBBF24/333333?text=Filé+Mignon';">
+                <div class="menu-item-details flex-1">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="text-lg font-semibold text-gray-800">Filé Mignon ao Molho Madeira</h3>
+                        <span class="price text-xl font-bold">R$ 75,00</span>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-3 leading-relaxed">
+                        Corte nobre grelhado ao ponto, molho madeira encorpado, arroz à piamontese e batatas noisette.
+                    </p>
+                    <div class="item-counter">
+                        <button class="counter-btn" onclick="decrementItem('file-mignon')">−</button>
+                        <span class="font-semibold text-lg min-w-[20px] text-center" id="file-mignon-count">0</span>
+                        <button class="counter-btn" onclick="incrementItem('file-mignon')">+</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="menu-item" data-item-id="salmao">
+                <img src="https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=300&h=200&fit=crop&q=80" 
+                    alt="Salmão Grelhado" class="menu-item-image"
+                    onerror="this.onerror=null;this.src='https://placehold.co/300x200/FBBF24/333333?text=Salmão';">
+                <div class="menu-item-details flex-1">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="text-lg font-semibold text-gray-800">Salmão Grelhado com Legumes</h3>
+                        <span class="price text-xl font-bold">R$ 80,00</span>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-3 leading-relaxed">
+                        Salmão fresco grelhado na manteiga de ervas finas, servido com mix de legumes salteados.
+                    </p>
+                    <div class="item-counter">
+                        <button class="counter-btn" onclick="decrementItem('salmao')">−</button>
+                        <span class="font-semibold text-lg min-w-[20px] text-center" id="salmao-count">0</span>
+                        <button class="counter-btn" onclick="incrementItem('salmao')">+</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="menu-item" data-item-id="risoto">
+                <img src="https://images.unsplash.com/photo-1563379091339-03246963d51a?w=300&h=200&fit=crop&q=80" 
+                    alt="Risoto de Camarão" class="menu-item-image"
+                    onerror="this.onerror=null;this.src='https://placehold.co/300x200/FBBF24/333333?text=Risoto';">
+                <div class="menu-item-details flex-1">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="text-lg font-semibold text-gray-800">Risoto de Camarão</h3>
+                        <span class="price text-xl font-bold">R$ 85,00</span>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-3 leading-relaxed">
+                        Arroz arbóreo cremoso com camarões frescos, tomate cereja confitado e toque de limão siciliano.
+                    </p>
+                    <div class="item-counter">
+                        <button class="counter-btn" onclick="decrementItem('risoto')">−</button>
+                        <span class="font-semibold text-lg min-w-[20px] text-center" id="risoto-count">0</span>
+                        <button class="counter-btn" onclick="incrementItem('risoto')">+</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="sobremesas" class="menu-category mb-8 fade-in">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">🍰 Sobremesas</h2>
+            
+            <div class="menu-item" data-item-id="pudim">
+                <img src="https://images.unsplash.com/photo-1551024506-0bccd828d307?w=300&h=200&fit=crop&q=80" 
+                    alt="Pudim de Leite Condensado" class="menu-item-image"
+                    onerror="this.onerror=null;this.src='https://placehold.co/300x200/FBBF24/333333?text=Pudim';">
+                <div class="menu-item-details flex-1">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="text-lg font-semibold text-gray-800">Pudim de Leite Condensado</h3>
+                        <span class="price text-xl font-bold">R$ 20,00</span>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-3 leading-relaxed">
+                        Tradicional pudim caseiro com calda de caramelo dourada e textura sedosa.
+                    </p>
+                    <div class="item-counter">
+                        <button class="counter-btn" onclick="decrementItem('pudim')">−</button>
+                        <span class="font-semibold text-lg min-w-[20px] text-center" id="pudim-count">0</span>
+                        <button class="counter-btn" onclick="incrementItem('pudim')">+</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="menu-item" data-item-id="petit-gateau">
+                <img src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=300&h=200&fit=crop&q=80" 
+                    alt="Petit Gateau" class="menu-item-image"
+                    onerror="this.onerror=null;this.src='https://placehold.co/300x200/FBBF24/333333?text=Petit+Gateau';">
+                <div class="menu-item-details flex-1">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="text-lg font-semibold text-gray-800">Petit Gateau</h3>
+                        <span class="price text-xl font-bold">R$ 28,00</span>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-3 leading-relaxed">
+                        Bolinho de chocolate belga com recheio cremoso quente, acompanhado de sorvete artesanal.
+                    </p>
+                    <div class="item-counter">
+                        <button class="counter-btn" onclick="decrementItem('petit-gateau')">−</button>
+                        <span class="font-semibold text-lg min-w-[20px] text-center" id="petit-gateau-count">0</span>
+                        <button class="counter-btn" onclick="incrementItem('petit-gateau')">+</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="bebidas" class="menu-category mb-20 fade-in">  
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">🥤 Bebidas</h2>
+            
+            <div class="grid gap-4">
+                <div class="menu-item" data-item-id="agua">
+                    <div class="menu-item-details flex-1">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-lg font-semibold text-gray-800">Água Mineral</h3>
+                            <span class="price text-xl font-bold">R$ 6,00</span>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-3">Com ou sem gás - 500ml</p>
+                        <div class="item-counter">
+                            <button class="counter-btn" onclick="decrementItem('agua')">−</button>
+                            <span class="font-semibold text-lg min-w-[20px] text-center" id="agua-count">0</span>
+                            <button class="counter-btn" onclick="incrementItem('agua')">+</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="menu-item" data-item-id="refrigerante">
+                    <div class="menu-item-details flex-1">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-lg font-semibold text-gray-800">Refrigerante Lata</h3>
+                            <span class="price text-xl font-bold">R$ 8,00</span>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-3">Coca-Cola, Guaraná, Sprite - 350ml</p>
+                        <div class="item-counter">
+                            <button class="counter-btn" onclick="decrementItem('refrigerante')">−</button>
+                            <span class="font-semibold text-lg min-w-[20px] text-center" id="refrigerante-count">0</span>
+                            <button class="counter-btn" onclick="incrementItem('refrigerante')">+</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="menu-item" data-item-id="suco">
+                    <div class="menu-item-details flex-1">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-lg font-semibold text-gray-800">Suco Natural</h3>
+                            <span class="price text-xl font-bold">R$ 12,00</span>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-3">Laranja, Limão, Abacaxi com Hortelã - 400ml</p>
+                        <div class="item-counter">
+                            <button class="counter-btn" onclick="decrementItem('suco')">−</button>
+                            <span class="font-semibold text-lg min-w-[20px] text-center" id="suco-count">0</span>
+                            <button class="counter-btn" onclick="incrementItem('suco')">+</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div class="floating-nav">
+        <button class="nav-button view-cart-button" onclick="toggleCartView()" title="Ver Carrinho">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" class="h-6 w-6">
+                <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49A1.003 1.003 0 0020 4H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"></path> </svg>
+            <span id="cart-item-count-badge" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center hidden">0</span>
+        </button>
+        <button class="nav-button my-orders-button" onclick="openMyRecentOrdersModal()" title="Meus Pedidos Recentes">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" class="h-6 w-6">
+                <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"></path> </svg>
+        </button>
+        <button class="nav-button" onclick="scrollToTop()" title="Voltar ao Topo">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"/>
+            </svg>
+        </button>
+    </div>
+
+    <div id="order-summary" class="order-summary"> 
+        <div class="flex justify-between items-center mb-4 pb-3 border-b">
+            <h3 class="font-bold text-xl text-gray-800">Meu Pedido (Carrinho)</h3>
+            <button onclick="toggleCartView()" class="text-gray-500 text-2xl leading-none p-1 hover:text-gray-700">&times;</button>
+        </div>
+        <div id="order-items-summary" class="space-y-3 mb-4 flex-grow overflow-y-auto pr-2">
+            </div>
+        <div class="border-t pt-4 mt-auto">
+            <div class="flex justify-between items-center font-bold text-lg mb-4">
+                <span>Total:</span>
+                <span id="total-price" class="text-green-600">R$ 0,00</span>
+            </div>
+            <button id="finalize-order-button" onclick="initiateOrderFinalization()" class="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-3 rounded-lg transition-colors text-lg">
+                Finalizar Pedido
+            </button>
+        </div>
+    </div>
+
+    <div id="order-confirmation-backdrop" class="modal-backdrop"></div>
+    <div id="order-confirmation-modal" class="modal-content">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-bold text-green-600">Pedido Enviado!</h2>
+            <button onclick="closeOrderConfirmationModal()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+        </div>
+        <div id="confirmation-details" class="text-sm space-y-2">
+            <p>O seu pedido foi enviado para a cozinha com sucesso.</p>
+            <p><strong>ID do Pedido:</strong> <span id="confirmation-order-id" class="font-semibold"></span></p>
+            <p><strong>Mesa:</strong> <span id="confirmation-table" class="font-semibold"></span></p>
+            <p><strong>Cliente:</strong> <span id="confirmation-customer" class="font-semibold"></span></p>
+            <div class="mt-3">
+                <h4 class="font-semibold mb-1">Itens:</h4>
+                <ul id="confirmation-items-list" class="list-disc list-inside text-gray-700 max-h-32 overflow-y-auto"></ul>
+            </div>
+            <p class="mt-2"><strong>Total:</strong> <span id="confirmation-total" class="font-semibold text-green-600"></span></p>
+            <p class="mt-4 text-xs text-gray-500">Guarde o ID do seu pedido para referência. Você pode acompanhar o status em "Meus Pedidos Recentes".</p>
+        </div>
+        <div class="mt-6 text-right">
+            <button onclick="closeOrderConfirmationModal()" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">Fechar</button>
+        </div>
+    </div>
+
+    <div id="my-recent-orders-backdrop" class="modal-backdrop"></div>
+    <div id="my-recent-orders-modal" class="modal-content">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-bold text-gray-700">Meus Pedidos Recentes</h2>
+            <button onclick="closeMyRecentOrdersModal()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+        </div>
+        <div id="my-recent-orders-list-container" class="text-sm space-y-4">
+            </div>
+        <p class="mt-4 text-xs text-gray-500">Nota: Esta lista mostra os pedidos enviados a partir deste navegador e não reflete o status em tempo real da cozinha.</p>
+        <div class="mt-6 text-right flex justify-between items-center">
+            <button onclick="updateAllOrderStatuses()" class="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors">Atualizar Status</button>
+            <button onclick="closeMyRecentOrdersModal()" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">Fechar</button>
+        </div>
+    </div>
+
+
+    <footer class="bg-gradient-to-r from-gray-800 to-gray-900 text-white text-center py-8 mt-12">
+        <div class="container mx-auto px-4">
+            <h3 class="text-xl font-bold mb-2">Restaurante Sabor & Arte</h3>
+            <p class="text-sm opacity-80 mb-2">Rua das Delícias, 123 - Centro</p>
+            <p class="text-sm opacity-80 mb-4">São Paulo - SP | Tel: (11) 99999-9999</p>
+            <div class="flex justify-center space-x-4">
+                <a href="#" class="text-yellow-400 hover:text-yellow-300 transition-colors">Instagram</a>
+                <a href="#" class="text-yellow-400 hover:text-yellow-300 transition-colors">Facebook</a>
+            </div>
+            <p class="text-xs opacity-60 mt-4">&copy; <span id="currentYear"></span> Todos os direitos reservados</p>
+        </div>
+    </footer>
+
+    <script>
+        let currentOrder = {};  
+        let currentOrderTotal = 0;  
+
+        const menuData = {
+            'bruschetta': { name: 'Bruschetta Clássica', price: 25.00 },
+            'dadinhos': { name: 'Dadinhos de Tapioca', price: 30.00 },
+            'carpaccio': { name: 'Carpaccio de Carne', price: 35.00 },
+            'file-mignon': { name: 'Filé Mignon ao Molho Madeira', price: 75.00 },
+            'salmao': { name: 'Salmão Grelhado com Legumes', price: 80.00 },
+            'risoto': { name: 'Risoto de Camarão', price: 85.00 },
+            'pudim': { name: 'Pudim de Leite Condensado', price: 20.00 },
+            'petit-gateau': { name: 'Petit Gateau', price: 28.00 },
+            'agua': { name: 'Água Mineral', price: 6.00 },
+            'refrigerante': { name: 'Refrigerante Lata', price: 8.00 },
+            'suco': { name: 'Suco Natural', price: 12.00 }
+        };
+
+        // Estados possíveis para um pedido e suas classes de cor Tailwind
+        const orderStatuses = {
+            "Pendente": "status-pending",
+            "Em Preparo": "status-in-progress",
+            "Pronto": "status-ready"
+        };
+        const orderStatusSequence = ["Pendente", "Em Preparo", "Pronto"]; // Para simular a progressão
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('currentYear').textContent = new Date().getFullYear();
+            document.querySelectorAll('.menu-item').forEach(itemElement => {
+                const itemId = itemElement.dataset.itemId;
+                if (itemId) {
+                    updateItemCounter(itemId);  
+                }
+            });
+            updateCartItemCountBadge(); // Inicializa o badge do carrinho ao carregar
+            updateCartSummary(); // Atualiza o resumo do carrinho para definir o estado inicial do botão Finalizar Pedido
+        });
+
+        // Função para rolar até uma seção específica e destacar o botão de categoria
+        function scrollToSection(sectionId, buttonElement) {
+            const section = document.getElementById(sectionId);
+            if (section) {
+                // Calcula o offset para que a seção não fique escondida atrás do cabeçalho fixo
+                const headerOffset = document.querySelector('header').offsetHeight + document.querySelector('.category-nav').offsetHeight + 10;
+                const elementPosition = section.getBoundingClientRect().top + window.pageYOffset;
+                const offsetPosition = elementPosition - headerOffset;
+
+                window.scrollTo({
+                    top: offsetPosition,
+                    behavior: "smooth"
+                });
+
+                // Remove a classe 'active' de todos os botões de categoria
+                document.querySelectorAll('.category-button').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                // Adiciona a classe 'active' ao botão clicado
+                buttonElement.classList.add('active');
+            }
+        }
+
+        // Função para rolar a página para o topo
+        function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: "smooth"
+            });
+        }
+
+        // Incrementa a quantidade de um item no carrinho
+        function incrementItem(itemId) {
+            currentOrder[itemId] = (currentOrder[itemId] || 0) + 1;
+            updateItemCounter(itemId);
+            updateCartSummary();
+            updateCartItemCountBadge();
+        }
+
+        // Decrementa a quantidade de um item no carrinho
+        function decrementItem(itemId) {
+            if (currentOrder[itemId] && currentOrder[itemId] > 0) {
+                currentOrder[itemId]--;
+                updateItemCounter(itemId);
+                updateCartSummary();
+                updateCartItemCountBadge();
+            }
+        }
+
+        // Atualiza o contador de itens na interface principal do cardápio
+        function updateItemCounter(itemId) {
+            const countElement = document.getElementById(`${itemId}-count`);
+            if (countElement) {
+                countElement.textContent = currentOrder[itemId] || 0;
+            }
+        }
+
+        // Alterna a visibilidade da visualização do carrinho (order-summary)
+        function toggleCartView() {
+            const orderSummary = document.getElementById('order-summary');
+            const backdrop = document.getElementById('order-confirmation-backdrop'); // Reutilizando o backdrop para o carrinho
+            
+            if (orderSummary.classList.contains('show')) {
+                orderSummary.classList.remove('show');
+                backdrop.classList.remove('show');
+                // Adiciona um pequeno delay para garantir que a transição termine antes de esconder
+                setTimeout(() => orderSummary.style.display = 'none', 400); 
+            } else {
+                orderSummary.style.display = 'flex'; // Garante que esteja visível para a transição
+                setTimeout(() => { // Pequeno delay para a transição funcionar corretamente
+                    orderSummary.classList.add('show');
+                    backdrop.classList.add('show');
+                }, 10);
+                updateCartSummary(); // Atualiza o resumo do carrinho ao abri-lo
+            }
+
+            // Impede a rolagem do corpo quando o carrinho está aberto
+            document.body.style.overflow = orderSummary.classList.contains('show') ? 'hidden' : '';
+        }
+
+        // Atualiza o resumo do carrinho e o preço total
+        function updateCartSummary() {
+            const orderItemsSummary = document.getElementById('order-items-summary');
+            const totalPriceElement = document.getElementById('total-price');
+            const finalizeButton = document.getElementById('finalize-order-button');
+            let total = 0;
+            orderItemsSummary.innerHTML = ''; // Limpa os itens existentes
+
+            let hasItems = false;
+
+            for (const itemId in currentOrder) {
+                const quantity = currentOrder[itemId];
+                if (quantity > 0) {
+                    hasItems = true;
+                    const item = menuData[itemId];
+                    const itemTotal = item.price * quantity;
+                    total += itemTotal;
+
+                    const itemDiv = document.createElement('div');
+                    itemDiv.classList.add('flex', 'justify-between', 'items-center', 'py-2', 'border-b', 'border-gray-100', 'last:border-b-0');
+                    itemDiv.innerHTML = `
+                        <div class="flex-1">
+                            <span class="font-medium text-gray-700">${quantity}x ${item.name}</span>
+                            <p class="text-xs text-gray-500">R$ ${item.price.toFixed(2)} / un.</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="font-semibold text-gray-800">R$ ${itemTotal.toFixed(2)}</span>
+                            <button onclick="removeItemFromCart('${itemId}')" class="text-red-500 hover:text-red-700 ml-2 text-lg leading-none">&times;</button>
+                        </div>
+                    `;
+                    orderItemsSummary.appendChild(itemDiv);
+                }
+            }
+
+            if (!hasItems) {
+                orderItemsSummary.innerHTML = '<p class="text-center text-gray-500 py-4">Seu carrinho está vazio.</p>';
+                finalizeButton.disabled = true;
+                finalizeButton.classList.add('opacity-50', 'cursor-not-allowed');
+            } else {
+                finalizeButton.disabled = false;
+                finalizeButton.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+
+            totalPriceElement.textContent = `R$ ${total.toFixed(2)}`;
+            currentOrderTotal = total; // Armazena o total para uso posterior
+        }
+
+        // Remove um item completamente do carrinho
+        function removeItemFromCart(itemId) {
+            delete currentOrder[itemId];
+            updateItemCounter(itemId); // Atualiza o contador na seção do cardápio
+            updateCartSummary();
+            updateCartItemCountBadge();
+        }
+
+        // Atualiza o badge de contagem de itens no botão do carrinho
+        function updateCartItemCountBadge() {
+            const badge = document.getElementById('cart-item-count-badge');
+            let totalItems = 0;
+            for (const itemId in currentOrder) {
+                totalItems += currentOrder[itemId];
+            }
+            if (totalItems > 0) {
+                badge.textContent = totalItems;
+                badge.classList.remove('hidden');
+                // Adiciona e remove a classe para disparar a animação
+                badge.classList.remove('badge-pop'); 
+                void badge.offsetWidth; // Força o reflow para reiniciar a animação
+                badge.classList.add('badge-pop');
+            } else {
+                badge.classList.add('hidden');
+                badge.classList.remove('badge-pop'); // Remove a classe se não houver itens
+            }
+        }
+
+        // Inicia o processo de finalização do pedido (abre o modal de confirmação)
+        function initiateOrderFinalization() {
+            if (Object.keys(currentOrder).length === 0) {
+                showCustomMessage("Seu carrinho está vazio. Adicione itens antes de finalizar o pedido.");
+                return;
+            }
+
+            // Fecha o carrinho
+            toggleCartView();
+
+            // Simula a coleta de dados do cliente/mesa
+            const customerName = prompt("Por favor, digite seu nome ou número da mesa para este pedido:");
+            if (!customerName) {
+                showCustomMessage("Pedido cancelado. Nome/Mesa é obrigatório para finalizar o pedido.");
+                return;
+            }
+
+            // Gera um ID de pedido simples
+            const orderId = `PED-${Date.now().toString().slice(-6)}`;
+
+            // Prepara os detalhes do pedido para armazenamento e exibição
+            const orderDetails = {
+                id: orderId,
+                customer: customerName,
+                table: "N/A", // Pode ser aprimorado para coletar a mesa separadamente
+                items: JSON.parse(JSON.stringify(currentOrder)), // Copia o objeto currentOrder
+                total: currentOrderTotal,
+                timestamp: new Date().toISOString(),
+                status: "Pendente" // Status inicial
+            };
+
+            // Salva o pedido no localStorage (simulação de persistência)
+            saveOrder(orderDetails);
+
+            // Exibe o modal de confirmação
+            displayOrderConfirmation(orderDetails);
+
+            // Limpa o carrinho atual após o envio
+            currentOrder = {};
+            currentOrderTotal = 0;
+            updateCartSummary();
+            updateCartItemCountBadge();
+            document.querySelectorAll('.menu-item').forEach(itemElement => {
+                const itemId = itemElement.dataset.itemId;
+                if (itemId) {
+                    updateItemCounter(itemId);
+                }
+            });
+        }
+
+        // Exibe o modal de confirmação do pedido
+        function displayOrderConfirmation(order) {
+            document.getElementById('confirmation-order-id').textContent = order.id;
+            document.getElementById('confirmation-table').textContent = order.table === "N/A" ? order.customer : order.table; // Mostra o nome/mesa
+            document.getElementById('confirmation-customer').textContent = order.customer;
+
+            const confirmationItemsList = document.getElementById('confirmation-items-list');
+            confirmationItemsList.innerHTML = '';
+            for (const itemId in order.items) {
+                const quantity = order.items[itemId];
+                const item = menuData[itemId];
+                const listItem = document.createElement('li');
+                listItem.textContent = `${quantity}x ${item.name} - R$ ${(item.price * quantity).toFixed(2)}`;
+                confirmationItemsList.appendChild(listItem);
+            }
+            document.getElementById('confirmation-total').textContent = `R$ ${order.total.toFixed(2)}`;
+
+            document.getElementById('order-confirmation-backdrop').classList.add('show');
+            document.getElementById('order-confirmation-modal').classList.add('show');
+            document.body.style.overflow = 'hidden'; // Impede a rolagem do corpo
+        }
+
+        // Fecha o modal de confirmação do pedido
+        function closeOrderConfirmationModal() {
+            document.getElementById('order-confirmation-backdrop').classList.remove('show');
+            document.getElementById('order-confirmation-modal').classList.remove('show');
+            document.body.style.overflow = ''; // Restaura a rolagem do corpo
+        }
+
+        // Salva um pedido no localStorage
+        function saveOrder(order) {
+            let recentOrders = JSON.parse(localStorage.getItem('recentOrders')) || [];
+            recentOrders.push(order);
+            localStorage.setItem('recentOrders', JSON.stringify(recentOrders));
+        }
+
+        // Abre o modal de pedidos recentes
+        function openMyRecentOrdersModal() {
+            displayRecentOrders();
+            document.getElementById('my-recent-orders-backdrop').classList.add('show');
+            document.getElementById('my-recent-orders-modal').classList.add('show');
+            document.body.style.overflow = 'hidden'; // Impede a rolagem do corpo
+        }
+
+        // Fecha o modal de pedidos recentes
+        function closeMyRecentOrdersModal() {
+            document.getElementById('my-recent-orders-backdrop').classList.remove('show');
+            document.getElementById('my-recent-orders-modal').classList.remove('show');
+            document.body.style.overflow = ''; // Restaura a rolagem do corpo
+        }
+
+        // Exibe os pedidos recentes no modal
+        function displayRecentOrders() {
+            const recentOrdersContainer = document.getElementById('my-recent-orders-list-container');
+            let recentOrders = JSON.parse(localStorage.getItem('recentOrders')) || [];
+            recentOrdersContainer.innerHTML = '';
+
+            if (recentOrders.length === 0) {
+                recentOrdersContainer.innerHTML = '<p class="text-center text-gray-500 py-4">Você não tem pedidos recentes.</p>';
+                return;
+            }
+
+            // Inverte a ordem para mostrar os mais recentes primeiro
+            recentOrders.reverse().forEach(order => {
+                const orderDiv = document.createElement('div');
+                orderDiv.classList.add('border', 'border-gray-200', 'rounded-lg', 'p-4', 'mb-3', 'bg-white', 'shadow-sm');
+                
+                let itemsHtml = '';
+                for (const itemId in order.items) {
+                    const quantity = order.items[itemId];
+                    const item = menuData[itemId];
+                    itemsHtml += `<li class="text-gray-700">${quantity}x ${item.name}</li>`;
+                }
+
+                // Obtém a classe de cor com base no status
+                const statusColorClass = orderStatuses[order.status] || 'text-gray-600'; // Fallback para cinza
+
+                orderDiv.innerHTML = `
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="font-bold text-gray-800">Pedido ID: ${order.id}</span>
+                        <span class="text-sm text-gray-600">${new Date(order.timestamp).toLocaleDateString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</span>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-1"><strong>Cliente/Mesa:</strong> ${order.customer}</p>
+                    <p class="text-sm text-gray-600 mb-2"><strong>Status:</strong> <span class="font-semibold ${statusColorClass}">${order.status}</span></p>
+                    <h4 class="font-semibold text-gray-700 mb-1">Itens:</h4>
+                    <ul class="list-disc list-inside text-xs pl-2 max-h-20 overflow-y-auto">${itemsHtml}</ul>
+                    <p class="font-bold text-lg text-green-600 mt-2">Total: R$ ${order.total.toFixed(2)}</p>
+                `;
+                recentOrdersContainer.appendChild(orderDiv);
+            });
+        }
+
+        // Simula a atualização do status de todos os pedidos
+        function updateAllOrderStatuses() {
+            let recentOrders = JSON.parse(localStorage.getItem('recentOrders')) || [];
+            if (recentOrders.length === 0) {
+                showCustomMessage("Não há pedidos para atualizar o status.");
+                return;
+            }
+
+            recentOrders = recentOrders.map(order => {
+                const currentIndex = orderStatusSequence.indexOf(order.status);
+                let newStatusIndex = currentIndex + 1;
+                if (newStatusIndex >= orderStatusSequence.length) {
+                    newStatusIndex = orderStatusSequence.length - 1; // Mantém no último status
+                }
+                order.status = orderStatusSequence[newStatusIndex];
+                return order;
+            });
+
+            localStorage.setItem('recentOrders', JSON.stringify(recentOrders));
+            displayRecentOrders(); // Atualiza a exibição no modal
+            showCustomMessage("Status dos pedidos atualizados!");
+        }
+
+        // Função para exibir mensagens personalizadas (substitui alert())
+        function showCustomMessage(message) {
+            const modalBackdrop = document.createElement('div');
+            modalBackdrop.classList.add('modal-backdrop', 'show');
+            document.body.appendChild(modalBackdrop);
+
+            const modalContent = document.createElement('div');
+            modalContent.classList.add('modal-content', 'show');
+            modalContent.innerHTML = `
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-bold text-gray-700">Atenção</h2>
+                    <button class="text-gray-500 hover:text-gray-700 text-2xl" onclick="closeCustomMessage(this)">&times;</button>
+                </div>
+                <p class="text-base text-gray-800">${message}</p>
+                <div class="mt-6 text-right">
+                    <button class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors" onclick="closeCustomMessage(this)">Ok</button>
+                </div>
+            `;
+            document.body.appendChild(modalContent);
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Fecha a mensagem personalizada
+        function closeCustomMessage(button) {
+            const modalContent = button.closest('.modal-content');
+            const modalBackdrop = document.querySelector('.modal-backdrop.show');
+            if (modalContent) {
+                modalContent.classList.remove('show');
+                setTimeout(() => modalContent.remove(), 300); // Remove após a transição
+            }
+            if (modalBackdrop) {
+                modalBackdrop.classList.remove('show');
+                setTimeout(() => modalBackdrop.remove(), 300); // Remove após a transição
+            }
+            document.body.style.overflow = '';
+        }
+
+    </script>
+</body>
+</html>
