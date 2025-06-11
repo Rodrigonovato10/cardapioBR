@@ -1,0 +1,26 @@
+{
+  "name": "cardapiobr",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Rodrigonovato10/cardapioBR.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Rodrigonovato10/cardapioBR/issues"
+  },
+  "homepage": "https://github.com/Rodrigonovato10/cardapioBR#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "uuid": "^11.1.0"
+  }
+}

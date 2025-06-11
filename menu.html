@@ -1,0 +1,1509 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Nosso Cardápio Digital</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            background-color: #f9fafb; /* Consistent bg */
+            color: #1f2937; /* Darker gray for better contrast */
+        }
+
+        .glass-effect {
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.9); /* Slightly less transparent */
+            border-bottom: 1px solid #e5e7eb; /* Softer border */
+        }
+
+        .menu-category h2 {
+            position: relative;
+            padding-bottom: 12px;
+            margin-bottom: 24px;
+            font-size: 1.75rem; /* Slightly larger */
+            color: #111827; /* Even darker for headings */
+        }
+
+        .menu-category h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 60px;
+            height: 4px; /* Thicker line */
+            background: linear-gradient(90deg, #F59E0B, #FBBF24);
+            border-radius: 2px;
+        }
+
+        .menu-item {
+            position: relative;
+            border-radius: 16px; /* More rounded */
+            padding: 20px;
+            margin-bottom: 20px; /* Increased margin */
+            background: #ffffff; /* Plain white for cleaner look */
+            border: 1px solid #e5e7eb;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -1px rgba(0, 0, 0, 0.04); /* Softer shadow */
+        }
+
+        .menu-item:hover {
+            transform: translateY(-4px); /* More pronounced hover */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            border-color: #FBBF24;
+        }
+
+        .menu-item-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            background-color: #f3f4f6; /* Placeholder bg */
+        }
+
+        @media (min-width: 640px) {
+            .menu-item {
+                display: flex;
+            }
+            .menu-item-image {
+                width: 140px;
+                height: 100px;
+                margin-right: 20px;
+                margin-bottom: 0;
+                flex-shrink: 0;
+            }
+            .menu-item-details {
+                flex-grow: 1;
+            }
+        }
+
+        .price {
+            background: linear-gradient(90deg, #059669, #10B981);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+            font-size: 1.25rem; /* Slightly larger price */
+        }
+
+        .floating-nav {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .nav-button {
+            width: 60px; /* Slightly larger buttons */
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #F59E0B, #FBBF24);
+            color: white;
+            border: none;
+            box-shadow: 0 4px 20px rgba(245, 158, 11, 0.4);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .nav-button:hover {
+            transform: scale(1.1) translateY(-2px); /* Added Y translation */
+            box-shadow: 0 6px 25px rgba(245, 158, 11, 0.6);
+        }
+
+        .cart-orders-button { /* Style for the new "Cart/Orders" button */
+            background: linear-gradient(135deg, #3B82F6, #2563EB); /* Blue gradient */
+            box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4);
+        }
+        .cart-orders-button:hover {
+            box-shadow: 0 6px 25px rgba(59, 130, 246, 0.6);
+        }
+
+        /* Removed .admin-button from here as it's now in the footer */
+
+        .category-nav {
+            position: sticky;
+            top: 80px; /* Adjusted for header height */
+            z-index: 40;
+            margin-bottom: 24px; /* Increased margin */
+            padding: 12px 0; /* Added vertical padding */
+        }
+
+        .category-button {
+            padding: 10px 20px; /* Larger padding */
+            border-radius: 24px; /* More rounded */
+            background: white;
+            border: 1px solid #d1d5db; /* Slightly darker border */
+            margin-right: 10px;
+            margin-bottom: 8px;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            font-size: 0.9rem; /* Slightly smaller font for more items */
+            font-weight: 500;
+            color: #374151; /* Darker text */
+            cursor: pointer;
+        }
+
+        .category-button.active, .category-button:hover {
+            background: linear-gradient(135deg, #F59E0B, #FBBF24);
+            color: white;
+            border-color: #F59E0B;
+            transform: translateY(-2px);
+            box-shadow: 0 2px 10px rgba(245, 158, 11, 0.3);
+        }
+
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+        .fade-in { animation: fadeIn 0.6s ease-in-out; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .item-counter {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .counter-btn {
+            width: 36px; /* Larger counter buttons */
+            height: 36px;
+            border-radius: 50%;
+            border: 2px solid #F59E0B;
+            background: white;
+            color: #F59E0B;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.1rem; /* Larger font */
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+
+        .counter-btn:hover {
+            background: #F59E0B;
+            color: white;
+            transform: scale(1.05);
+        }
+        .counter-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* Modal Styles */
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.6); /* Darker backdrop */
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            z-index: 190;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .modal-backdrop.show { display: block; opacity: 1; }
+
+        .modal-content {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.95);
+            opacity: 0;
+            background-color: white;
+            padding: 0; /* Padding will be handled by inner divs */
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            z-index: 200;
+            width: calc(100% - 32px); /* More padding on sides */
+            max-width: 600px; /* Wider modal */
+            max-height: 90vh; /* Taller modal */
+            overflow: hidden; /* Prevent content overflow before inner scroll */
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            display: none;
+            flex-direction: column; /* For header, content, footer structure */
+        }
+        .modal-content.show { display: flex; transform: translate(-50%, -50%) scale(1); opacity: 1; }
+
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .modal-body {
+            padding: 24px;
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+        .modal-footer {
+            padding: 20px 24px;
+            border-top: 1px solid #e5e7eb;
+            background-color: #f9fafb; /* Light gray for footer */
+            display: flex;
+            justify-content: flex-end; /* Align buttons to the right */
+            gap: 12px; /* Space between buttons */
+        }
+
+        /* Tab Styles for Cart/Orders Modal */
+        .tab-buttons {
+            display: flex;
+            border-bottom: 1px solid #e5e7eb;
+            margin-bottom: 20px;
+        }
+        .tab-button {
+            padding: 12px 20px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-weight: 500;
+            color: #6b7280;
+            position: relative;
+            transition: color 0.3s ease;
+        }
+        .tab-button.active {
+            color: #F59E0B;
+        }
+        .tab-button.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px; /* Align with border-bottom of .tab-buttons */
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: #F59E0B;
+            border-radius: 2px 2px 0 0;
+        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* Cart Item Styles */
+        .cart-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        .cart-item:last-child { border-bottom: none; }
+        .cart-item-details { flex-grow: 1; margin-right: 16px; }
+        .cart-item-name { font-weight: 600; color: #374151; }
+        .cart-item-price-unit { font-size: 0.8rem; color: #6b7280; }
+        .cart-item-actions { display: flex; align-items: center; gap: 8px; }
+        .cart-item-quantity { font-weight: 500; min-width: 20px; text-align: center; }
+        .cart-item-subtotal { font-weight: 600; color: #10B981; min-width: 70px; text-align: right;}
+        .remove-item-btn {
+            background: none; border: none; color: #ef4444; cursor: pointer; padding: 4px;
+        }
+        .remove-item-btn:hover { color: #dc2626; }
+
+        /* Order History Item Styles */
+        .order-history-item {
+            background-color: #ffffff; /* Fundo branco para os itens */
+            padding: 16px;
+            border-radius: 12px; /* Mais arredondado */
+            border: 1px solid #e5e7eb;
+            margin-bottom: 16px; /* Mais espaço entre itens */
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05); /* Sombra suave */
+            transition: all 0.2s ease-in-out;
+        }
+        .order-history-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        .order-history-item h4 {
+            font-size: 1.2rem; /* Título um pouco maior */
+            font-weight: 700; /* Mais negrito */
+            color: #111827;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between; /* Alinha status à direita */
+        }
+        .order-history-item p {
+            margin-bottom: 6px; /* Mais espaço entre parágrafos */
+            font-size: 0.95rem; /* Texto um pouco maior */
+            color: #4b5563; /* Cor de texto mais escura */
+        }
+        .order-history-item strong { color: #374151; }
+        .order-history-item .status-tag {
+            font-weight: 600;
+            display: inline-block;
+            padding: 4px 12px; /* Mais padding */
+            border-radius: 20px; /* Mais arredondado (pílula) */
+            font-size: 0.85rem; /* Um pouco maior */
+            margin-left: 12px; /* Mais espaço à esquerda */
+            text-transform: uppercase; /* Maiúsculas */
+            letter-spacing: 0.5px; /* Espaçamento de letras */
+        }
+        .order-history-item .status-pending { background-color: #FFFBEB; color: #D97706; border: 1px solid #FBBF24; } /* Amarelo mais suave */
+        .order-history-item .status-in-progress { background-color: #EFF6FF; color: #2563EB; border: 1px solid #60A5FA; } /* Azul mais suave */
+        .order-history-item .status-finished { background-color: #ECFDF5; color: #059669; border: 1px solid #34D399; } /* Verde mais suave */
+        .order-history-item .status-cancelled { background-color: #FEF2F2; color: #EF4444; border: 1px solid #F87171; } /* Vermelho mais suave */
+        .order-history-item .status-awaiting-payment { background-color: #FEF2F2; color: #EF4444; border: 1px solid #F87171; } /* Vermelho para aguardando pagamento */
+        
+        .order-history-item ul {
+            list-style: none; /* Remove bullet points */
+            padding-left: 0;
+            margin-top: 10px;
+            border-top: 1px dashed #e5e7eb; /* Linha tracejada */
+            padding-top: 10px;
+        }
+        .order-history-item ul li {
+            padding: 4px 0;
+            color: #6b7280;
+            font-size: 0.9rem;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* Pre-order Info Form Styles */
+        .form-group { margin-bottom: 16px; }
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            color: #374151;
+            font-size: 0.9rem;
+        }
+        .form-group input[type="text"], .form-group input[type="number"], .form-group input[type="password"], .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            box-sizing: border-box;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        .form-group input[type="text"]:focus, .form-group input[type="number"]:focus, .form-group input[type="password"]:focus, .form-group textarea:focus, .form-group select:focus {
+            border-color: #F59E0B;
+            box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
+            outline: none;
+        }
+        .radio-group label {
+            margin-right: 16px;
+            font-weight: normal;
+            display: inline-flex; /* Align radio and text */
+            align-items: center;
+            cursor: pointer;
+        }
+        .radio-group input[type="radio"] {
+            margin-right: 6px;
+            accent-color: #F59E0B; /* Color the radio button itself */
+        }
+        .form-error-message {
+            color: #ef4444;
+            font-size: 0.8rem;
+            margin-top: 4px;
+        }
+
+        /* Classes for showing/hiding groups based on JS */
+        .hidden-group {
+            display: none;
+        }
+
+
+        @media (max-width: 640px) {
+            .menu-item {
+                margin-bottom: 16px;
+                padding: 16px;
+                flex-direction: column;
+            }
+            .menu-item-image {
+                width: 100%;
+                height: 180px;
+                margin-right: 0;
+                margin-bottom: 12px;
+                flex-shrink: 0;
+            }
+            .container { padding-left: 16px; padding-right: 16px; }
+            .modal-content { width: calc(100% - 24px); } /* More padding for smaller screens */
+            .modal-header, .modal-body { padding: 16px; }
+            .modal-footer { padding: 16px; flex-direction: column-reverse; gap: 10px; } /* Stack buttons on mobile */
+            .modal-footer button { width: 100%; }
+
+
+            .tab-button { padding: 10px 12px; font-size: 0.9rem; }
+            .cart-item { flex-direction: column; align-items: flex-start; }
+            .cart-item-actions { margin-top: 8px; width: 100%; justify-content: space-between; }
+            .cart-item-subtotal { margin-top: 4px; text-align: left; }
+        }
+
+        /* Footer styles */
+        footer {
+            background-color: #1f2937; /* Dark background for footer */
+            color: #d1d5db; /* Light gray text */
+            padding: 40px 20px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        footer .footer-content {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        footer .footer-section h3 {
+            font-weight: 600;
+            color: #f9fafb;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        footer .footer-section p, footer .footer-section a {
+            color: #9ca3af;
+            text-decoration: none;
+            line-height: 1.6;
+        }
+
+        footer .footer-section a:hover {
+            color: #FBBF24;
+        }
+
+        footer .social-icons a {
+            display: inline-block;
+            margin: 0 10px;
+            color: #9ca3af;
+            font-size: 1.5rem;
+            transition: color 0.2s ease;
+        }
+
+        footer .social-icons a:hover {
+            color: #FBBF24;
+        }
+
+        footer .admin-footer-link {
+            display: inline-block;
+            margin-top: 20px;
+            color: #9ca3af; /* Discreet color */
+            font-size: 0.85rem;
+            text-decoration: underline;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        footer .admin-footer-link:hover {
+            color: #FBBF24;
+        }
+
+        @media (min-width: 768px) {
+            footer .footer-content {
+                flex-direction: row;
+                justify-content: space-around;
+                align-items: flex-start;
+            }
+            footer .footer-section {
+                flex: 1;
+                margin: 0 15px;
+                text-align: left;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="glass-effect sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-5 text-center">
+            <h1 class="text-3xl font-bold bg-gradient-to-r from-yellow-500 to-orange-500 bg-clip-text text-transparent">
+                Restaurante Sabor & Arte
+            </h1>
+            <p class="text-sm text-gray-600 mt-1 font-medium">Experiências gastronômicas únicas</p>
+        </div>
+    </header>
+
+    <div class="category-nav glass-effect px-4" id="category-nav">
+        <div class="container mx-auto flex overflow-x-auto scrollbar-hide" id="category-buttons-container">
+            <!-- Botões de categoria serão carregados aqui pelo JavaScript -->
+        </div>
+    </div>
+
+    <main class="container mx-auto px-4 py-6" id="main-menu-content">
+        <!-- Seções de menu serão carregadas aqui pelo JavaScript -->
+    </main>
+
+    <div class="floating-nav">
+        <button id="cart-orders-btn" class="nav-button cart-orders-button">
+            <i class="fas fa-shopping-cart text-2xl"></i>
+            <span id="cart-item-count" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center hidden">0</span>
+        </button>
+    </div>
+
+    <footer class="bg-gray-800 text-gray-300 py-8 text-center">
+        <div class="container mx-auto px-4">
+            <div class="footer-content" id="footer-content">
+                <!-- Conteúdo do rodapé será carregado aqui pelo JavaScript -->
+            </div>
+            <p id="footer-copyright" class="mt-8 text-xs text-gray-500"></p>
+            <p id="footer-message" class="mt-2 text-sm text-gray-400"></p>
+            <a href="admin.html" class="admin-footer-link mt-4 text-xs">Acessar Painel Admin</a>
+            <br>
+            <a href="order_management.html" class="admin-footer-link mt-2 text-xs">Acessar Gestão de Pedidos</a>
+        </div>
+    </footer>
+
+    <!-- Modal HTML Structure -->
+    <div id="global-modal" class="modal-backdrop">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title" class="text-xl font-semibold text-gray-800"></h3>
+                <button id="modal-close-btn" class="text-gray-500 hover:text-gray-700 text-2xl leading-none">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- A div modal-message-text foi movida para fora das abas para ser sempre visível -->
+                <div id="modal-message-text" class="mb-4"></div> 
+                
+                <!-- Tab Buttons -->
+                <div class="tab-buttons">
+                    <button class="tab-button active" data-tab="cart-tab">Carrinho</button>
+                    <button class="tab-button" data-tab="order-history-tab">Histórico de Pedidos</button>
+                </div>
+
+                <!-- Cart Tab Content -->
+                <div id="cart-tab" class="tab-content active">
+                    <div id="cart-content">
+                        <h4 class="text-lg font-semibold mb-3">Seu Carrinho:</h4>
+                        <div id="cart-items-list" class="mb-4 max-h-60 overflow-y-auto">
+                            <!-- Itens do carrinho serão listados aqui -->
+                        </div>
+                        <div class="flex justify-between items-center text-xl font-bold border-t border-gray-200 pt-4">
+                            <span>Total:</span>
+                            <span id="cart-total-price">R$ 0,00</span>
+                        </div>
+
+                        <h4 class="text-lg font-semibold mt-6 mb-3">Detalhes do Pedido:</h4>
+                        <div class="form-group">
+                            <label for="customer-name" class="block text-gray-700 text-sm font-bold mb-2">Seu Nome:</label>
+                            <input type="text" id="customer-name" class="form-input" placeholder="Nome Completo" required>
+                        </div>
+
+                        <div class="form-group radio-group">
+                            <label class="block text-gray-700 text-sm font-bold mb-2">Tipo de Pedido:</label>
+                            <label>
+                                <input type="radio" name="order-type" value="balcao" id="order-type-balcao" checked>
+                                Balcão
+                            </label>
+                            <label>
+                                <input type="radio" name="order-type" value="mesa" id="order-type-mesa">
+                                Mesa
+                            </label>
+                        </div>
+
+                        <div class="form-group hidden-group" id="table-number-group">
+                            <label for="table-number" class="block text-gray-700 text-sm font-bold mb-2">Número da Mesa:</label>
+                            <input type="number" id="table-number" class="form-input" placeholder="Ex: 5" min="1">
+                        </div>
+
+                        <!-- Mantido oculto, pois o foco é balcão/mesa -->
+                        <div class="form-group hidden-group" id="delivery-address-group">
+                            <label for="delivery-address" class="block text-gray-700 text-sm font-bold mb-2">Endereço de Entrega:</label>
+                            <textarea id="delivery-address" class="form-input h-20 resize-y" placeholder="Rua, Número, Bairro, Cidade, CEP"></textarea>
+                        </div>
+
+                        <!-- Campo para método de pagamento -->
+                        <div class="form-group" id="payment-method-group">
+                            <label for="payment-method" class="block text-gray-700 text-sm font-bold mb-2">Método de Pagamento:</label>
+                            <select id="payment-method" class="form-input">
+                                <option value="pix">Pix</option>
+                                <option value="pagar_balcao_cartao">Pagar no balcão com cartão Crédito/Débito</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="order-notes" class="block text-gray-700 text-sm font-bold mb-2">Observações:</label>
+                            <textarea id="order-notes" class="form-input h-20 resize-y" placeholder="Ex: Sem cebola, ponto da carne, etc."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Order History Tab Content -->
+                <div id="order-history-tab" class="tab-content">
+                    <h4 class="text-lg font-semibold mb-3">Seus Pedidos Anteriores:</h4>
+                    <div id="order-history-list" class="max-h-96 overflow-y-auto">
+                        <p class="text-gray-500 text-center py-4">Carregando histórico de pedidos...</p>
+                        <!-- Histórico de pedidos será carregado aqui pelo JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Seção para exibição do Pix QR Code e Copia e Cola -->
+                <div id="pix-qr-section" class="hidden-group">
+                    <h3 class="text-xl font-semibold mb-3 text-center text-gray-800">Efetue o Pagamento via Pix</h3>
+                    <p class="text-lg text-center mb-4 text-gray-700">Total do pedido: <strong id="pix-total-display" class="text-green-600">R$ 0,00</strong></p>
+
+                    <div class="flex flex-col items-center justify-center space-y-4">
+                        <img id="qr-code-img" alt="QR Code Pix" class="w-48 h-48 sm:w-64 sm:h-64 rounded-lg border border-gray-200 p-2 shadow-sm">
+                        <div class="text-center w-full">
+                            <h5 class="font-semibold text-gray-700 mb-2">Código Pix Copia e Cola:</h5>
+                            <div id="pix-code-text" class="bg-gray-100 p-3 rounded-lg text-sm font-mono break-all max-w-full overflow-auto border border-gray-200 text-gray-900"></div>
+                            <button id="copy-pix-btn" class="mt-4 px-6 py-2 rounded-lg text-white font-medium transition-colors duration-200 bg-orange-500 hover:bg-orange-600">
+                                <i class="fas fa-copy mr-2"></i> Copiar Código Pix
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="modal-cancel-btn" class="px-5 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100 transition-colors duration-200 hidden">
+                    Cancelar
+                </button>
+                <button id="modal-confirm-btn" class="px-5 py-2 rounded-lg text-white font-medium transition-colors duration-200">
+                    Fechar
+                </button>
+                <button id="place-order-btn" class="px-5 py-2 rounded-lg text-white font-medium transition-colors duration-200 bg-green-500 hover:bg-green-600">
+                    Fazer Pedido
+                </button>
+                <button id="pix-confirm-payment-btn" class="px-5 py-2 rounded-lg text-white font-medium transition-colors duration-200 bg-green-500 hover:bg-green-600 hidden-group">
+                    Pagamento Feito!
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const BASE_URL = 'http://localhost:3000/api'; // URL base do seu backend Node.js
+
+        let menuData = {};
+        let footerData = {};
+        let cart = {}; // key: itemId, value: { itemDetails, quantity }
+
+        // Variáveis de configuração do Pix (SIMULADAS)
+        // Em um ambiente real, estas viriam do seu backend ou de uma API de pagamento.
+        const PIX_KEY = "61482920336"; // Sua chave Pix
+        const PIX_MERCHANT_NAME = "Robson Lanchonete";
+        const PIX_MERCHANT_CITY = "São João";
+
+        // Variáveis para os elementos DOM, inicializadas após o carregamento da página
+        let modal, modalTitle, modalMessageText, modalConfirmBtn, modalCancelBtn, modalCloseBtn, cartContentDiv, placeOrderBtn;
+        let customerNameInput, orderTypeRadios, tableNumberGroup, tableNumberInput, deliveryAddressGroup, deliveryAddressInput, paymentMethodSelect, orderNotesInput;
+        let tabButtons, tabContents, orderHistoryList;
+        let pixQrSection, pixTotalDisplay, qrCodeImg, pixCodeText, copyPixBtn, pixConfirmPaymentBtn;
+
+        // Funções de Utilitários
+        function slugify(text) {
+            return text.toString().toLowerCase()
+                .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Remove acentos
+                .replace(/\s+/g, '-')
+                .replace(/[^\w-]+/g, '')
+                .replace(/--+/g, '-')
+                .replace(/-+$/, '');
+        }
+
+        function getCategoryDisplayName(slug) {
+            return slug.replace(/-/g, ' ').split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+        }
+
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(amount);
+        }
+
+        // Função para formatar a data/hora
+        function formatDateTime(isoString) {
+            if (!isoString) return 'N/A';
+            const date = new Date(isoString);
+            return date.toLocaleString('pt-BR', {
+                year: 'numeric',
+                month: 'numeric',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        function getStatusDisplayName(status) {
+            switch (status) {
+                case 'pending': return 'Em Espera';
+                case 'in-progress': return 'Em Produção';
+                case 'finished': return 'Finalizado';
+                case 'cancelled': return 'Cancelado';
+                case 'awaiting-payment': return 'Aguardando Pagamento'; // Novo status
+                default: return status;
+            }
+        }
+
+        // Função para inicializar todos os elementos DOM e adicionar event listeners
+        function initializeDOMElements() {
+            modal = document.getElementById('global-modal');
+            modalTitle = document.getElementById('modal-title');
+            modalMessageText = document.getElementById('modal-message-text'); 
+            modalConfirmBtn = document.getElementById('modal-confirm-btn');
+            modalCancelBtn = document.getElementById('modal-cancel-btn');
+            modalCloseBtn = document.getElementById('modal-close-btn');
+            cartContentDiv = document.getElementById('cart-content');
+            placeOrderBtn = document.getElementById('place-order-btn');
+
+            customerNameInput = document.getElementById('customer-name');
+            orderTypeRadios = document.querySelectorAll('input[name="order-type"]');
+            tableNumberGroup = document.getElementById('table-number-group');
+            tableNumberInput = document.getElementById('table-number');
+            deliveryAddressGroup = document.getElementById('delivery-address-group');
+            deliveryAddressInput = document.getElementById('delivery-address');
+            paymentMethodSelect = document.getElementById('payment-method');
+            orderNotesInput = document.getElementById('order-notes');
+
+            tabButtons = document.querySelectorAll('.tab-button');
+            tabContents = document.querySelectorAll('.tab-content');
+            orderHistoryList = document.getElementById('order-history-list');
+
+            pixQrSection = document.getElementById('pix-qr-section');
+            pixTotalDisplay = document.getElementById('pix-total-display');
+            qrCodeImg = document.getElementById('qr-code-img');
+            pixCodeText = document.getElementById('pix-code-text');
+            copyPixBtn = document.getElementById('copy-pix-btn');
+            pixConfirmPaymentBtn = document.getElementById('pix-confirm-payment-btn');
+
+            // Adiciona event listeners aqui, depois que os elementos são garantidamente encontrados
+            if (modalCloseBtn) modalCloseBtn.addEventListener('click', closeModal);
+            if (modalConfirmBtn) modalConfirmBtn.addEventListener('click', closeModal);
+            if (document.getElementById('cart-orders-btn')) { // Check if cart-orders-btn exists
+                document.getElementById('cart-orders-btn').addEventListener('click', () => {
+                    openModal('Seu Carrinho e Pedido', '', 'cart');
+                });
+            }
+            if (placeOrderBtn) placeOrderBtn.addEventListener('click', placeOrder); // Usa uma função nomeada para o clique
+            if (copyPixBtn) copyPixBtn.addEventListener('click', copiarPix);
+            if (pixConfirmPaymentBtn) pixConfirmPaymentBtn.addEventListener('click', handlePixPaymentConfirmation); // Usa uma função nomeada para clareza
+
+            // Adiciona event listeners para os rádios de tipo de pedido
+            orderTypeRadios.forEach(radio => {
+                radio.addEventListener('change', (e) => {
+                    if (e.target.value === 'mesa') {
+                        if (tableNumberGroup) tableNumberGroup.classList.remove('hidden-group');
+                        if (deliveryAddressGroup) deliveryAddressGroup.classList.add('hidden-group');
+                        if (deliveryAddressInput) deliveryAddressInput.value = '';
+                    } else if (e.target.value === 'balcao') {
+                        if (tableNumberGroup) tableNumberGroup.classList.add('hidden-group');
+                        if (deliveryAddressGroup) deliveryAddressGroup.classList.add('hidden-group');
+                        if (tableNumberInput) tableNumberInput.value = '';
+                        if (deliveryAddressInput) deliveryAddressInput.value = '';
+                    }
+                });
+            });
+
+            // Adiciona event listeners para os botões de tab
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const targetTab = button.dataset.tab;
+                    showTab(targetTab);
+                });
+            });
+
+            // Estado inicial para o tipo de pedido
+            // Garantir que esses elementos existem antes de acessá-los
+            const orderTypeBalcao = document.getElementById('order-type-balcao');
+            if (orderTypeBalcao) orderTypeBalcao.checked = true;
+            if (tableNumberGroup) tableNumberGroup.classList.add('hidden-group');
+            if (deliveryAddressGroup) deliveryAddressGroup.classList.add('hidden-group');
+
+            console.log('Elementos DOM inicializados.'); // Log de depuração
+        }
+
+        // Funções do Modal (adaptadas para o carrinho/pedido)
+        function openModal(title, message = '', type = 'cart') { // type pode ser 'cart', 'alert', 'confirm', 'pix_payment', 'balcao_payment_info'
+            // Verifica se os elementos essenciais do modal existem antes de tentar manipulá-los
+            if (!modal || !modalTitle || !modalMessageText || !cartContentDiv || !pixQrSection || !placeOrderBtn || !modalConfirmBtn) {
+                console.error("Erro: Elementos essenciais do modal não encontrados. Não é possível abrir o modal.");
+                return; // Impede erros adicionais
+            }
+
+            modalTitle.textContent = title;
+            modalMessageText.innerHTML = message; 
+            
+            // Esconde todas as seções e botões no início
+            cartContentDiv.classList.add('hidden-group');
+            pixQrSection.classList.add('hidden-group');
+            placeOrderBtn.classList.add('hidden-group');
+            if (modalCancelBtn) modalCancelBtn.classList.add('hidden-group'); // Check for modalCancelBtn existence
+            if (pixConfirmPaymentBtn) pixConfirmPaymentBtn.classList.add('hidden-group'); // Check for pixConfirmPaymentBtn existence
+
+            // Lógica para mostrar/esconder abas (mantida para consistência)
+            tabContents.forEach(tc => tc.classList.remove('active'));
+            tabButtons.forEach(tb => tb.classList.remove('active'));
+            
+            if (type === 'cart') {
+                showTab('cart-tab'); // Ativa a aba do carrinho
+                cartContentDiv.classList.remove('hidden-group'); // Garante que o conteúdo do carrinho esteja visível
+                placeOrderBtn.classList.remove('hidden-group');
+                modalConfirmBtn.textContent = 'Fechar'; 
+                modalConfirmBtn.classList.remove('hidden-group'); // Mostrar botão Fechar
+                if (modalCancelBtn) modalCancelBtn.classList.add('hidden-group');
+                renderCart(); // Renderiza o carrinho ao abrir o modal
+            } else if (type === 'alert') {
+                modalConfirmBtn.textContent = 'Fechar';
+                modalConfirmBtn.classList.remove('hidden-group'); // Mostrar botão Fechar
+                if (modalCancelBtn) modalCancelBtn.classList.add('hidden-group');
+            } else if (type === 'confirm') { 
+                modalConfirmBtn.textContent = 'Confirmar';
+                modalConfirmBtn.classList.remove('bg-blue-500', 'hover:bg-blue-600');
+                modalConfirmBtn.classList.add('bg-red-500', 'hover:bg-red-600');
+                if (modalCancelBtn) modalCancelBtn.classList.remove('hidden-group');
+                modalConfirmBtn.classList.remove('hidden-group'); // Mostrar botão Confirmar
+            } else if (type === 'pix_payment') {
+                modalTitle.textContent = "Pagamento via Pix";
+                modalMessageText.innerHTML = "Seu pedido foi enviado! Utilize as informações abaixo para realizar o pagamento. O status do pedido será atualizado após a confirmação do pagamento.";
+                modalMessageText.classList.remove('hidden-group'); // Garante que a mensagem esteja visível
+                
+                tabButtons.forEach(button => button.classList.add('hidden-group')); // Esconde as abas
+                
+                pixQrSection.classList.remove('hidden-group'); // Mostra a seção Pix
+                modalConfirmBtn.textContent = 'Fechar';
+                modalConfirmBtn.classList.remove('hidden-group'); // Mostrar botão Fechar
+                if (copyPixBtn) copyPixBtn.classList.remove('hidden-group'); // Mostrar botão Copiar
+                if (pixConfirmPaymentBtn) pixConfirmPaymentBtn.classList.remove('hidden-group'); // Mostrar botão "Pagamento Feito!"
+            } else if (type === 'balcao_payment_info') {
+                modalTitle.textContent = "Pedido Realizado!";
+                modalMessageText.innerHTML = message; // A mensagem já virá formatada
+                modalMessageText.classList.remove('hidden-group');
+                
+                tabButtons.forEach(button => button.classList.add('hidden-group')); // Esconde as abas
+                
+                cartContentDiv.classList.add('hidden-group');
+                pixQrSection.classList.add('hidden-group');
+                placeOrderBtn.classList.add('hidden-group');
+                modalConfirmBtn.textContent = 'Fechar';
+                modalConfirmBtn.classList.remove('hidden-group');
+                if (modalCancelBtn) modalCancelBtn.classList.add('hidden-group');
+                if (copyPixBtn) copyPixBtn.classList.add('hidden-group');
+                if (pixConfirmPaymentBtn) pixConfirmPaymentBtn.classList.add('hidden-group');
+            }
+
+            modal.classList.add('show');
+            modal.querySelector('.modal-content').classList.add('show');
+        }
+
+        function closeModal() {
+            // Verifica se os elementos essenciais do modal existem antes de tentar manipulá-los
+            if (!modal || !modalMessageText || !placeOrderBtn || !copyPixBtn || !pixConfirmPaymentBtn || !tabButtons) {
+                console.error("Erro: Elementos essenciais do modal não encontrados ao fechar. Não é possível resetar o estado.");
+                return; 
+            }
+
+            modal.classList.remove('show');
+            modal.querySelector('.modal-content').classList.remove('show');
+            modalMessageText.innerHTML = ''; // Limpa a mensagem ao fechar
+            // Garante que os botões de footer sejam resetados para o estado padrão do carrinho
+            placeOrderBtn.classList.remove('hidden-group');
+            copyPixBtn.classList.add('hidden-group');
+            pixConfirmPaymentBtn.classList.add('hidden-group');
+            tabButtons.forEach(button => button.classList.remove('hidden-group')); // Reexibe as abas
+        }
+
+        function showTab(tabId) {
+            // Verifica se os elementos essenciais das abas existem
+            if (!tabContents || !tabButtons || !pixQrSection || !modalMessageText || !cartContentDiv || !placeOrderBtn || !modalConfirmBtn || !copyPixBtn || !pixConfirmPaymentBtn) {
+                console.error("Erro: Elementos essenciais das abas não encontrados. Não é possível alternar as abas.");
+                return;
+            }
+
+            tabContents.forEach(content => {
+                if (content.id === tabId) {
+                    content.classList.add('active');
+                } else {
+                    content.classList.remove('active');
+                }
+            });
+            tabButtons.forEach(button => {
+                if (button.dataset.tab === tabId) {
+                    button.classList.add('active');
+                } else {
+                    button.classList.remove('active');
+                }
+            });
+
+            // Lógica para mostrar/esconder botões e seções específicas do footer do modal
+            pixQrSection.classList.add('hidden-group'); // Sempre esconde a seção Pix ao trocar de aba
+            // modalMessageText.classList.remove('hidden-group'); // Removido para evitar que a mensagem de alerta se sobreponha às abas
+
+            if (tabId === 'cart-tab') {
+                cartContentDiv.classList.remove('hidden-group'); // Garante que o conteúdo do carrinho esteja visível
+                placeOrderBtn.classList.remove('hidden-group');
+                modalConfirmBtn.textContent = 'Fechar';
+                modalConfirmBtn.classList.remove('hidden-group');
+                copyPixBtn.classList.add('hidden-group'); // Esconde o botão Copiar Pix
+                pixConfirmPaymentBtn.classList.add('hidden-group'); // Esconde o botão "Pagamento Feito!"
+                modalMessageText.classList.add('hidden-group'); // Esconde a mensagem de alerta/confirmação na aba de carrinho
+            } else { // Se for a aba de histórico
+                cartContentDiv.classList.add('hidden-group'); // Esconde o formulário do carrinho
+                placeOrderBtn.classList.add('hidden-group');
+                modalConfirmBtn.textContent = 'Fechar';
+                modalConfirmBtn.classList.remove('hidden-group');
+                copyPixBtn.classList.add('hidden-group'); // Esconde o botão Copiar Pix
+                pixConfirmPaymentBtn.classList.add('hidden-group'); // Esconde o botão "Pagamento Feito!"
+                modalMessageText.classList.add('hidden-group'); // Esconde a mensagem de alerta/confirmação na aba de histórico
+
+                // Carrega o histórico de pedidos quando a aba é ativada
+                if (tabId === 'order-history-tab') {
+                    renderOrderHistory();
+                }
+            }
+        }
+
+
+        // --- Funções de Carregamento de Dados do Backend ---
+        async function loadAppData() {
+            try {
+                // Busca dados do menu
+                const menuResponse = await fetch(`${BASE_URL}/menu-items`);
+                if (!menuResponse.ok) throw new Error('Erro ao carregar dados do menu.');
+                menuData = await menuResponse.json();
+
+                // Busca dados do rodapé
+                const footerResponse = await fetch(`${BASE_URL}/footer`);
+                if (!footerResponse.ok) throw new Error('Erro ao carregar dados do rodapé.');
+                footerData = await footerResponse.json();
+
+                renderAll();
+            } catch (error) {
+                console.error('Erro ao carregar dados da API:', error);
+                // Use modalMessageText para exibir o erro de conexão
+                openModal('Erro de Conexão', 'Não foi possível carregar o cardápio. Verifique a conexão com o servidor Node.js (rode `node server.js`).', 'alert');
+            }
+        }
+
+        // --- Renderização Geral ---
+        function renderAll() {
+            renderCategoryButtons();
+            renderMenuItems();
+            renderFooter();
+            updateCartItemCount(); // Atualiza o contador do carrinho na barra flutuante
+
+            // Ativa a primeira categoria por padrão ou a categoria na URL hash
+            const initialCategory = Object.keys(menuData)[0];
+            if (window.location.hash) {
+                const targetCategory = window.location.hash.substring(1);
+                if (menuData[targetCategory]) {
+                    scrollToSection(targetCategory, document.querySelector(`.category-button[onclick*="${targetCategory}"]`));
+                } else if (initialCategory) {
+                    scrollToSection(initialCategory, document.querySelector(`.category-button[onclick*="${initialCategory}"]`));
+                }
+            } else if (initialCategory) {
+                scrollToSection(initialCategory, document.querySelector(`.category-button[onclick*="${initialCategory}"]`));
+            }
+        }
+
+        function renderCategoryButtons() {
+            const container = document.getElementById('category-buttons-container');
+            if (!container) return; // Adiciona verificação de existência
+            container.innerHTML = '';
+            if (Object.keys(menuData).length === 0) {
+                container.innerHTML = '<p class="text-gray-500">Nenhuma categoria disponível.</p>';
+                return;
+            }
+            Object.keys(menuData).forEach(slug => {
+                const button = document.createElement('button');
+                button.className = 'category-button';
+                button.textContent = getCategoryDisplayName(slug);
+                button.onclick = () => scrollToSection(slug, button);
+                container.appendChild(button);
+            });
+        }
+
+        function renderMenuItems() {
+            const mainContent = document.getElementById('main-menu-content');
+            if (!mainContent) return; // Adiciona verificação de existência
+            mainContent.innerHTML = ''; // Limpa antes de renderizar
+
+            if (Object.keys(menuData).length === 0) {
+                mainContent.innerHTML = `
+                    <div class="text-center py-10 text-gray-600">
+                        <p class="text-lg">Nenhum item de menu disponível. Por favor, adicione itens no painel de administração.</p>
+                        <a href="admin.html" class="mt-4 inline-block px-6 py-3 rounded-lg text-white bg-orange-500 hover:bg-orange-600">Ir para o Painel Admin</a>
+                    </div>
+                `;
+                return;
+            }
+
+            for (const categorySlug in menuData) {
+                const categoryDisplayName = getCategoryDisplayName(categorySlug);
+                const section = document.createElement('section');
+                section.id = categorySlug;
+                section.className = "menu-category mb-10 fade-in";
+                section.innerHTML = `
+                    <h2 class="text-gray-800">${categoryDisplayName}</h2>
+                    <div class="grid gap-6">
+                        <!-- Itens do menu serão inseridos aqui -->
+                    </div>
+                `;
+                mainContent.appendChild(section);
+
+                const itemsContainer = section.querySelector('div.grid');
+                if (itemsContainer && menuData[categorySlug].length === 0) { // Adiciona verificação para itemsContainer
+                    itemsContainer.innerHTML = `
+                        <div class="text-center py-6 text-gray-500 col-span-full">
+                            <p>Nenhum item nesta categoria ainda.</p>
+                        </div>
+                    `;
+                } else if (itemsContainer) { // Adiciona verificação para itemsContainer
+                    menuData[categorySlug].forEach(item => {
+                        const itemDiv = document.createElement('div');
+                        itemDiv.className = "menu-item";
+                        itemDiv.setAttribute('data-item-id', item.id);
+                        itemDiv.innerHTML = `
+                            <img src="${item.imageUrl}"
+                                 alt="${item.name}" class="menu-item-image"
+                                 onerror="this.onerror=null;this.src='https://placehold.co/300x200/FBBF24/333333?text=${encodeURIComponent(item.name.substring(0, Math.min(item.name.length, 10)))}';">
+                            <div class="menu-item-details">
+                                <div class="flex justify-between items-start mb-2">
+                                    <h3 class="text-lg font-semibold text-gray-800">${item.name}</h3>
+                                    <span class="price">${formatCurrency(item.price)}</span>
+                                </div>
+                                <p class="text-sm text-gray-600 mb-3 leading-relaxed">
+                                    ${item.description}
+                                </p>
+                                <div class="item-counter">
+                                    <button class="counter-btn" onclick="decrementItem('${item.id}')">−</button>
+                                    <span class="font-semibold text-lg min-w-[20px] text-center" id="${item.id}-count">${cart[item.id] ? cart[item.id].quantity : 0}</span>
+                                    <button class="counter-btn" onclick="incrementItem('${item.id}')">+</button>
+                                </div>
+                            </div>
+                        `;
+                        itemsContainer.appendChild(itemDiv);
+                    });
+                }
+            }
+        }
+
+        function renderFooter() {
+            const footerContentDiv = document.getElementById('footer-content');
+            if (!footerContentDiv) return; // Adiciona verificação de existência
+            footerContentDiv.innerHTML = `
+                <div class="footer-section">
+                    <h3>Contactos</h3>
+                    <p><i class="fas fa-phone mr-2"></i> ${footerData.contacts.phone || 'Não informado'}</p>
+                    <p><i class="fas fa-envelope mr-2"></i> ${footerData.contacts.email || 'Não informado'}</p>
+                    <p><i class="fas fa-map-marker-alt mr-2"></i> ${footerData.contacts.address || 'Não informado'}</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Horário de Funcionamento</h3>
+                    ${footerData.operatingHours ? footerData.operatingHours.split('\n').map(line => `<p>${line}</p>`).join('') : '<p>Não informado</p>'}
+                </div>
+                <div class="footer-section social-icons">
+                    <h3>Siga-nos</h3>
+                    <a href="#" class="hover:text-blue-500" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="hover:text-pink-500" title="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="hover:text-blue-400" title="Twitter"><i class="fab fa-twitter"></i></a>
+                </div>
+            `;
+            const footerCopyright = document.getElementById('footer-copyright');
+            const footerMessage = document.getElementById('footer-message');
+            if (footerCopyright) footerCopyright.innerHTML = footerData.copyright || '';
+            if (footerMessage) footerMessage.innerHTML = footerData.message || '';
+        }
+
+        // --- Funções de Navegação e Contador ---
+        function scrollToSection(sectionId, clickedButton) {
+            const section = document.getElementById(sectionId);
+            if (section) {
+                // Remove 'active' de todos os botões de categoria
+                document.querySelectorAll('.category-button').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                // Adiciona 'active' ao botão clicado
+                if (clickedButton) {
+                    clickedButton.classList.add('active');
+                }
+                // Rola para a seção
+                section.scrollIntoView({ behavior: 'smooth' });
+                // Atualiza a URL sem recarregar a página
+                history.pushState(null, '', `#${sectionId}`);
+            }
+        }
+
+        function updateCartDisplay(itemId, quantity) {
+            const countSpan = document.getElementById(`${itemId}-count`);
+            if (countSpan) {
+                countSpan.textContent = quantity;
+            }
+            updateCartItemCount(); // Atualiza o contador flutuante
+        }
+
+        function updateCartItemCount() {
+            const cartItemCountSpan = document.getElementById('cart-item-count');
+            if (!cartItemCountSpan) return; // Adiciona verificação de existência
+            let totalItems = 0;
+            for (const itemId in cart) {
+                totalItems += cart[itemId].quantity;
+            }
+            cartItemCountSpan.textContent = totalItems;
+            if (totalItems > 0) {
+                cartItemCountSpan.classList.remove('hidden');
+            } else {
+                cartItemCountSpan.classList.add('hidden');
+            }
+        }
+
+        function findItemInMenu(itemId) {
+            for (const categorySlug in menuData) {
+                const item = menuData[categorySlug].find(item => item.id === itemId);
+                if (item) {
+                    return item;
+                }
+            }
+            return null;
+        }
+
+        function incrementItem(itemId) {
+            const itemDetails = findItemInMenu(itemId);
+            if (!itemDetails) return;
+
+            if (cart[itemId]) {
+                cart[itemId].quantity++;
+            } else {
+                cart[itemId] = { ...itemDetails, quantity: 1 };
+            }
+            updateCartDisplay(itemId, cart[itemId].quantity);
+            console.log(`Item ${itemId} incrementado para ${cart[itemId].quantity}`);
+        }
+
+        function decrementItem(itemId) {
+            if (cart[itemId] && cart[itemId].quantity > 0) {
+                cart[itemId].quantity--;
+                if (cart[itemId].quantity === 0) {
+                    delete cart[itemId];
+                }
+                updateCartDisplay(itemId, cart[itemId] ? cart[itemId].quantity : 0);
+                console.log(`Item ${itemId} decrementado para ${cart[itemId] ? cart[itemId].quantity : 0}`);
+            } else {
+                if (cart[itemId]) delete cart[itemId]; // Remove if quantity becomes zero explicitly
+                updateCartDisplay(itemId, 0);
+                console.log(`Item ${itemId} já está em zero ou não existe no carrinho.`);
+            }
+        }
+
+        function renderCart() {
+            const cartItemsList = document.getElementById('cart-items-list');
+            const cartTotalPriceSpan = document.getElementById('cart-total-price');
+            if (!cartItemsList || !cartTotalPriceSpan) return; // Adiciona verificação de existência
+            cartItemsList.innerHTML = '';
+            let totalCartPrice = 0;
+
+            if (Object.keys(cart).length === 0) {
+                cartItemsList.innerHTML = '<p class="text-gray-500 text-center py-4">Seu carrinho está vazio.</p>';
+                if (placeOrderBtn) placeOrderBtn.disabled = true; // Desabilita botão de fazer pedido
+            } else {
+                if (placeOrderBtn) placeOrderBtn.disabled = false; // Habilita o botão
+                for (const itemId in cart) {
+                    const item = cart[itemId];
+                    const itemTotalPrice = item.quantity * item.price;
+                    totalCartPrice += itemTotalPrice;
+
+                    const cartItemDiv = document.createElement('div');
+                    cartItemDiv.className = 'cart-item';
+                    cartItemDiv.innerHTML = `
+                        <div class="cart-item-details">
+                            <span class="cart-item-name">${item.name}</span>
+                            <span class="cart-item-price-unit block text-gray-500">${formatCurrency(item.price)} cada</span>
+                        </div>
+                        <div class="cart-item-actions">
+                            <button class="counter-btn text-sm" onclick="decrementItemInCart('${item.id}')">−</button>
+                            <span class="cart-item-quantity text-lg">${item.quantity}</span>
+                            <button class="counter-btn text-sm" onclick="incrementItemInCart('${item.id}')">+</button>
+                            <span class="cart-item-subtotal">${formatCurrency(itemTotalPrice)}</span>
+                            <button class="remove-item-btn" onclick="removeItemFromCart('${item.id}')">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </div>
+                    `;
+                    cartItemsList.appendChild(cartItemDiv);
+                }
+            }
+            cartTotalPriceSpan.textContent = formatCurrency(totalCartPrice);
+        }
+
+        // Funções específicas para o carrinho dentro do modal
+        function incrementItemInCart(itemId) {
+            incrementItem(itemId);
+            renderCart(); // Re-renderiza o carrinho no modal
+        }
+
+        function decrementItemInCart(itemId) {
+            decrementItem(itemId);
+            renderCart(); // Re-renderiza o carrinho no modal
+        }
+
+        function removeItemFromCart(itemId) {
+            delete cart[itemId];
+            updateCartDisplay(itemId, 0); // Atualiza o contador do item no menu principal
+            renderCart(); // Re-renderiza o carrinho no modal
+        }
+
+        // Função para renderizar o histórico de pedidos
+        async function renderOrderHistory() {
+            if (!orderHistoryList) return; // Adiciona verificação de existência
+            orderHistoryList.innerHTML = '<p class="text-gray-500 text-center py-4">Carregando histórico de pedidos...</p>';
+            try {
+                const response = await fetch(`${BASE_URL}/orders`);
+                if (!response.ok) throw new Error('Erro ao carregar histórico de pedidos.');
+                const orders = await response.json();
+
+                if (orders.length === 0) {
+                    orderHistoryList.innerHTML = '<p class="text-gray-500 text-center py-4">Você ainda não fez nenhum pedido.</p>';
+                    return;
+                }
+
+                orderHistoryList.innerHTML = ''; // Limpa a mensagem de carregamento
+                orders.forEach(order => {
+                    const orderDiv = document.createElement('div');
+                    orderDiv.className = 'order-history-item';
+                    // Use o status original para a classe de cor
+                    const statusClass = `status-${order.status.replace(/\s+/g, '-').toLowerCase()}`; 
+                    // Determine o texto a ser exibido para o status
+                    let statusDisplayText = getStatusDisplayName(order.status);
+                    if (order.status === 'awaiting-payment') {
+                        statusDisplayText += ' <span class="text-red-500 font-bold">(Dirija ao Balcão para fazer o pagamento)</span>';
+                    }
+
+                    orderDiv.innerHTML = `
+                        <h4>
+                            Pedido #${order.id.substring(0, 8)}
+                            <span class="status-tag ${statusClass}">${statusDisplayText}</span>
+                        </h4>
+                        <p><strong>Cliente:</strong> ${order.customerName}</p>
+                        <p><strong>Tipo:</strong> ${order.orderType === 'mesa' ? `Mesa ${order.tableNumber}` : 'Balcão'}</p>
+                        <p><strong>Método de Pagamento:</strong> ${order.paymentMethod || 'Não Informado'}</p>
+                        <p><strong>Observações:</strong> ${order.notes || 'Nenhuma'}</p>
+                        <p><strong>Data/Hora:</strong> ${formatDateTime(order.orderTime)}</p>
+                        ${order.finishTime ? `<p><strong>Finalizado:</strong> ${formatDateTime(order.finishTime)}</p>` : ''}
+                        <ul>
+                            ${order.items.map(item => `<li>${item.qty}x ${item.name} - ${formatCurrency(item.qty * item.price)}</li>`).join('')}
+                        </ul>
+                        <div class="flex justify-between items-center text-xl font-bold mt-3">
+                            <span>Total do Pedido:</span>
+                            <span class="text-green-600">${formatCurrency(order.total)}</span>
+                        </div>
+                    `;
+                    orderHistoryList.appendChild(orderDiv);
+                });
+            } catch (error) {
+                console.error('Erro ao buscar histórico de pedidos:', error);
+                orderHistoryList.innerHTML = `<p class="text-red-500 text-center py-4">Erro ao carregar histórico: ${error.message}.</p>`;
+            }
+        }
+
+        // --- Funções para Geração do Pix ---
+        function montarPayload(valor, chave, nome, cidade, identificador) {
+            const payload = 
+                "000201" + // ID Payload Format Indicator (Fixed)
+                "2658" + // ID Merchant Account Information (Dynamic, length)
+                "0014BR.GOV.BCB.PIX" + // GUID (Fixed)
+                "01" + chave.length.toString().padStart(2, '0') + chave + // Pix Key (Dynamic, length, value)
+                "52040000" + // ID Merchant Category Code (Fixed)
+                "5303986" + // ID Transaction Currency (Fixed - BRL)
+                "54" + valor.toFixed(2).replace('.', '').length.toString().padStart(2, '0') + valor.toFixed(2).replace('.', '') + // Transaction Amount (Dynamic, length, value)
+                "5802BR" + // ID Country Code (Fixed)
+                "59" + nome.length.toString().padStart(2, '0') + nome + // Merchant Name (Dynamic, length, value)
+                "60" + cidade.length.toString().padStart(2, '0') + cidade + // Merchant City (Dynamic, length, value)
+                "62070503" + identificador + // ID Additional Data Field Template (Dynamic, length, value)
+                "6304"; // ID CRC16 (CRC checksum, placeholder)
+
+            return payload + calcularCRC16(payload);
+        }
+
+        function calcularCRC16(str) {
+            let crc = 0xFFFF;
+            for (let i = 0; i < str.length; i++) {
+                crc ^= str.charCodeAt(i) << 8;
+                for (let j = 0; j < 8; j++) {
+                    if ((crc & 0x8000) !== 0) {
+                        crc = (crc << 1) ^ 0x1021;
+                    } else {
+                        crc <<= 1;
+                    }
+                    crc &= 0xFFFF;
+                }
+            }
+            return crc.toString(16).toUpperCase().padStart(4, '0');
+        }
+
+        function displayPixPayment(orderTotal, orderId) {
+            // Verifica se os elementos do Pix existem antes de tentar manipulá-los
+            if (!pixTotalDisplay || !pixCodeText || !qrCodeImg) {
+                console.error("Erro: Elementos do Pix não encontrados. Não é possível exibir o pagamento Pix.");
+                return;
+            }
+
+            const pixPayload = montarPayload(orderTotal, PIX_KEY, PIX_MERCHANT_NAME, PIX_MERCHANT_CITY, orderId.substring(0, 8).toUpperCase());
+            const qrUrl = "https://chart.googleapis.com/chart?cht=qr&chl=" + encodeURIComponent(pixPayload) + "&chs=250x250";
+
+            pixTotalDisplay.textContent = formatCurrency(orderTotal);
+            pixCodeText.textContent = pixPayload;
+            qrCodeImg.src = qrUrl;
+
+            // Abre o modal no modo Pix
+            openModal('Pagamento via Pix', '', 'pix_payment');
+        }
+
+        function copiarPix() {
+            // Verifica se o elemento existe
+            if (!pixCodeText || !modalMessageText) {
+                console.error("Erro: Elementos de cópia Pix ou mensagem não encontrados.");
+                return;
+            }
+            const texto = pixCodeText.textContent;
+            navigator.clipboard.writeText(texto).then(() => {
+                modalMessageText.innerHTML = '<strong class="text-green-600">Código Pix copiado com sucesso!</strong>';
+                // Remove a mensagem após alguns segundos
+                setTimeout(() => { modalMessageText.innerHTML = ''; }, 3000);
+            }).catch(err => {
+                modalMessageText.innerHTML = '<strong class="text-red-600">Erro ao copiar o código Pix.</strong>';
+                console.error('Erro ao copiar Pix:', err);
+                setTimeout(() => { modalMessageText.innerHTML = ''; }, 3000);
+            });
+        }
+        
+        // Event listener para o botão "Pagamento Feito!" (simulação de confirmação)
+        function handlePixPaymentConfirmation() {
+            // Verifica se o elemento existe
+            if (!modalMessageText) {
+                console.error("Erro: Elemento de mensagem do modal não encontrado para confirmação Pix.");
+                return;
+            }
+
+            modalMessageText.innerHTML = '<strong class="text-green-600">Aguardando a confirmação do seu pagamento...</strong>';
+            setTimeout(() => { 
+                modalMessageText.innerHTML = ''; 
+                closeModal(); // Fecha o modal após a "confirmação" simulada
+                openModal('Pedido Finalizado!', '<strong class="text-green-600">Seu pagamento foi confirmado! Acompanhe o status do seu pedido na aba "Histórico de Pedidos".</strong>', 'alert');
+            }, 3000); // Simula um tempo para confirmação
+        }
+
+        // Função para fazer o pedido
+        async function placeOrder() {
+            // Verifica se os elementos do formulário existem
+            if (!customerNameInput || !orderTypeRadios || !paymentMethodSelect || !orderNotesInput || !tableNumberInput) {
+                console.error("Erro: Elementos do formulário de pedido não encontrados.");
+                return;
+            }
+
+            const customerName = customerNameInput.value.trim();
+            const orderType = document.querySelector('input[name="order-type"]:checked').value;
+            const tableNumber = orderType === 'mesa' ? tableNumberInput.value.trim() : null;
+            const paymentMethod = paymentMethodSelect.value;
+            const notes = orderNotesInput.value.trim();
+
+            if (!customerName) {
+                openModal('Erro', 'Por favor, insira seu nome.', 'alert');
+                return;
+            }
+            if (orderType === 'mesa' && !tableNumber) {
+                openModal('Erro', 'Por favor, insira o número da mesa para pedido na mesa.', 'alert');
+                return;
+            }
+            if (Object.keys(cart).length === 0) {
+                openModal('Erro', 'Seu carrinho está vazio. Adicione itens antes de fazer o pedido.', 'alert');
+                return;
+            }
+
+            const orderItems = Object.values(cart).map(item => ({
+                name: item.name,
+                qty: item.quantity,
+                price: item.price
+            }));
+
+            const orderTotal = Object.values(cart).reduce((sum, item) => sum + (item.quantity * item.price), 0);
+
+            // Determina o status inicial do pedido
+            let orderStatus;
+            if (paymentMethod === 'pagar_balcao_cartao') {
+                orderStatus = 'awaiting-payment';
+            } else {
+                orderStatus = 'pending'; // Status padrão para Pix ou outros
+            }
+
+            const orderData = {
+                customerName,
+                items: orderItems,
+                total: orderTotal,
+                orderType,
+                tableNumber: tableNumber ? parseInt(tableNumber) : null,
+                deliveryAddress: null, // Mantido null
+                paymentMethod, 
+                notes,
+                status: orderStatus // Envia o status inicial
+            };
+
+            try {
+                const response = await fetch(`${BASE_URL}/orders`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(orderData)
+                });
+
+                if (!response.ok) {
+                    const errorDetails = await response.json();
+                    throw new Error(errorDetails.message || 'Falha ao fazer o pedido.');
+                }
+
+                const result = await response.json();
+                console.log('Pedido realizado com sucesso:', result.order);
+                
+                // Limpa o carrinho e reseta os inputs do formulário
+                cart = {}; 
+                updateCartItemCount(); 
+                renderMenuItems(); 
+                customerNameInput.value = ''; 
+                if (tableNumberInput) tableNumberInput.value = ''; // Check for tableNumberInput existence
+                orderNotesInput.value = ''; 
+                const orderTypeBalcao = document.getElementById('order-type-balcao');
+                if (orderTypeBalcao) orderTypeBalcao.checked = true;
+                if (tableNumberGroup) tableNumberGroup.classList.add('hidden-group');
+                if (paymentMethodSelect) paymentMethodSelect.value = 'pix'; // Reseta o método de pagamento para Pix
+
+
+                if (paymentMethod === 'pix') {
+                    // Chama a função para exibir os detalhes do Pix
+                    displayPixPayment(result.order.total, result.order.id);
+                } else if (paymentMethod === 'pagar_balcao_cartao') {
+                    // Mensagem específica para pagamento no balcão
+                    const successMessage = `Seu pedido foi enviado! Número do Pedido: <strong>${result.order.id.substring(0, 8)}</strong>.<br>
+                                            <span class="text-red-600 font-bold">Dirija ao Balcão para fazer o pagamento</span>.`;
+                    openModal('Pedido Realizado!', successMessage, 'balcao_payment_info'); // Novo tipo de modal
+                } else {
+                    // Mensagem de sucesso para outros métodos de pagamento (caso existam)
+                    const successMessage = `Seu pedido foi enviado! Número do Pedido: <strong>${result.order.id.substring(0, 8)}</strong>.<br>
+                                            Método de Pagamento: <strong>${paymentMethodSelect.options[paymentMethodSelect.selectedIndex].text}</strong>.`;
+                    openModal('Pedido Realizado!', successMessage, 'alert');
+                }
+
+            } catch (error) {
+                console.error('Erro ao fazer pedido:', error);
+                openModal('Erro ao Fazer Pedido', `Ocorreu um erro: ${error.message}. Por favor, tente novamente.`, 'alert');
+            }
+        }
+
+
+        // Inicializa o aplicativo
+        window.onload = () => {
+            initializeDOMElements(); // Garante que todos os elementos DOM sejam encontrados primeiro
+            loadAppData(); // Então, carrega os dados da aplicação
+        };
+
+        // Listener para mudanças na hash da URL para rolagem em categorias
+        window.addEventListener('hashchange', () => {
+            const targetCategory = window.location.hash.substring(1);
+            if (targetCategory && menuData[targetCategory]) {
+                const button = document.querySelector(`.category-button[onclick*="${targetCategory}"]`);
+                scrollToSection(targetCategory, button);
+            }
+        });
+    </script>
+</body>
+</html>

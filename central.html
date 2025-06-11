@@ -1,0 +1,1772 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Nosso Cardápio Digital</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            background-color: #f9fafb; /* Consistent bg */
+            color: #1f2937; /* Darker gray for better contrast */
+        }
+
+        .glass-effect {
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.9); /* Slightly less transparent */
+            border-bottom: 1px solid #e5e7eb; /* Softer border */
+        }
+
+        .menu-category h2 {
+            position: relative;
+            padding-bottom: 12px;
+            margin-bottom: 24px;
+            font-size: 1.75rem; /* Slightly larger */
+            color: #111827; /* Even darker for headings */
+        }
+
+        .menu-category h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 60px;
+            height: 4px; /* Thicker line */
+            background: linear-gradient(90deg, #F59E0B, #FBBF24);
+            border-radius: 2px;
+        }
+
+        .menu-item {
+            position: relative;
+            border-radius: 16px; /* More rounded */
+            padding: 20px;
+            margin-bottom: 20px; /* Increased margin */
+            background: #ffffff; /* Plain white for cleaner look */
+            border: 1px solid #e5e7eb;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -1px rgba(0, 0, 0, 0.04); /* Softer shadow */
+        }
+
+        .menu-item:hover {
+            transform: translateY(-4px); /* More pronounced hover */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            border-color: #FBBF24;
+        }
+
+        .menu-item-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            background-color: #f3f4f6; /* Placeholder bg */
+        }
+
+        @media (min-width: 640px) {
+            .menu-item {
+                display: flex;
+            }
+            .menu-item-image {
+                width: 140px;
+                height: 100px;
+                margin-right: 20px;
+                margin-bottom: 0;
+                flex-shrink: 0;
+            }
+            .menu-item-details {
+                flex-grow: 1;
+            }
+        }
+
+        .price {
+            background: linear-gradient(90deg, #059669, #10B981);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+            font-size: 1.25rem; /* Slightly larger price */
+        }
+
+        .floating-nav {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .nav-button {
+            width: 60px; /* Slightly larger buttons */
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #F59E0B, #FBBF24);
+            color: white;
+            border: none;
+            box-shadow: 0 4px 20px rgba(245, 158, 11, 0.4);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .nav-button:hover {
+            transform: scale(1.1) translateY(-2px); /* Added Y translation */
+            box-shadow: 0 6px 25px rgba(245, 158, 11, 0.6);
+        }
+
+        .cart-orders-button { /* Style for the new "Cart/Orders" button */
+            background: linear-gradient(135deg, #3B82F6, #2563EB); /* Blue gradient */
+            box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4);
+        }
+        .cart-orders-button:hover {
+            box-shadow: 0 6px 25px rgba(59, 130, 246, 0.6);
+        }
+
+        /* Removed .admin-button from here as it's now in the footer */
+
+        .category-nav {
+            position: sticky;
+            top: 80px; /* Adjusted for header height */
+            z-index: 40;
+            margin-bottom: 24px; /* Increased margin */
+            padding: 12px 0; /* Added vertical padding */
+        }
+
+        .category-button {
+            padding: 10px 20px; /* Larger padding */
+            border-radius: 24px; /* More rounded */
+            background: white;
+            border: 1px solid #d1d5db; /* Slightly darker border */
+            margin-right: 10px;
+            margin-bottom: 8px;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            font-size: 0.9rem; /* Slightly smaller font for more items */
+            font-weight: 500;
+            color: #374151; /* Darker text */
+            cursor: pointer;
+        }
+
+        .category-button.active, .category-button:hover {
+            background: linear-gradient(135deg, #F59E0B, #FBBF24);
+            color: white;
+            border-color: #F59E0B;
+            transform: translateY(-2px);
+            box-shadow: 0 2px 10px rgba(245, 158, 11, 0.3);
+        }
+
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+        .fade-in { animation: fadeIn 0.6s ease-in-out; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .item-counter {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .counter-btn {
+            width: 36px; /* Larger counter buttons */
+            height: 36px;
+            border-radius: 50%;
+            border: 2px solid #F59E0B;
+            background: white;
+            color: #F59E0B;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.1rem; /* Larger font */
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+
+        .counter-btn:hover {
+            background: #F59E0B;
+            color: white;
+            transform: scale(1.05);
+        }
+        .counter-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* Modal Styles */
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.6); /* Darker backdrop */
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            z-index: 190;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .modal-backdrop.show { display: block; opacity: 1; }
+
+        .modal-content {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.95);
+            opacity: 0;
+            background-color: white;
+            padding: 0; /* Padding will be handled by inner divs */
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            z-index: 200;
+            width: calc(100% - 32px); /* More padding on sides */
+            max-width: 600px; /* Wider modal */
+            max-height: 90vh; /* Taller modal */
+            overflow: hidden; /* Prevent content overflow before inner scroll */
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            display: none;
+            flex-direction: column; /* For header, content, footer structure */
+        }
+        .modal-content.show { display: flex; transform: translate(-50%, -50%) scale(1); opacity: 1; }
+
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .modal-body {
+            padding: 24px;
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+        .modal-footer {
+            padding: 20px 24px;
+            border-top: 1px solid #e5e7eb;
+            background-color: #f9fafb; /* Light gray for footer */
+            display: flex;
+            justify-content: flex-end; /* Align buttons to the right */
+            gap: 12px; /* Space between buttons */
+        }
+
+        /* Tab Styles for Cart/Orders Modal */
+        .tab-buttons {
+            display: flex;
+            border-bottom: 1px solid #e5e7eb;
+            margin-bottom: 20px;
+        }
+        .tab-button {
+            padding: 12px 20px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-weight: 500;
+            color: #6b7280;
+            position: relative;
+            transition: color 0.3s ease;
+        }
+        .tab-button.active {
+            color: #F59E0B;
+        }
+        .tab-button.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px; /* Align with border-bottom of .tab-buttons */
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: #F59E0B;
+            border-radius: 2px 2px 0 0;
+        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* Cart Item Styles */
+        .cart-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        .cart-item:last-child { border-bottom: none; }
+        .cart-item-details { flex-grow: 1; margin-right: 16px; }
+        .cart-item-name { font-weight: 600; color: #374151; }
+        .cart-item-price-unit { font-size: 0.8rem; color: #6b7280; }
+        .cart-item-actions { display: flex; align-items: center; gap: 8px; }
+        .cart-item-quantity { font-weight: 500; min-width: 20px; text-align: center; }
+        .cart-item-subtotal { font-weight: 600; color: #10B981; min-width: 70px; text-align: right;}
+        .remove-item-btn {
+            background: none; border: none; color: #ef4444; cursor: pointer; padding: 4px;
+        }
+        .remove-item-btn:hover { color: #dc2626; }
+
+        /* Order History Item Styles */
+        .order-history-item {
+            background-color: #ffffff; /* Fundo branco para os itens */
+            padding: 16px;
+            border-radius: 12px; /* Mais arredondado */
+            border: 1px solid #e5e7eb;
+            margin-bottom: 16px; /* Mais espaço entre itens */
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05); /* Sombra suave */
+            transition: all 0.2s ease-in-out;
+        }
+        .order-history-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        .order-history-item h4 {
+            font-size: 1.2rem; /* Título um pouco maior */
+            font-weight: 700; /* Mais negrito */
+            color: #111827;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between; /* Alinha status à direita */
+        }
+        .order-history-item p {
+            margin-bottom: 6px; /* Mais espaço entre parágrafos */
+            font-size: 0.95rem; /* Texto um pouco maior */
+            color: #4b5563; /* Cor de texto mais escura */
+        }
+        .order-history-item strong { color: #374151; }
+        .order-history-item .status-tag {
+            font-weight: 600;
+            display: inline-block;
+            padding: 4px 12px; /* Mais padding */
+            border-radius: 20px; /* Mais arredondado (pílula) */
+            font-size: 0.85rem; /* Um pouco maior */
+            margin-left: 12px; /* Mais espaço à esquerda */
+            text-transform: uppercase; /* Maiúsculas */
+            letter-spacing: 0.5px; /* Espaçamento de letras */
+        }
+        .order-history-item .status-Em-Espera { background-color: #FFFBEB; color: #D97706; border: 1px solid #FBBF24; } /* Amarelo mais suave */
+        .order-history-item .status-Em-Producao { background-color: #EFF6FF; color: #2563EB; border: 1px solid #60A5FA; } /* Azul mais suave */
+        .order-history-item .status-Finalizado { background-color: #ECFDF5; color: #059669; border: 1px solid #34D399; } /* Verde mais suave */
+        .order-history-item .status-Cancelado { background-color: #FEF2F2; color: #EF4444; border: 1px solid #F87171; } /* Vermelho mais suave */
+        
+        .order-history-item ul {
+            list-style: none; /* Remove bullet points */
+            padding-left: 0;
+            margin-top: 10px;
+            border-top: 1px dashed #e5e7eb; /* Linha tracejada */
+            padding-top: 10px;
+        }
+        .order-history-item ul li {
+            padding: 4px 0;
+            color: #6b7280;
+            font-size: 0.9rem;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* Pre-order Info Form Styles */
+        .form-group { margin-bottom: 16px; }
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            color: #374151;
+            font-size: 0.9rem;
+        }
+        .form-group input[type="text"], .form-group input[type="number"], .form-group input[type="password"], .form-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            box-sizing: border-box;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        .form-group input[type="text"]:focus, .form-group input[type="number"]:focus, .form-group input[type="password"]:focus, .form-group textarea:focus {
+            border-color: #F59E0B;
+            box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
+            outline: none;
+        }
+        .radio-group label {
+            margin-right: 16px;
+            font-weight: normal;
+            display: inline-flex; /* Align radio and text */
+            align-items: center;
+            cursor: pointer;
+        }
+        .radio-group input[type="radio"] {
+            margin-right: 6px;
+            accent-color: #F59E0B; /* Color the radio button itself */
+        }
+        #table-number-group { display: none; } /* Hidden by default */
+        .form-error-message {
+            color: #ef4444;
+            font-size: 0.8rem;
+            margin-top: 4px;
+        }
+
+
+        @media (max-width: 640px) {
+            .menu-item {
+                margin-bottom: 16px;
+                padding: 16px;
+                flex-direction: column;
+            }
+            .menu-item-image {
+                width: 100%;
+                height: 180px;
+                margin-right: 0;
+                margin-bottom: 12px;
+            }
+            .container { padding-left: 16px; padding-right: 16px; }
+            .modal-content { width: calc(100% - 24px); } /* More padding for smaller screens */
+            .modal-header, .modal-body { padding: 16px; }
+            .modal-footer { padding: 16px; flex-direction: column-reverse; gap: 10px; } /* Stack buttons on mobile */
+            .modal-footer button { width: 100%; }
+
+
+            .tab-button { padding: 10px 12px; font-size: 0.9rem; }
+            .cart-item { flex-direction: column; align-items: flex-start; }
+            .cart-item-actions { margin-top: 8px; width: 100%; justify-content: space-between; }
+            .cart-item-subtotal { margin-top: 4px; text-align: left; }
+        }
+
+        /* Footer styles */
+        footer {
+            background-color: #1f2937; /* Dark background for footer */
+            color: #d1d5db; /* Light gray text */
+            padding: 40px 20px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        footer .footer-content {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        footer .footer-section h3 {
+            font-weight: 600;
+            color: #f9fafb;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        footer .footer-section p, footer .footer-section a {
+            color: #9ca3af;
+            text-decoration: none;
+            line-height: 1.6;
+        }
+
+        footer .footer-section a:hover {
+            color: #FBBF24;
+        }
+
+        footer .social-icons a {
+            display: inline-block;
+            margin: 0 10px;
+            color: #9ca3af;
+            font-size: 1.5rem;
+            transition: color 0.2s ease;
+        }
+
+        footer .social-icons a:hover {
+            color: #FBBF24;
+        }
+
+        footer .admin-footer-link {
+            display: inline-block;
+            margin-top: 20px;
+            color: #9ca3af; /* Discreet color */
+            font-size: 0.85rem;
+            text-decoration: underline;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        footer .admin-footer-link:hover {
+            color: #FBBF24;
+        }
+
+        @media (min-width: 768px) {
+            footer .footer-content {
+                flex-direction: row;
+                justify-content: space-around;
+                align-items: flex-start;
+            }
+            footer .footer-section {
+                flex: 1;
+                margin: 0 15px;
+                text-align: left;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="glass-effect sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-5 text-center">
+            <h1 class="text-3xl font-bold bg-gradient-to-r from-yellow-500 to-orange-500 bg-clip-text text-transparent">
+                Restaurante Sabor & Arte
+            </h1>
+            <p class="text-sm text-gray-600 mt-1 font-medium">Experiências gastronômicas únicas</p>
+        </div>
+    </header>
+
+    <div class="category-nav glass-effect px-4">
+        <div class="container mx-auto flex overflow-x-auto scrollbar-hide">
+            <button class="category-button active" onclick="scrollToSection('entradas', this)">Entradas</button>
+            <button class="category-button" onclick="scrollToSection('pratos-principais', this)">Principais</button>
+            <button class="category-button" onclick="scrollToSection('sobremesas', this)">Sobremesas</button>
+            <button class="category-button" onclick="scrollToSection('bebidas', this)">Bebidas</button>
+        </div>
+    </div>
+
+    <main class="container mx-auto px-4 py-6">
+        <!-- Entradas Section -->
+        <section id="entradas" class="menu-category mb-10 fade-in">
+            <h2 class="text-gray-800">🥗 Entradas</h2>
+            <div class="menu-item" data-item-id="bruschetta">
+                <img src="https://images.unsplash.com/photo-1572441713132-51c75654db73?w=300&h=200&fit=crop&q=80"
+                     alt="Bruschetta Clássica" class="menu-item-image"
+                     onerror="this.onerror=null;this.src='https://placehold.co/300x200/FBBF24/333333?text=Bruschetta';">
+                <div class="menu-item-details">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="text-lg font-semibold text-gray-800">Bruschetta Clássica</h3>
+                        <span class="price">R$ 25,00</span>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-3 leading-relaxed">
+                        Pão italiano tostado com tomates frescos, alho, manjericão e azeite extra virgem.
+                    </p>
+                    <div class="item-counter">
+                        <button class="counter-btn" onclick="decrementItem('bruschetta')">−</button>
+                        <span class="font-semibold text-lg min-w-[20px] text-center" id="bruschetta-count">0</span>
+                        <button class="counter-btn" onclick="incrementItem('bruschetta')">+</button>
+                    </div>
+                </div>
+            </div>
+            <div class="menu-item" data-item-id="dadinhos">
+                <img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=300&h=200&fit=crop&q=80"
+                     alt="Dadinhos de Tapioca" class="menu-item-image"
+                     onerror="this.onerror=null;this.src='https://placehold.co/300x200/FBBF24/333333?text=Dadinhos';">
+                <div class="menu-item-details">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="text-lg font-semibold text-gray-800">Dadinhos de Tapioca</h3>
+                        <span class="price">R$ 30,00</span>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-3 leading-relaxed">
+                        Cubinhos dourados de tapioca com queijo coalho, acompanhados de geleia de pimenta artesanal.
+                    </p>
+                    <div class="item-counter">
+                        <button class="counter-btn" onclick="decrementItem('dadinhos')">−</button>
+                        <span class="font-semibold text-lg min-w-[20px] text-center" id="dadinhos-count">0</span>
+                        <button class="counter-btn" onclick="incrementItem('dadinhos')">+</button>
+                    </div>
+                </div>
+            </div>
+            <div class="menu-item" data-item-id="carpaccio">
+                <img src="https://images.unsplash.com/photo-1594212699903-ec8a3eca50f5?w=300&h=200&fit=crop&q=80"
+                     alt="Carpaccio de Carne" class="menu-item-image"
+                     onerror="this.onerror=null;this.src='https://placehold.co/300x200/FBBF24/333333?text=Carpaccio';">
+                <div class="menu-item-details">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="text-lg font-semibold text-gray-800">Carpaccio de Carne</h3>
+                        <span class="price">R$ 35,00</span>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-3 leading-relaxed">
+                        Finas fatias de carne premium, molho de alcaparras, mostarda dijon e lascas de parmesão.
+                    </p>
+                    <div class="item-counter">
+                        <button class="counter-btn" onclick="decrementItem('carpaccio')">−</button>
+                        <span class="font-semibold text-lg min-w-[20px] text-center" id="carpaccio-count">0</span>
+                        <button class="counter-btn" onclick="incrementItem('carpaccio')">+</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pratos Principais Section -->
+        <section id="pratos-principais" class="menu-category mb-10 fade-in">
+            <h2 class="text-gray-800">🍽️ Pratos Principais</h2>
+            <div class="menu-item" data-item-id="file-mignon">
+                <img src="https://images.unsplash.com/photo-1558030006-450675393462?w=300&h=200&fit=crop&q=80"
+                     alt="Filé Mignon ao Molho Madeira" class="menu-item-image"
+                     onerror="this.onerror=null;this.src='https://placehold.co/300x200/FBBF24/333333?text=Filé+Mignon';">
+                <div class="menu-item-details">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="text-lg font-semibold text-gray-800">Filé Mignon ao Molho Madeira</h3>
+                        <span class="price">R$ 75,00</span>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-3 leading-relaxed">
+                        Corte nobre grelhado ao ponto, molho madeira encorpado, arroz à piamontese e batatas noisette.
+                    </p>
+                    <div class="item-counter">
+                        <button class="counter-btn" onclick="decrementItem('file-mignon')">−</button>
+                        <span class="font-semibold text-lg min-w-[20px] text-center" id="file-mignon-count">0</span>
+                        <button class="counter-btn" onclick="incrementItem('file-mignon')">+</button>
+                    </div>
+                </div>
+            </div>
+            <div class="menu-item" data-item-id="salmao">
+                <img src="https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=300&h=200&fit=crop&q=80"
+                     alt="Salmão Grelhado" class="menu-item-image"
+                     onerror="this.onerror=null;this.src='https://placehold.co/300x200/FBBF24/333333?text=Salmão';">
+                <div class="menu-item-details">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="text-lg font-semibold text-gray-800">Salmão Grelhado com Legumes</h3>
+                        <span class="price">R$ 80,00</span>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-3 leading-relaxed">
+                        Salmão fresco grelhado na manteiga de ervas finas, servido com mix de legumes salteados.
+                    </p>
+                    <div class="item-counter">
+                        <button class="counter-btn" onclick="decrementItem('salmao')">−</button>
+                        <span class="font-semibold text-lg min-w-[20px] text-center" id="salmao-count">0</span>
+                        <button class="counter-btn" onclick="incrementItem('salmao')">+</button>
+                    </div>
+                </div>
+            </div>
+            <div class="menu-item" data-item-id="risoto">
+                <img src="https://images.unsplash.com/photo-1563379091339-03246963d51a?w=300&h=200&fit=crop&q=80"
+                     alt="Risoto de Camarão" class="menu-item-image"
+                     onerror="this.onerror=null;this.src='https://placehold.co/300x200/FBBF24/333333?text=Risoto';">
+                <div class="menu-item-details">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="text-lg font-semibold text-gray-800">Risoto de Camarão</h3>
+                        <span class="price">R$ 85,00</span>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-3 leading-relaxed">
+                        Arroz arbóreo cremoso com camarões frescos, tomate cereja confitado e toque de limão siciliano.
+                    </p>
+                    <div class="item-counter">
+                        <button class="counter-btn" onclick="decrementItem('risoto')">−</button>
+                        <span class="font-semibold text-lg min-w-[20px] text-center" id="risoto-count">0</span>
+                        <button class="counter-btn" onclick="incrementItem('risoto')">+</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sobremesas Section -->
+        <section id="sobremesas" class="menu-category mb-10 fade-in">
+            <h2 class="text-gray-800">🍰 Sobremesas</h2>
+            <div class="menu-item" data-item-id="pudim">
+                <img src="https://images.unsplash.com/photo-1551024506-0bccd828d307?w=300&h=200&fit=crop&q=80"
+                     alt="Pudim de Leite Condensado" class="menu-item-image"
+                     onerror="this.onerror=null;this.src='https://placehold.co/300x200/FBBF24/333333?text=Pudim';">
+                <div class="menu-item-details">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="text-lg font-semibold text-gray-800">Pudim de Leite Condensado</h3>
+                        <span class="price">R$ 20,00</span>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-3 leading-relaxed">
+                        Tradicional pudim caseiro com calda de caramelo dourada e textura sedosa.
+                    </p>
+                    <div class="item-counter">
+                        <button class="counter-btn" onclick="decrementItem('pudim')">−</button>
+                        <span class="font-semibold text-lg min-w-[20px] text-center" id="pudim-count">0</span>
+                        <button class="counter-btn" onclick="incrementItem('pudim')">+</button>
+                    </div>
+                </div>
+            </div>
+            <div class="menu-item" data-item-id="petit-gateau">
+                <img src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=300&h=200&fit=crop&q=80"
+                     alt="Petit Gateau" class="menu-item-image"
+                     onerror="this.onerror=null;this.src='https://placehold.co/300x200/FBBF24/333333?text=Petit+Gateau';">
+                <div class="menu-item-details">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="text-lg font-semibold text-gray-800">Petit Gateau</h3>
+                        <span class="price">R$ 28,00</span>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-3 leading-relaxed">
+                        Bolinho de chocolate belga com recheio cremoso quente, acompanhado de sorvete artesanal.
+                    </p>
+                    <div class="item-counter">
+                        <button class="counter-btn" onclick="decrementItem('petit-gateau')">−</button>
+                        <span class="font-semibold text-lg min-w-[20px] text-center" id="petit-gateau-count">0</span>
+                        <button class="counter-btn" onclick="incrementItem('petit-gateau')">+</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Bebidas Section -->
+        <section id="bebidas" class="menu-category mb-20 fade-in">
+            <h2 class="text-gray-800">🥤 Bebidas</h2>
+            <div class="grid gap-4 sm:grid-cols-1">
+                <div class="menu-item" data-item-id="agua">
+                    <div class="menu-item-details">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-lg font-semibold text-gray-800">Água Mineral</h3>
+                            <span class="price">R$ 6,00</span>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-3">Com ou sem gás - 500ml</p>
+                        <div class="item-counter">
+                            <button class="counter-btn" onclick="decrementItem('agua')">−</button>
+                            <span class="font-semibold text-lg min-w-[20px] text-center" id="agua-count">0</span>
+                            <button class="counter-btn" onclick="incrementItem('agua')">+</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="menu-item" data-item-id="refrigerante">
+                    <div class="menu-item-details">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-lg font-semibold text-gray-800">Refrigerante Lata</h3>
+                            <span class="price">R$ 8,00</span>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-3">Coca-Cola, Guaraná, Sprite - 350ml</p>
+                        <div class="item-counter">
+                            <button class="counter-btn" onclick="decrementItem('refrigerante')">−</button>
+                            <span class="font-semibold text-lg min-w-[20px] text-center" id="refrigerante-count">0</span>
+                            <button class="counter-btn" onclick="incrementItem('refrigerante')">+</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="menu-item" data-item-id="suco">
+                    <div class="menu-item-details">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-lg font-semibold text-gray-800">Suco Natural</h3>
+                            <span class="price">R$ 12,00</span>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-3">Laranja, Limão, Abacaxi com Hortelã - 400ml</p>
+                        <div class="item-counter">
+                            <button class="counter-btn" onclick="decrementItem('suco')">−</button>
+                            <span class="font-semibold text-lg min-w-[20px] text-center" id="suco-count">0</span>
+                            <button class="counter-btn" onclick="incrementItem('suco')">+</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div class="floating-nav">
+        <!-- Cart/Orders Button -->
+        <button class="nav-button cart-orders-button" onclick="openCartOrdersModal()">
+            <i class="fas fa-shopping-cart text-xl"></i>
+        </button>
+    </div>
+
+    <!-- Cart / Order History Modal -->
+    <div id="cartOrdersModalBackdrop" class="modal-backdrop" onclick="closeCartOrdersModal()"></div>
+    <div id="cartOrdersModal" class="modal-content">
+        <div class="modal-header">
+            <h3 class="text-xl font-semibold text-gray-800" id="cartOrdersModalTitle">Seu Pedido</h3>
+            <button class="text-gray-500 hover:text-gray-700 text-2xl" onclick="closeCartOrdersModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="tab-buttons">
+                <button class="tab-button active" onclick="showTab('cartTab', this)">Carrinho</button>
+                <button class="tab-button" onclick="showTab('ordersTab', this)">Meus Pedidos</button>
+            </div>
+
+            <div id="cartTab" class="tab-content active">
+                <div id="cartItemsContainer" class="mb-4">
+                    <!-- Cart items will be rendered here -->
+                </div>
+                <div id="cartEmptyMessage" class="text-center text-gray-500 py-8" style="display: none;">
+                    Seu carrinho está vazio. Adicione alguns itens!
+                </div>
+                <div class="flex justify-between items-center border-t border-gray-200 pt-4 mt-4">
+                    <span class="text-lg font-semibold text-gray-800">Total:</span>
+                    <span class="text-xl font-bold price" id="cartTotalPrice">R$ 0,00</span>
+                </div>
+                <!-- Pre-order Info Form -->
+                <form id="preOrderForm" class="mt-6">
+                    <h4 class="text-lg font-semibold text-gray-800 mb-4">Informações para o Pedido</h4>
+                    <div class="form-group">
+                        <label for="customer-name">Seu Nome:</label>
+                        <input type="text" id="customer-name" placeholder="Nome Completo" required>
+                        <p id="name-error" class="form-error-message" style="display: none;">Por favor, digite seu nome.</p>
+                    </div>
+                    <div class="form-group">
+                        <label for="customer-phone">Telefone (WhatsApp):</label>
+                        <input type="text" id="customer-phone" placeholder="(XX) XXXXX-XXXX" required>
+                        <p id="phone-error" class="form-error-message" style="display: none;">Por favor, digite seu telefone.</p>
+                    </div>
+                    <div class="form-group">
+                        <label>Tipo de Pedido:</label>
+                        <div class="radio-group flex gap-4">
+                            <label><input type="radio" name="order-type" value="delivery" checked> Delivery</label>
+                            <label><input type="radio" name="order-type" value="table-order"> Pedido na Mesa</label>
+                        </div>
+                    </div>
+                    <div class="form-group" id="table-number-group">
+                        <label for="table-number">Número da Mesa:</label>
+                        <input type="number" id="table-number" placeholder="Ex: 5" min="1">
+                        <p id="table-error" class="form-error-message" style="display: none;">Por favor, digite o número da mesa.</p>
+                    </div>
+                    <div class="form-group">
+                        <label for="customer-notes">Observações:</label>
+                        <textarea id="customer-notes" rows="3" placeholder="Ex: Sem cebola, ponto da carne mal passado, etc."></textarea>
+                    </div>
+                </form>
+            </div>
+
+            <div id="ordersTab" class="tab-content">
+                <div id="orderHistoryContainer">
+                    <!-- Order history will be rendered here -->
+                </div>
+                <div id="ordersEmptyMessage" class="text-center text-gray-500 py-8" style="display: none;">
+                    Você ainda não fez nenhum pedido.
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="bg-gray-300 text-gray-800 font-semibold py-3 px-6 rounded-xl hover:bg-gray-400 transition" onclick="closeCartOrdersModal()">Continuar Comprando</button>
+            <button id="placeOrderButton" class="bg-yellow-500 text-white font-semibold py-3 px-6 rounded-xl hover:bg-yellow-600 transition disabled:opacity-50 disabled:cursor-not-allowed" onclick="placeOrder()">Finalizar Pedido</button>
+        </div>
+    </div>
+
+    <!-- Admin Login Modal -->
+    <div id="adminLoginModalBackdrop" class="modal-backdrop" onclick="closeAdminLoginModal()"></div>
+    <div id="adminLoginModal" class="modal-content">
+        <div class="modal-header">
+            <h3 class="text-xl font-semibold text-gray-800">Login Administrativo</h3>
+            <button class="text-gray-500 hover:text-gray-700 text-2xl" onclick="closeAdminLoginModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form id="adminLoginForm">
+                <div class="form-group">
+                    <label for="admin-username">Nome de Usuário:</label>
+                    <input type="text" id="admin-username" placeholder="admin" required>
+                    <p id="admin-username-error" class="form-error-message" style="display: none;"></p>
+                </div>
+                <div class="form-group">
+                    <label for="admin-password">Senha:</label>
+                    <input type="password" id="admin-password" placeholder="Sua senha" required>
+                    <p id="admin-password-error" class="form-error-message" style="display: none;"></p>
+                </div>
+                <p id="admin-login-error" class="form-error-message text-center" style="display: none;"></p>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="bg-gray-300 text-gray-800 font-semibold py-3 px-6 rounded-xl hover:bg-gray-400 transition" onclick="closeAdminLoginModal()">Cancelar</button>
+            <button class="bg-blue-600 text-white font-semibold py-3 px-6 rounded-xl hover:bg-blue-700 transition" onclick="adminLogin()">Login</button>
+        </div>
+    </div>
+
+    <!-- Admin Options Modal - Novo modal para as opções -->
+    <div id="adminOptionsModalBackdrop" class="modal-backdrop" onclick="closeAdminOptionsModal()"></div>
+    <div id="adminOptionsModal" class="modal-content">
+        <div class="modal-header">
+            <h3 class="text-xl font-semibold text-gray-800">Opções Administrativas</h3>
+            <button class="text-gray-500 hover:text-gray-700 text-2xl" onclick="closeAdminOptionsModal()">&times;</button>
+        </div>
+        <div class="modal-body flex flex-col items-center justify-center space-y-6 py-10">
+        
+            <a href="./editaCardapio.html" ><button class="w-4/5 max-w-xs px-6 py-4 rounded-lg bg-yellow-500 text-white font-semibold text-lg hover:bg-yellow-600 transition duration-200 shadow-md"
+                    onclick="alert('Funcionalidade de Edição de Cardápio não implementada ainda.'); closeAdminOptionsModal();">
+                Editar Cardápio
+            </button></a>
+
+            <button class="w-4/5 max-w-xs px-6 py-4 rounded-lg bg-green-500 text-white font-semibold text-lg hover:bg-green-600 transition duration-200 shadow-md"
+                    onclick="closeAdminOptionsModal(); openAdminPanelModal();">
+                Gerenciar Pedidos
+            </button>
+        </div>        
+    </div>
+
+    <!-- Admin Panel Modal (agora dedicado ao gerenciamento de pedidos) -->
+    <div id="adminPanelModalBackdrop" class="modal-backdrop" onclick="closeAdminPanelModal()"></div>
+    <div id="adminPanelModal" class="modal-content">
+        <div class="modal-header">
+            <h3 class="text-xl font-semibold text-gray-800">Painel Administrativo: Gerenciar Pedidos</h3>
+            <button class="text-gray-500 hover:text-gray-700 text-2xl" onclick="closeAdminPanelModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <h4 class="text-lg font-semibold text-gray-800 mb-4">Pedidos em Aberto</h4>
+            <div id="adminOrdersContainer">
+                <!-- Admin orders will be rendered here -->
+                <div id="adminOrdersEmptyMessage" class="text-center text-gray-500 py-8" style="display: none;">
+                    Não há pedidos em aberto.
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="bg-red-600 text-white font-semibold py-3 px-6 rounded-xl hover:bg-red-700 transition" onclick="adminLogout()">Sair</button>
+            <button class="bg-gray-300 text-gray-800 font-semibold py-3 px-6 rounded-xl hover:bg-gray-400 transition" onclick="closeAdminPanelModal()">Fechar</button>
+        </div>
+    </div>
+
+    <!-- Payment Options Modal -->
+    <div id="paymentModalBackdrop" class="modal-backdrop" onclick="closePaymentOptionsModal()"></div>
+    <div id="paymentModal" class="modal-content">
+        <div class="modal-header">
+            <h3 class="text-xl font-semibold text-gray-800">Escolha a Forma de Pagamento</h3>
+            <button class="text-gray-500 hover:text-gray-700 text-2xl" onclick="closePaymentOptionsModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p class="text-center text-lg mb-6">Total do Pedido: <span id="payment-total-price" class="font-bold price">R$ 0,00</span></p>
+
+            <div class="flex flex-col sm:flex-row gap-4 mb-6">
+                <button class="flex-1 px-6 py-4 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold shadow-lg hover:from-purple-600 hover:to-pink-600 transition" onclick="selectPaymentMethod('pix')">
+                    Pagar com Pix
+                </button>
+                <button class="flex-1 px-6 py-4 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-semibold shadow-lg hover:from-blue-600 hover:to-indigo-700 transition" onclick="selectPaymentMethod('card')">
+                    Pagar com Cartão
+                </button>
+            </div>
+
+            <div id="payment-details-container" class="mt-4 p-4 bg-gray-50 border border-gray-200 rounded-lg text-center" style="display: none;">
+                <div id="pix-info" style="display: none;">
+                    <p class="text-gray-700 font-medium mb-4">Escaneie o QR Code ou use a chave Pix abaixo para pagar:</p>
+                    <img src="https://placehold.co/200x200/4F46E5/FFFFFF?text=QR+Code+Pix" alt="QR Code Pix" class="mx-auto my-4 rounded-lg">
+                    <p class="font-mono text-gray-800 bg-gray-100 p-3 rounded-md inline-block select-all cursor-pointer" onclick="copyPixKey()">
+                        Chave Pix Aleatória: <span id="pix-key">a1b2c3d4-e5f6-7890-1234-567890abcdef</span>
+                    </p>
+                    <p class="text-sm text-gray-500 mt-2">Clique na chave para copiar.</p>
+                    <div id="copy-feedback" class="text-green-600 mt-2 font-semibold" style="display: none;">Copiado!</div>
+                </div>
+                <div id="card-info" style="display: none;">
+                    <p class="text-gray-700 font-medium">Você será redirecionado para o terminal de pagamento para finalizar com cartão.</p>
+                    <p class="text-sm text-gray-500 mt-2">Por favor, siga as instruções na tela do terminal.</p>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer justify-center">
+            <button class="px-6 py-3 rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 text-white font-semibold shadow-lg hover:from-green-600 hover:to-emerald-700 transition" onclick="confirmPayment()">Confirmar Pagamento</button>
+            <button class="px-6 py-3 rounded-xl bg-gray-200 text-gray-700 font-semibold hover:bg-gray-300 transition" onclick="closePaymentOptionsModal()">Cancelar Pagamento</button>
+        </div>
+    </div>
+
+
+    <footer class="mt-12">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>Contato</h3>
+                <p>Email: contato@restaurante.com</p>
+                <p>Telefone: (XX) XXXX-XXXX</p>
+                <p>Endereço: Rua do Sabor, 123, Cidade Gastronômica</p>
+            </div>
+            <div class="footer-section">
+                <h3>Horário de Funcionamento</h3>
+                <p>Ter - Dom: 18h00 - 23h00</p>
+                <p>Segunda-feira: Fechado</p>
+            </div>
+            <div class="footer-section">
+                <h3>Siga-nos</h3>
+                <div class="social-icons mt-3">
+                    <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                </div>
+            </div>
+        </div>
+        <p class="mt-8 text-sm text-gray-500">&copy; 2025 Restaurante Sabor & Arte. Todos os direitos reservados.</p>
+        <a href="#" class="admin-footer-link" onclick="openAdminPanel()">Área Administrativa</a>
+    </footer>
+
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, addDoc, setDoc, updateDoc, deleteDoc, onSnapshot, collection, query, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Firebase Configuration (provided by the environment or placeholders for local development)
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'cardapio-digital-local'; // Placeholder ID for local
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+            apiKey: "YOUR_API_KEY", // Substitua pelo seu API Key do Firebase
+            authDomain: "YOUR_PROJECT_ID.firebaseapp.com", // Substitua pelo seu Auth Domain do Firebase
+            projectId: "YOUR_PROJECT_ID", // Substitua pelo seu Project ID do Firebase
+            storageBucket: "YOUR_PROJECT_ID.appspot.com", // Substitua pelo seu Storage Bucket do Firebase
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID", // Substitua pelo seu Messaging Sender ID do Firebase
+            appId: "YOUR_APP_ID" // Substitua pelo seu App ID do Firebase
+        }; 
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null; // Placeholder token for local
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        let currentUserId = null;
+        let isAdmin = false; // Flag to check admin status
+        let currentOrderTotal = 0; // To store the total for payment modal
+
+        // Authenticate user
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                // User is signed in.
+                currentUserId = user.uid;
+                console.log("Usuário logado:", currentUserId);
+
+                // No longer checking admin status based on Firebase email here for the admin panel login
+                // Admin status for the panel is now handled by the hardcoded check in adminLogin()
+                // This block primarily ensures regular Firebase users are logged in and their data loaded.
+                loadCart();
+                loadOrderHistory();
+                if (isAdmin) { // Only load admin orders if already determined as admin by hardcoded login
+                    loadAdminOrders();
+                }
+            } else {
+                // User is signed out. Sign in anonymously if not initial auth token
+                if (initialAuthToken) { 
+                    try {
+                        await signInWithCustomToken(auth, initialAuthToken);
+                    } catch (error) {
+                        console.error("Erro ao autenticar com token customizado:", error);
+                        // Fallback to anonymous if custom token fails
+                        await signInAnonymously(auth);
+                    }
+                } else {
+                    await signInAnonymously(auth);
+                }
+                currentUserId = auth.currentUser?.uid || crypto.randomUUID(); // Fallback if still no user
+                console.log("Usuário logado anonimamente:", currentUserId);
+                isAdmin = false; // Ensure admin flag is false for anonymous users
+                loadCart(); // Load cart for anonymous users
+                loadOrderHistory(); // Load order history for anonymous users
+            }
+        });
+
+        // Global items and cart state
+        const menuItems = {
+            'bruschetta': { name: 'Bruschetta Clássica', price: 25.00 },
+            'dadinhos': { name: 'Dadinhos de Tapioca', price: 30.00 },
+            'carpaccio': { name: 'Carpaccio de Carne', price: 35.00 },
+            'file-mignon': { name: 'Filé Mignon ao Molho Madeira', price: 75.00 },
+            'salmao': { name: 'Salmão Grelhado com Legumes', price: 80.00 },
+            'risoto': { name: 'Risoto de Camarão', price: 85.00 },
+            'pudim': { name: 'Pudim de Leite Condensado', price: 20.00 },
+            'petit-gateau': { name: 'Petit Gateau', price: 28.00 },
+            'agua': { name: 'Água Mineral', price: 6.00 },
+            'refrigerante': { name: 'Refrigerante Lata', price: 8.00 },
+            'suco': { name: 'Suco Natural', price: 12.00 } // Adicionado item 'suco'
+        };
+
+        let cart = {}; // { itemId: quantity }
+
+        // --- Utility Functions ---
+
+        // Function to safely access DOM elements
+        function getElement(id) {
+            const element = document.getElementById(id);
+            if (!element) {
+                console.error(`Element with ID '${id}' not found.`);
+            }
+            return element;
+        }
+
+        // Function to format currency
+        function formatCurrency(value) {
+            return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        }
+
+        // --- Menu Item Quantity Management ---
+
+        window.updateItemCount = function(itemId) {
+            const countSpan = getElement(`${itemId}-count`);
+            if (countSpan) {
+                countSpan.textContent = cart[itemId] || 0;
+            }
+        }
+
+        window.incrementItem = function(itemId) {
+            cart[itemId] = (cart[itemId] || 0) + 1;
+            updateItemCount(itemId);
+            saveCart();
+            renderCartItems(); // Update cart modal when quantity changes
+        }
+
+        window.decrementItem = function(itemId) {
+            if (cart[itemId] && cart[itemId] > 0) {
+                cart[itemId]--;
+                if (cart[itemId] === 0) {
+                    delete cart[itemId];
+                }
+                updateItemCount(itemId);
+                saveCart();
+                renderCartItems(); // Update cart modal when quantity changes
+            }
+        }
+
+        // --- Firebase Cart Management ---
+
+        function saveCart() {
+            if (currentUserId) {
+                 // Save cart to user-specific private data in Firestore
+                 const userDocRef = doc(db, `artifacts/${appId}/users/${currentUserId}/data/cart`);
+                 setDoc(userDocRef, { items: JSON.stringify(cart) })
+                     .then(() => console.log("Carrinho salvo no Firestore com sucesso!"))
+                     .catch(error => console.error("Erro ao salvar carrinho no Firestore:", error));
+            } else {
+                console.warn("currentUserId não definido. Não foi possível salvar o carrinho no Firestore.");
+                // Fallback for unexpected cases (shouldn't happen with anonymous auth)
+                localStorage.setItem('userCart', JSON.stringify(cart));
+                console.log("Carrinho salvo no Local Storage (fallback).");
+            }
+        }
+
+        function loadCart() {
+             if (currentUserId) {
+                const userDocRef = doc(db, `artifacts/${appId}/users/${currentUserId}/data/cart`);
+                onSnapshot(userDocRef, (docSnap) => {
+                    if (docSnap.exists() && docSnap.data().items) {
+                        try {
+                            cart = JSON.parse(docSnap.data().items);
+                            console.log("Carrinho carregado do Firestore:", cart);
+                        } catch (e) {
+                            console.error("Erro ao parsear carrinho do Firestore:", e);
+                            cart = {};
+                        }
+                    } else {
+                        cart = {}; // Initialize empty cart if no data
+                        console.log("Nenhum carrinho encontrado no Firestore, iniciando vazio.");
+                    }
+                    // Update all item counts on the page and render cart
+                    Object.keys(menuItems).forEach(updateItemCount);
+                    renderCartItems();
+                }, (error) => {
+                    console.error("Erro ao carregar carrinho do Firestore:", error);
+                    // Fallback to local storage if Firestore fails
+                    const storedCart = localStorage.getItem('userCart');
+                    if (storedCart) {
+                        cart = JSON.parse(storedCart);
+                    } else {
+                        cart = {};
+                    }
+                    Object.keys(menuItems).forEach(updateItemCount);
+                    renderCartItems();
+                });
+            } else {
+                // This block should ideally not be reached if anonymous auth works
+                const storedCart = localStorage.getItem('userCart');
+                if (storedCart) {
+                    cart = JSON.parse(storedCart);
+                } else {
+                    cart = {};
+                }
+                Object.keys(menuItems).forEach(updateItemCount);
+                renderCartItems();
+            }
+        }
+
+        // --- Scroll and Category Navigation ---
+
+        window.scrollToSection = function(id, button) {
+            const section = getElement(id);
+            if (section) {
+                section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                // Update active state for category buttons
+                document.querySelectorAll('.category-button').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                button.classList.add('active');
+            }
+        }
+
+        // --- Modals (Cart/Orders, Admin Login, Admin Panel, Admin Options, Payment) ---
+
+        function showModal(modalId) {
+            const backdrop = getElement(`${modalId}Backdrop`);
+            const modal = getElement(modalId);
+            if (backdrop && modal) {
+                backdrop.classList.add('show');
+                modal.classList.add('show');
+                document.body.style.overflow = 'hidden'; // Prevent scrolling background
+            }
+        }
+
+        function hideModal(modalId) {
+            const backdrop = getElement(`${modalId}Backdrop`);
+            const modal = getElement(modalId);
+            if (backdrop && modal) {
+                backdrop.classList.remove('show');
+                modal.classList.remove('show');
+                // Allow some delay for animation before removing overflow hidden
+                setTimeout(() => {
+                    if (!document.querySelector('.modal-backdrop.show')) {
+                        document.body.style.overflow = '';
+                    }
+                }, 300);
+            }
+        }
+
+        // Cart/Orders Modal functions
+        window.openCartOrdersModal = function() {
+            renderCartItems();
+            loadOrderHistory(); // Ensure order history is loaded when modal opens
+            showModal('cartOrdersModal');
+        }
+
+        window.closeCartOrdersModal = function() {
+            hideModal('cartOrdersModal');
+        }
+
+        window.showTab = function(tabId, button) {
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            getElement(tabId).classList.add('active');
+            button.classList.add('active');
+
+            if (tabId === 'cartTab') {
+                getElement('cartOrdersModalTitle').textContent = 'Seu Pedido';
+                getElement('placeOrderButton').style.display = 'inline-block'; // Show place order button
+                getElement('preOrderForm').style.display = 'block'; // Show form
+            } else {
+                getElement('cartOrdersModalTitle').textContent = 'Meus Pedidos';
+                getElement('placeOrderButton').style.display = 'none'; // Hide place order button
+                getElement('preOrderForm').style.display = 'none'; // Hide form
+            }
+        }
+
+        // Admin Login Modal functions
+        window.openAdminLoginModal = function() {
+            // Clear any previous errors
+            getElement('admin-username-error').style.display = 'none';
+            getElement('admin-password-error').style.display = 'none';
+            getElement('admin-login-error').style.display = 'none';
+            // Clear input fields
+            getElement('admin-username').value = '';
+            getElement('admin-password').value = '';
+            showModal('adminLoginModal');
+        }
+
+        window.closeAdminLoginModal = function() {
+            hideModal('adminLoginModal');
+        }
+
+        // Admin Options Modal functions (NEW)
+        window.openAdminOptionsModal = function() {
+            showModal('adminOptionsModal');
+        }
+
+        window.closeAdminOptionsModal = function() {
+            hideModal('adminOptionsModal');
+        }
+
+        // Admin Panel Modal functions (now specifically for managing orders)
+        window.openAdminPanelModal = function() {
+            loadAdminOrders(); // Always load latest orders when opening admin panel
+            showModal('adminPanelModal');
+        }
+
+        window.closeAdminPanelModal = function() {
+            hideModal('adminPanelModal');
+        }
+
+        // Payment Options Modal Functions
+        window.openPaymentOptionsModal = function(total) {
+            currentOrderTotal = total;
+            getElement('payment-total-price').textContent = formatCurrency(currentOrderTotal);
+            
+            // Hide payment details container by default when opening
+            getElement('payment-details-container').style.display = 'none';
+            getElement('pix-info').style.display = 'none';
+            getElement('card-info').style.display = 'none';
+            getElement('copy-feedback').style.display = 'none'; // Hide copy feedback
+
+            showModal('paymentModal');
+        }
+
+        window.closePaymentOptionsModal = function() {
+            hideModal('paymentModal');
+        }
+
+        window.selectPaymentMethod = function(method) {
+            const paymentDetailsContainer = getElement('payment-details-container');
+            const pixInfo = getElement('pix-info');
+            const cardInfo = getElement('card-info');
+            const copyFeedback = getElement('copy-feedback');
+
+            paymentDetailsContainer.style.display = 'block'; // Show the container for details
+            pixInfo.style.display = 'none';
+            cardInfo.style.display = 'none';
+            copyFeedback.style.display = 'none'; // Hide copy feedback when changing method
+
+            if (method === 'pix') {
+                pixInfo.style.display = 'block';
+            } else if (method === 'card') {
+                cardInfo.style.display = 'block';
+            }
+        }
+
+        window.copyPixKey = function() {
+            const pixKeySpan = getElement('pix-key');
+            const pixKey = pixKeySpan.textContent;
+            const copyFeedback = getElement('copy-feedback');
+
+            // Using document.execCommand('copy') for better compatibility in iframes
+            const tempInput = document.createElement('textarea');
+            tempInput.value = pixKey;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+
+            copyFeedback.style.display = 'block'; // Show copied feedback
+            setTimeout(() => {
+                copyFeedback.style.display = 'none'; // Hide after a delay
+            }, 2000);
+        }
+
+        window.confirmPayment = async function() {
+            // Here you would integrate with a real payment gateway
+            // For now, we'll just simulate a successful payment and proceed with order placement
+            alert("Pagamento confirmado! O seu pedido está a ser processado.");
+            
+            // Proceed with saving the order after "payment" is confirmed
+            // We'll call the original placeOrder logic here, but without re-validating form fields
+            // as it's assumed validation was done before opening payment modal.
+
+            const customerName = getElement('customer-name').value.trim();
+            const customerPhone = getElement('customer-phone').value.trim();
+            const orderType = document.querySelector('input[name="order-type"]:checked').value;
+            const tableNumber = getElement('table-number').value.trim();
+            const customerNotes = getElement('customer-notes').value.trim();
+
+            const orderItems = [];
+            for (const itemId in cart) {
+                const quantity = cart[itemId];
+                if (quantity > 0 && menuItems[itemId]) {
+                    const item = menuItems[itemId];
+                    orderItems.push({
+                        id: itemId,
+                        name: item.name,
+                        price: item.price,
+                        quantity: quantity,
+                        subtotal: item.price * quantity
+                    });
+                }
+            }
+            
+            const orderData = {
+                customerId: currentUserId, // Store the Firebase UID
+                customerName: customerName,
+                customerPhone: customerPhone,
+                orderType: orderType,
+                tableNumber: orderType === 'table-order' ? tableNumber : null,
+                notes: customerNotes,
+                items: JSON.stringify(orderItems), // Stringify complex array for Firestore
+                total: currentOrderTotal, // Use the total from the payment modal
+                status: 'Em Espera', // Initial status
+                timestamp: serverTimestamp() // Firestore server timestamp
+            };
+
+            try {
+                const docRef = await addDoc(collection(db, `artifacts/${appId}/public/data/orders`), orderData);
+                console.log("Pedido salvo com ID:", docRef.id);
+
+                cart = {};
+                saveCart(); 
+                Object.keys(menuItems).forEach(updateItemCount); 
+
+                showTab('ordersTab', document.querySelector('.tab-button:nth-child(2)'));
+                closeCartOrdersModal(); 
+                closePaymentOptionsModal(); // Close payment modal
+                alert("Pedido realizado com sucesso! Você pode acompanhar o status em 'Meus Pedidos'.");
+
+            } catch (e) {
+                console.error("Erro ao salvar o pedido após pagamento:", e);
+                alert("Erro ao finalizar o pedido. Por favor, tente novamente.");
+            } finally {
+                // Ensure placeOrderButton is re-enabled if it was disabled before payment
+                getElement('placeOrderButton').disabled = false;
+            }
+        }
+
+
+        // --- Cart Rendering and Total Calculation ---
+
+        function renderCartItems() {
+            const container = getElement('cartItemsContainer');
+            if (!container) return;
+
+            container.innerHTML = ''; // Clear previous items
+            let total = 0;
+            let hasItems = false;
+
+            for (const itemId in cart) {
+                const quantity = cart[itemId];
+                if (quantity > 0 && menuItems[itemId]) {
+                    hasItems = true;
+                    const item = menuItems[itemId];
+                    const itemSubtotal = item.price * quantity;
+                    total += itemSubtotal;
+
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = 'cart-item';
+                    itemDiv.innerHTML = `
+                        <div class="cart-item-details">
+                            <div class="cart-item-name">${item.name}</div>
+                            <div class="cart-item-price-unit">${formatCurrency(item.price)} cada</div>
+                        </div>
+                        <div class="cart-item-actions">
+                            <button class="counter-btn" onclick="decrementItemInCart('${itemId}')">−</button>
+                            <span class="cart-item-quantity">${quantity}</span>
+                            <button class="counter-btn" onclick="incrementItemInCart('${itemId}')">+</button>
+                            <button class="remove-item-btn" onclick="removeItemFromCart('${itemId}')">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </div>
+                        <span class="cart-item-subtotal">${formatCurrency(itemSubtotal)}</span>
+                    `;
+                    container.appendChild(itemDiv);
+                }
+            }
+
+            getElement('cartTotalPrice').textContent = formatCurrency(total);
+
+            // Show/hide empty message
+            const cartEmptyMessage = getElement('cartEmptyMessage');
+            const placeOrderButton = getElement('placeOrderButton');
+            if (hasItems) {
+                cartEmptyMessage.style.display = 'none';
+                placeOrderButton.disabled = false;
+            } else {
+                cartEmptyMessage.style.display = 'block';
+                placeOrderButton.disabled = true;
+            }
+        }
+
+        // Functions to update cart from within the modal
+        window.incrementItemInCart = function(itemId) {
+            incrementItem(itemId);
+        }
+
+        window.decrementItemInCart = function(itemId) {
+            decrementItem(itemId);
+        }
+
+        window.removeItemFromCart = function(itemId) {
+            delete cart[itemId];
+            saveCart();
+            updateItemCount(itemId); // Update the count on the main menu page
+            renderCartItems();
+        }
+
+        // --- Order Placement ---
+
+        // Event listener for order type radio buttons
+        document.addEventListener('DOMContentLoaded', () => {
+            const orderTypeRadios = document.querySelectorAll('input[name="order-type"]');
+            const tableNumberGroup = getElement('table-number-group');
+
+            orderTypeRadios.forEach(radio => {
+                radio.addEventListener('change', (event) => {
+                    if (event.target.value === 'table-order') {
+                        tableNumberGroup.style.display = 'block';
+                        getElement('table-number').setAttribute('required', 'required');
+                    } else {
+                        tableNumberGroup.style.display = 'none';
+                        getElement('table-number').removeAttribute('required');
+                    }
+                });
+            });
+
+            // Trigger change for default checked radio on load
+            const defaultOrderTypeRadio = document.querySelector('input[name="order-type"]:checked');
+            if (defaultOrderTypeRadio) {
+                defaultOrderTypeRadio.dispatchEvent(new Event('change'));
+            }
+        });
+
+
+        window.placeOrder = async function() {
+            const customerName = getElement('customer-name').value.trim();
+            const customerPhone = getElement('customer-phone').value.trim();
+            const orderType = document.querySelector('input[name="order-type"]:checked').value;
+            const tableNumber = getElement('table-number').value.trim();
+            const customerNotes = getElement('customer-notes').value.trim();
+
+            // Clear previous errors
+            getElement('name-error').style.display = 'none';
+            getElement('phone-error').style.display = 'none';
+            getElement('table-error').style.display = 'none';
+            getElement('placeOrderButton').disabled = true; // Disable button to prevent double submission
+
+            let isValid = true;
+
+            if (!customerName) {
+                getElement('name-error').style.display = 'block';
+                isValid = false;
+            }
+            if (!customerPhone) {
+                getElement('phone-error').style.display = 'block';
+                isValid = false;
+            }
+            if (orderType === 'table-order' && !tableNumber) {
+                getElement('table-error').style.display = 'block';
+                isValid = false;
+            }
+
+            if (!isValid) {
+                getElement('placeOrderButton').disabled = false; // Re-enable button
+                return;
+            }
+
+            const orderItems = [];
+            let orderTotal = 0;
+            for (const itemId in cart) {
+                const quantity = cart[itemId];
+                if (quantity > 0 && menuItems[itemId]) {
+                    const item = menuItems[itemId];
+                    orderItems.push({
+                        id: itemId,
+                        name: item.name,
+                        price: item.price,
+                        quantity: quantity,
+                        subtotal: item.price * quantity
+                    });
+                    orderTotal += item.price * quantity;
+                }
+            }
+
+            if (orderItems.length === 0) {
+                getElement('placeOrderButton').disabled = false;
+                console.log("Carrinho vazio. Adicione itens antes de finalizar o pedido.");
+                return;
+            }
+
+            // Instead of directly saving the order, open the payment modal
+            // The actual order saving will happen after payment confirmation
+            closeCartOrdersModal(); // Close the cart modal
+            openPaymentOptionsModal(orderTotal); // Open the payment modal with the total
+        }
+
+        // --- Order History (Client View) ---
+
+        function renderOrderHistory(orders) {
+            const container = getElement('orderHistoryContainer');
+            if (!container) return;
+
+            container.innerHTML = '';
+            if (orders.length === 0) {
+                getElement('ordersEmptyMessage').style.display = 'block';
+                return;
+            } else {
+                getElement('ordersEmptyMessage').style.display = 'none';
+            }
+
+            orders.forEach(order => {
+                const orderDiv = document.createElement('div');
+                orderDiv.className = 'order-history-item fade-in';
+                const itemsList = JSON.parse(order.items).map(item => `<li>${item.quantity}x ${item.name} - ${formatCurrency(item.subtotal)}</li>`).join('');
+
+                const orderDate = order.timestamp ? new Date(order.timestamp.toDate()).toLocaleString('pt-BR') : 'Data Indisponível';
+
+                orderDiv.innerHTML = `
+                    <h4>
+                        Pedido #${order.id.substring(0, 6)}
+                        <span class="status-tag status-${order.status.replace(/\s/g, '-')}" style="font-size:0.75rem">${order.status}</span>
+                    </h4>
+                    <p><strong>Cliente:</strong> ${order.customerName}</p>
+                    <p><strong>Telefone:</strong> ${order.customerPhone}</p>
+                    <p><strong>Tipo:</strong> ${order.orderType === 'delivery' ? 'Delivery' : `Mesa ${order.tableNumber}`}</p>
+                    ${order.notes ? `<p><strong>Obs:</strong> ${order.notes}</p>` : ''}
+                    <p><strong>Data:</strong> ${orderDate}</p>
+                    <ul>
+                        ${itemsList}
+                    </ul>
+                    <p class="mt-2 text-right"><strong>Total:</strong> <span class="price">${formatCurrency(order.total)}</span></p>
+                `;
+                container.appendChild(orderDiv);
+            });
+        }
+
+        function loadOrderHistory() {
+            if (!currentUserId) {
+                console.log("Usuário não logado para carregar histórico de pedidos.");
+                getElement('ordersEmptyMessage').style.display = 'block';
+                return;
+            }
+            // Listen for real-time updates on orders specific to this user
+            const ordersCollectionRef = collection(db, `artifacts/${appId}/public/data/orders`);
+            const q = query(ordersCollectionRef, where("customerId", "==", currentUserId));
+
+            onSnapshot(q, (snapshot) => {
+                const orders = [];
+                snapshot.forEach(doc => {
+                    orders.push({ id: doc.id, ...doc.data() });
+                });
+                // Sort orders by timestamp, newest first
+                orders.sort((a, b) => (b.timestamp?.toDate().getTime() || 0) - (a.timestamp?.toDate().getTime() || 0));
+                renderOrderHistory(orders);
+            }, (error) => {
+                console.error("Erro ao carregar histórico de pedidos:", error);
+                getElement('ordersEmptyMessage').style.display = 'block';
+                getElement('ordersEmptyMessage').textContent = 'Erro ao carregar seus pedidos.';
+            });
+        }
+
+        // --- Admin Panel Functions ---
+
+        // openAdminPanel agora SEMPRE abre o modal de login
+        window.openAdminPanel = async function() {
+            openAdminLoginModal();
+        }
+
+        window.adminLogin = async function() {
+            const username = getElement('admin-username').value.trim(); // Obter nome de usuário
+            const password = getElement('admin-password').value.trim();
+            const usernameError = getElement('admin-username-error'); // Erro para nome de usuário
+            const passwordError = getElement('admin-password-error');
+            const loginError = getElement('admin-login-error');
+
+            usernameError.style.display = 'none';
+            passwordError.style.display = 'none';
+            loginError.style.display = 'none';
+
+            if (!username) {
+                usernameError.textContent = 'Nome de usuário é obrigatório.';
+                usernameError.style.display = 'block';
+                return;
+            }
+            if (!password) {
+                passwordError.textContent = 'Senha é obrigatória.';
+                passwordError.style.display = 'block';
+                return;
+            }
+
+            // Credenciais hardcoded para o login administrativo
+            const ADMIN_USERNAME = "admin";
+            const ADMIN_PASSWORD = "Ruth1010"; // Usando a senha fornecida pelo usuário
+
+            if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+                isAdmin = true;
+                closeAdminLoginModal();
+                openAdminOptionsModal(); 
+                console.log("Login de administrador bem-sucedido!");
+            } else {
+                isAdmin = false;
+                loginError.textContent = 'Credenciais inválidas. Verifique seu nome de usuário e senha.';
+                loginError.style.display = 'block';
+                console.warn("Tentativa de login de administrador falhou.");
+            }
+        }
+
+        window.adminLogout = async function() {
+            try {
+                // Ao fazer logout da área admin, não estamos a deslogar do Firebase,
+                // apenas a redefinir o estado 'isAdmin' e fechar o modal.
+                // Se o utilizador normal estava autenticado anonimamente, ele continua.
+                isAdmin = false;
+                closeAdminPanelModal();
+                alert("Você foi desconectado da área administrativa.");
+            } catch (error) {
+                console.error("Erro ao fazer logout:", error);
+                alert("Erro ao fazer logout. Tente novamente.");
+            }
+        }
+
+        function renderAdminOrders(orders) {
+            const container = getElement('adminOrdersContainer');
+            if (!container) return;
+
+            container.innerHTML = '';
+            if (orders.length === 0) {
+                getElement('adminOrdersEmptyMessage').style.display = 'block';
+                return;
+            } else {
+                getElement('adminOrdersEmptyMessage').style.display = 'none';
+            }
+
+            orders.forEach(order => {
+                const orderDiv = document.createElement('div');
+                orderDiv.className = 'order-history-item fade-in';
+                const itemsList = JSON.parse(order.items).map(item => `<li>${item.quantity}x ${item.name} - ${formatCurrency(item.subtotal)}</li>`).join('');
+                const orderDate = order.timestamp ? new Date(order.timestamp.toDate()).toLocaleString('pt-BR') : 'Data Indisponível';
+
+                orderDiv.innerHTML = `
+                    <h4>
+                        Pedido #${order.id.substring(0, 6)} (Cliente: ${order.customerName})
+                        <span class="status-tag status-${order.status.replace(/\s/g, '-')}" style="font-size:0.75rem">${order.status}</span>
+                    </h4>
+                    <p><strong>ID do Cliente:</strong> ${order.customerId}</p>
+                    <p><strong>Telefone:</strong> ${order.customerPhone}</p>
+                    <p><strong>Tipo:</strong> ${order.orderType === 'delivery' ? 'Delivery' : `Mesa ${order.tableNumber}`}</p>
+                    ${order.notes ? `<p><strong>Obs:</strong> ${order.notes}</p>` : ''}
+                    <p><strong>Data:</strong> ${orderDate}</p>
+                    <ul>
+                        ${itemsList}
+                    </ul>
+                    <p class="mt-2 text-right"><strong>Total:</strong> <span class="price">${formatCurrency(order.total)}</span></p>
+                    <div class="mt-4 flex flex-wrap gap-2 justify-end">
+                        <select onchange="updateOrderStatus('${order.id}', this.value)"
+                                class="p-2 border rounded-md bg-white text-gray-700">
+                            <option value="Em Espera" ${order.status === 'Em Espera' ? 'selected' : ''}>Em Espera</option>
+                            <option value="Em Producao" ${order.status === 'Em Producao' ? 'selected' : ''}>Em Produção</option>
+                            <option value="Finalizado" ${order.status === 'Finalizado' ? 'selected' : ''}>Finalizado</option>
+                            <option value="Cancelado" ${order.status === 'Cancelado' ? 'selected' : ''}>Cancelado</option>
+                        </select>
+                    </div>
+                `;
+                container.appendChild(orderDiv);
+            });
+        }
+
+        function loadAdminOrders() {
+            if (!isAdmin) {
+                console.log("Não autorizado para carregar pedidos do admin.");
+                return;
+            }
+            const ordersCollectionRef = collection(db, `artifacts/${appId}/public/data/orders`);
+            // Query to listen for all orders
+            const q = query(ordersCollectionRef);
+
+            onSnapshot(q, (snapshot) => {
+                const orders = [];
+                snapshot.forEach(doc => {
+                    orders.push({ id: doc.id, ...doc.data() });
+                });
+                // Sort orders by timestamp, newest first
+                orders.sort((a, b) => (b.timestamp?.toDate().getTime() || 0) - (a.timestamp?.toDate().getTime() || 0));
+                renderAdminOrders(orders);
+            }, (error) => {
+                console.error("Erro ao carregar pedidos para o admin:", error);
+                getElement('adminOrdersEmptyMessage').style.display = 'block';
+                getElement('adminOrdersEmptyMessage').textContent = 'Erro ao carregar pedidos.';
+            });
+        }
+
+        window.updateOrderStatus = async function(orderId, newStatus) {
+            try {
+                const orderRef = doc(db, `artifacts/${appId}/public/data/orders`, orderId);
+                await updateDoc(orderRef, {
+                    status: newStatus
+                });
+                console.log(`Status do pedido ${orderId} atualizado para ${newStatus}`);
+            } catch (error) {
+                console.error("Erro ao atualizar status do pedido:", error);
+                alert("Erro ao atualizar o status do pedido.");
+            }
+        }
+
+        // Initial load
+        window.onload = () => {
+            // No need to call loadCart() or loadOrderHistory() explicitly here
+            // as onAuthStateChanged handles it after authentication.
+            // Ensure initial category button is active
+            const firstCategoryButton = document.querySelector('.category-button');
+            if (firstCategoryButton) {
+                firstCategoryButton.classList.add('active');
+            }
+
+            // Manually trigger change for order type if delivery is default
+            const deliveryRadio = document.querySelector('input[name="order-type"][value="delivery"]');
+            if (deliveryRadio && deliveryRadio.checked) {
+                const event = new Event('change');
+                deliveryRadio.dispatchEvent(event);
+            }
+        };
+    </script>
+</body>
+</html>

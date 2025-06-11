@@ -2,328 +2,1446 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nosso Cardápio Digital</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Nosso Cardápio Digital Otimizado</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        * {
+            -webkit-tap-highlight-color: transparent;
+        }
+        
         body {
             font-family: 'Inter', sans-serif;
-        }
-        .menu-category h2 {
-            border-bottom: 2px solid #FBBF24; /* Amarelo do Tailwind */
-            padding-bottom: 0.5rem;
-            margin-bottom: 1.5rem; 
-        }
-        .menu-item {
-            border-bottom: 1px dashed #E5E7EB; /* Cinza claro do Tailwind */
-            padding-bottom: 1.5rem; 
-            margin-bottom: 1.5rem; 
-            display: flex;
-            flex-direction: column; 
-        }
-        @media (min-width: 640px) { /* sm breakpoint do Tailwind */
-            .menu-item {
-                flex-direction: row; 
-                align-items: flex-start; 
-            }
-        }
-        .menu-item:last-child {
-            border-bottom: none;
-            margin-bottom: 0;
-        }
-        .menu-item-image {
-            width: 100%; 
-            max-width: 150px; 
-            height: 100px;
-            object-fit: cover;
-            border-radius: 0.375rem; /* rounded-md */
-            margin-bottom: 1rem; 
-        }
-        @media (min-width: 640px) {
-            .menu-item-image {
-                width: 120px; 
-                height: 80px; 
-                margin-right: 1rem; 
-                margin-bottom: 0; 
-            }
-        }
-        .menu-item-details {
-            flex-grow: 1;
-        }
-        .price {
-            color: #16A34A; /* Verde do Tailwind */
-            white-space: nowrap; 
-        }
-        .item-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start; 
-            width: 100%;
+            overflow-x: hidden;
+            background-color: #f9fafb; /* Consistent bg */
+            color: #1f2937; /* Darker gray for better contrast */
         }
 
-        /* Estilo para o modal de mensagem */
-        .modal {
-            display: none; 
-            position: fixed;
-            z-index: 1000;
+        .glass-effect {
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.9); /* Slightly less transparent */
+            border-bottom: 1px solid #e5e7eb; /* Softer border */
+        }
+
+        .menu-category h2 {
+            position: relative;
+            padding-bottom: 12px;
+            margin-bottom: 24px;
+            font-size: 1.75rem; /* Slightly larger */
+            color: #111827; /* Even darker for headings */
+        }
+        
+        .menu-category h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
             left: 0;
-            top: 0;
+            width: 60px;
+            height: 4px; /* Thicker line */
+            background: linear-gradient(90deg, #F59E0B, #FBBF24);
+            border-radius: 2px;
+        }
+
+        .menu-item {
+            position: relative;
+            border-radius: 16px; /* More rounded */
+            padding: 20px;
+            margin-bottom: 20px; /* Increased margin */
+            background: #ffffff; /* Plain white for cleaner look */
+            border: 1px solid #e5e7eb;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -1px rgba(0, 0, 0, 0.04); /* Softer shadow */
+        }
+
+        .menu-item:hover {
+            transform: translateY(-4px); /* More pronounced hover */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            border-color: #FBBF24;
+        }
+
+        .menu-item-image {
             width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0,0,0,0.5);
+            height: 200px;
+            object-fit: cover;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            background-color: #f3f4f6; /* Placeholder bg */
+        }
+
+        @media (min-width: 640px) {
+            .menu-item {
+                display: flex; 
+            }
+            .menu-item-image {
+                width: 140px;
+                height: 100px; 
+                margin-right: 20px;
+                margin-bottom: 0;
+                flex-shrink: 0; 
+            }
+            .menu-item-details {
+                flex-grow: 1; 
+            }
+        }
+
+        .price {
+            background: linear-gradient(90deg, #059669, #10B981);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+            font-size: 1.25rem; /* Slightly larger price */
+        }
+
+        .floating-nav {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .nav-button {
+            width: 60px; /* Slightly larger buttons */
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #F59E0B, #FBBF24);
+            color: white;
+            border: none;
+            box-shadow: 0 4px 20px rgba(245, 158, 11, 0.4);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
             justify-content: center;
+            cursor: pointer;
+        }
+
+        .nav-button:hover {
+            transform: scale(1.1) translateY(-2px); /* Added Y translation */
+            box-shadow: 0 6px 25px rgba(245, 158, 11, 0.6);
+        }
+        
+        .cart-orders-button { /* Style for the new "Cart/Orders" button */
+             background: linear-gradient(135deg, #3B82F6, #2563EB); /* Blue gradient */
+             box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4);
+        }
+        .cart-orders-button:hover {
+             box-shadow: 0 6px 25px rgba(59, 130, 246, 0.6);
+        }
+
+        /* Removed .admin-button from here as it's now in the footer */
+
+        .category-nav {
+            position: sticky;
+            top: 80px; /* Adjusted for header height */
+            z-index: 40;
+            margin-bottom: 24px; /* Increased margin */
+            padding: 12px 0; /* Added vertical padding */
+        }
+
+        .category-button {
+            padding: 10px 20px; /* Larger padding */
+            border-radius: 24px; /* More rounded */
+            background: white;
+            border: 1px solid #d1d5db; /* Slightly darker border */
+            margin-right: 10px;
+            margin-bottom: 8px; 
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            font-size: 0.9rem; /* Slightly smaller font for more items */
+            font-weight: 500;
+            color: #374151; /* Darker text */
+            cursor: pointer;
+        }
+
+        .category-button.active, .category-button:hover {
+            background: linear-gradient(135deg, #F59E0B, #FBBF24);
+            color: white;
+            border-color: #F59E0B;
+            transform: translateY(-2px);
+            box-shadow: 0 2px 10px rgba(245, 158, 11, 0.3);
+        }
+        
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+        .fade-in { animation: fadeIn 0.6s ease-in-out; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .item-counter {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .counter-btn {
+            width: 36px; /* Larger counter buttons */
+            height: 36px;
+            border-radius: 50%;
+            border: 2px solid #F59E0B;
+            background: white;
+            color: #F59E0B;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.1rem; /* Larger font */
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none; 
+        }
+
+        .counter-btn:hover {
+            background: #F59E0B;
+            color: white;
+            transform: scale(1.05);
+        }
+        .counter-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        
+        /* Modal Styles */
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.6); /* Darker backdrop */
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            z-index: 190;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .modal-backdrop.show { display: block; opacity: 1; }
+
+        .modal-content {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.95);
+            opacity: 0;
+            background-color: white;
+            padding: 0; /* Padding will be handled by inner divs */
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            z-index: 200;
+            width: calc(100% - 32px); /* More padding on sides */
+            max-width: 600px; /* Wider modal */
+            max-height: 90vh; /* Taller modal */
+            overflow: hidden; /* Prevent content overflow before inner scroll */
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            display: none;
+            flex-direction: column; /* For header, content, footer structure */
+        }
+        .modal-content.show { display: flex; transform: translate(-50%, -50%) scale(1); opacity: 1; }
+
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
             align-items: center;
         }
-        .modal-content {
-            background-color: #fefefe;
-            margin: auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 80%;
-            max-width: 500px;
-            border-radius: 0.5rem;
-            text-align: center;
+        .modal-body {
+            padding: 24px;
+            overflow-y: auto;
+            flex-grow: 1;
         }
-        .modal-close-button {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
+        .modal-footer {
+            padding: 20px 24px;
+            border-top: 1px solid #e5e7eb;
+            background-color: #f9fafb; /* Light gray for footer */
+            display: flex;
+            justify-content: flex-end; /* Align buttons to the right */
+            gap: 12px; /* Space between buttons */
+        }
+
+        /* Tab Styles for Cart/Orders Modal */
+        .tab-buttons {
+            display: flex;
+            border-bottom: 1px solid #e5e7eb;
+            margin-bottom: 20px;
+        }
+        .tab-button {
+            padding: 12px 20px;
             cursor: pointer;
+            border: none;
+            background: none;
+            font-weight: 500;
+            color: #6b7280;
+            position: relative;
+            transition: color 0.3s ease;
+        }
+        .tab-button.active {
+            color: #F59E0B;
+        }
+        .tab-button.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px; /* Align with border-bottom of .tab-buttons */
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: #F59E0B;
+            border-radius: 2px 2px 0 0;
+        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* Cart Item Styles */
+        .cart-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        .cart-item:last-child { border-bottom: none; }
+        .cart-item-details { flex-grow: 1; margin-right: 16px; }
+        .cart-item-name { font-weight: 600; color: #374151; }
+        .cart-item-price-unit { font-size: 0.8rem; color: #6b7280; }
+        .cart-item-actions { display: flex; align-items: center; gap: 8px; }
+        .cart-item-quantity { font-weight: 500; min-width: 20px; text-align: center; }
+        .cart-item-subtotal { font-weight: 600; color: #10B981; min-width: 70px; text-align: right;}
+        .remove-item-btn {
+            background: none; border: none; color: #ef4444; cursor: pointer; padding: 4px;
+        }
+        .remove-item-btn:hover { color: #dc2626; }
+
+        /* Order History Item Styles */
+        .order-history-item {
+            background-color: #f9fafb;
+            padding: 16px;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            margin-bottom: 12px;
+        }
+        .order-history-item h4 { font-size: 1.1rem; font-weight: 600; margin-bottom: 8px; }
+        .order-history-item p { margin-bottom: 4px; font-size: 0.9rem; }
+        .order-history-item strong { color: #374151; }
+        .order-history-item .status-tag {
+            font-weight: 600;
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            margin-left: 8px;
+        }
+        .order-history-item .status-Em-Espera { background-color: #FEF3C7; color: #D97706; } /* Yellow */
+        .order-history-item .status-Em-Producao { background-color: #DBEAFE; color: #2563EB; } /* Blue */
+        .order-history-item .status-Finalizado { background-color: #D1FAE5; color: #059669; } /* Green */
+        .order-history-item .status-Cancelado { background-color: #FEE2E2; color: #EF4444; } /* Red */
+        
+        /* Pre-order Info Form Styles */
+        .form-group { margin-bottom: 16px; }
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            color: #374151;
+            font-size: 0.9rem;
+        }
+        .form-group input[type="text"], .form-group input[type="number"], .form-group input[type="password"] {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            box-sizing: border-box;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        .form-group input[type="text"]:focus, .form-group input[type="number"]:focus, .form-group input[type="password"]:focus {
+            border-color: #F59E0B;
+            box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
+            outline: none;
+        }
+        .radio-group label {
+            margin-right: 16px;
+            font-weight: normal;
+            display: inline-flex; /* Align radio and text */
+            align-items: center;
+            cursor: pointer;
+        }
+         .radio-group input[type="radio"] {
+            margin-right: 6px;
+            accent-color: #F59E0B; /* Color the radio button itself */
+        }
+        #table-number-group { display: none; } /* Hidden by default */
+        .form-error-message {
+            color: #ef4444;
+            font-size: 0.8rem;
+            margin-top: 4px;
+        }
+
+
+        @media (max-width: 640px) {
+            .menu-item {
+                margin-bottom: 16px;
+                padding: 16px;
+                flex-direction: column; 
+            }
+            .menu-item-image {
+                width: 100%; 
+                height: 180px; 
+                margin-right: 0;
+                margin-bottom: 12px; 
+            }
+            .container { padding-left: 16px; padding-right: 16px; }
+            .modal-content { width: calc(100% - 24px); } /* More padding for smaller screens */
+            .modal-header, .modal-body { padding: 16px; }
+            .modal-footer { padding: 16px; flex-direction: column-reverse; gap: 10px; } /* Stack buttons on mobile */
+            .modal-footer button { width: 100%; }
+
+
+            .tab-button { padding: 10px 12px; font-size: 0.9rem; }
+            .cart-item { flex-direction: column; align-items: flex-start; }
+            .cart-item-actions { margin-top: 8px; width: 100%; justify-content: space-between; }
+            .cart-item-subtotal { margin-top: 4px; text-align: left; }
+        }
+
+        /* Footer styles */
+        footer {
+            background-color: #1f2937; /* Dark background for footer */
+            color: #d1d5db; /* Light gray text */
+            padding: 40px 20px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        footer .footer-content {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        footer .footer-section h3 {
+            font-weight: 600;
+            color: #f9fafb;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        footer .footer-section p, footer .footer-section a {
+            color: #9ca3af;
+            text-decoration: none;
+            line-height: 1.6;
+        }
+
+        footer .footer-section a:hover {
+            color: #FBBF24;
+        }
+
+        footer .social-icons a {
+            display: inline-block;
+            margin: 0 10px;
+            color: #9ca3af;
+            font-size: 1.5rem;
+            transition: color 0.2s ease;
+        }
+
+        footer .social-icons a:hover {
+            color: #FBBF24;
+        }
+
+        footer .admin-footer-link {
+            display: inline-block;
+            margin-top: 20px;
+            color: #9ca3af; /* Discreet color */
+            font-size: 0.85rem;
+            text-decoration: underline;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        footer .admin-footer-link:hover {
+            color: #FBBF24;
+        }
+
+        @media (min-width: 768px) {
+            footer .footer-content {
+                flex-direction: row;
+                justify-content: space-around;
+                align-items: flex-start;
+            }
+            footer .footer-section {
+                flex: 1;
+                margin: 0 15px;
+                text-align: left;
+            }
         }
     </style>
 </head>
-<body class="bg-gray-100 text-gray-800">
+<body>
 
-    <header class="bg-white shadow-md sticky top-0 z-50">
-        <div class="container mx-auto px-4 py-6 text-center">
-            <h1 class="text-3xl font-bold text-yellow-500">Nome do Restaurante</h1>
-            <p class="text-sm text-gray-600 mt-1">Seu Slogan ou uma mensagem de boas-vindas!</p>
+    <header class="glass-effect sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-5 text-center"> <!-- Reduced py -->
+            <h1 class="text-3xl font-bold bg-gradient-to-r from-yellow-500 to-orange-500 bg-clip-text text-transparent">
+                Restaurante Sabor & Arte
+            </h1>
+            <p class="text-sm text-gray-600 mt-1 font-medium">Experiências gastronômicas únicas</p>
         </div>
     </header>
 
-    <main class="container mx-auto px-4 py-8">
+    <div class="category-nav glass-effect px-4"> <!-- Removed py-3, handled by .category-nav style -->
+        <div class="container mx-auto flex overflow-x-auto scrollbar-hide">
+            <button class="category-button active" onclick="scrollToSection('entradas', this)">Entradas</button>
+            <button class="category-button" onclick="scrollToSection('pratos-principais', this)">Principais</button>
+            <button class="category-button" onclick="scrollToSection('sobremesas', this)">Sobremesas</button>
+            <button class="category-button" onclick="scrollToSection('bebidas', this)">Bebidas</button>
+        </div>
+    </div>
 
-        <section id="entradas" class="menu-category mb-8 p-6 bg-white rounded-lg shadow">
-            <h2 class="text-2xl font-semibold text-yellow-600">Entradas</h2>
-            
-            <div class="menu-item">
-                <img src="https://placehold.co/150x100/FBBF24/333333?text=Bruschetta" alt="Foto da Bruschetta Clássica" class="menu-item-image" onerror="this.src='https://placehold.co/150x100/CCCCCC/333333?text=Imagem+Indisponível';">
+    <main class="container mx-auto px-4 py-6">
+        <!-- Entradas Section -->
+        <section id="entradas" class="menu-category mb-10 fade-in">
+            <h2 class="text-gray-800">🥗 Entradas</h2>
+            <div class="menu-item" data-item-id="bruschetta">
+                <img src="https://images.unsplash.com/photo-1572441713132-51c75654db73?w=300&h=200&fit=crop&q=80" 
+                     alt="Bruschetta Clássica" class="menu-item-image" 
+                     onerror="this.onerror=null;this.src='https://placehold.co/300x200/FBBF24/333333?text=Bruschetta';">
                 <div class="menu-item-details">
-                    <div class="item-header">
-                        <h3 class="text-lg font-semibold">Bruschetta Clássica</h3>
-                        <span class="price text-lg font-semibold ml-4">R$ 25,00</span>
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="text-lg font-semibold text-gray-800">Bruschetta Clássica</h3>
+                        <span class="price">R$ 25,00</span>
                     </div>
-                    <p class="text-sm text-gray-600 mt-1">Pão italiano tostado com tomates frescos, alho, manjericão e azeite.</p>
+                    <p class="text-sm text-gray-600 mb-3 leading-relaxed">
+                        Pão italiano tostado com tomates frescos, alho, manjericão e azeite extra virgem.
+                    </p>
+                    <div class="item-counter">
+                        <button class="counter-btn" onclick="decrementItem('bruschetta')">−</button>
+                        <span class="font-semibold text-lg min-w-[20px] text-center" id="bruschetta-count">0</span>
+                        <button class="counter-btn" onclick="incrementItem('bruschetta')">+</button>
+                    </div>
                 </div>
             </div>
-
-            <div class="menu-item">
-                <img src="https://placehold.co/150x100/FBBF24/333333?text=Dadinhos" alt="Foto dos Dadinhos de Tapioca" class="menu-item-image" onerror="this.src='https://placehold.co/150x100/CCCCCC/333333?text=Imagem+Indisponível';">
+            <div class="menu-item" data-item-id="dadinhos">
+                <img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=300&h=200&fit=crop&q=80" 
+                     alt="Dadinhos de Tapioca" class="menu-item-image"
+                     onerror="this.onerror=null;this.src='https://placehold.co/300x200/FBBF24/333333?text=Dadinhos';">
                 <div class="menu-item-details">
-                    <div class="item-header">
-                        <h3 class="text-lg font-semibold">Dadinhos de Tapioca</h3>
-                        <span class="price text-lg font-semibold ml-4">R$ 30,00</span>
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="text-lg font-semibold text-gray-800">Dadinhos de Tapioca</h3>
+                        <span class="price">R$ 30,00</span>
                     </div>
-                    <p class="text-sm text-gray-600 mt-1">Com queijo coalho, acompanhados de geleia de pimenta.</p>
+                    <p class="text-sm text-gray-600 mb-3 leading-relaxed">
+                        Cubinhos dourados de tapioca com queijo coalho, acompanhados de geleia de pimenta artesanal.
+                    </p>
+                    <div class="item-counter">
+                        <button class="counter-btn" onclick="decrementItem('dadinhos')">−</button>
+                        <span class="font-semibold text-lg min-w-[20px] text-center" id="dadinhos-count">0</span>
+                        <button class="counter-btn" onclick="incrementItem('dadinhos')">+</button>
+                    </div>
                 </div>
             </div>
-
-            <div class="menu-item">
-                <img src="https://placehold.co/150x100/FBBF24/333333?text=Carpaccio" alt="Foto do Carpaccio de Carne" class="menu-item-image" onerror="this.src='https://placehold.co/150x100/CCCCCC/333333?text=Imagem+Indisponível';">
+             <div class="menu-item" data-item-id="carpaccio">
+                <img src="https://images.unsplash.com/photo-1594212699903-ec8a3eca50f5?w=300&h=200&fit=crop&q=80" 
+                     alt="Carpaccio de Carne" class="menu-item-image"
+                     onerror="this.onerror=null;this.src='https://placehold.co/300x200/FBBF24/333333?text=Carpaccio';">
                 <div class="menu-item-details">
-                    <div class="item-header">
-                        <h3 class="text-lg font-semibold">Carpaccio de Carne</h3>
-                        <span class="price text-lg font-semibold ml-4">R$ 35,00</span>
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="text-lg font-semibold text-gray-800">Carpaccio de Carne</h3>
+                        <span class="price">R$ 35,00</span>
                     </div>
-                    <p class="text-sm text-gray-600 mt-1">Finas fatias de carne crua, molho de alcaparras, mostarda e parmesão.</p>
+                    <p class="text-sm text-gray-600 mb-3 leading-relaxed">
+                        Finas fatias de carne premium, molho de alcaparras, mostarda dijon e lascas de parmesão.
+                    </p>
+                    <div class="item-counter">
+                        <button class="counter-btn" onclick="decrementItem('carpaccio')">−</button>
+                        <span class="font-semibold text-lg min-w-[20px] text-center" id="carpaccio-count">0</span>
+                        <button class="counter-btn" onclick="incrementItem('carpaccio')">+</button>
+                    </div>
                 </div>
             </div>
         </section>
 
-        <section id="pratos-principais" class="menu-category mb-8 p-6 bg-white rounded-lg shadow">
-            <h2 class="text-2xl font-semibold text-yellow-600">Pratos Principais</h2>
-            
-            <div class="menu-item">
-                <img src="https://placehold.co/150x100/FBBF24/333333?text=Filé+Mignon" alt="Foto do Filé Mignon ao Molho Madeira" class="menu-item-image" onerror="this.src='https://placehold.co/150x100/CCCCCC/333333?text=Imagem+Indisponível';">
+        <!-- Pratos Principais Section -->
+        <section id="pratos-principais" class="menu-category mb-10 fade-in">
+            <h2 class="text-gray-800">🍽️ Pratos Principais</h2>
+            <div class="menu-item" data-item-id="file-mignon">
+                <img src="https://images.unsplash.com/photo-1558030006-450675393462?w=300&h=200&fit=crop&q=80" 
+                     alt="Filé Mignon ao Molho Madeira" class="menu-item-image"
+                     onerror="this.onerror=null;this.src='https://placehold.co/300x200/FBBF24/333333?text=Filé+Mignon';">
                 <div class="menu-item-details">
-                    <div class="item-header">
-                         <h3 class="text-lg font-semibold">Filé Mignon ao Molho Madeira</h3>
-                        <span class="price text-lg font-semibold ml-4">R$ 75,00</span>
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="text-lg font-semibold text-gray-800">Filé Mignon ao Molho Madeira</h3>
+                        <span class="price">R$ 75,00</span>
                     </div>
-                    <p class="text-sm text-gray-600 mt-1">Acompanha arroz à piamontese e batatas noisette.</p>
+                    <p class="text-sm text-gray-600 mb-3 leading-relaxed">
+                        Corte nobre grelhado ao ponto, molho madeira encorpado, arroz à piamontese e batatas noisette.
+                    </p>
+                    <div class="item-counter">
+                        <button class="counter-btn" onclick="decrementItem('file-mignon')">−</button>
+                        <span class="font-semibold text-lg min-w-[20px] text-center" id="file-mignon-count">0</span>
+                        <button class="counter-btn" onclick="incrementItem('file-mignon')">+</button>
+                    </div>
                 </div>
             </div>
-
-            <div class="menu-item">
-                <img src="https://placehold.co/150x100/FBBF24/333333?text=Salmão" alt="Foto do Salmão Grelhado com Legumes" class="menu-item-image" onerror="this.src='https://placehold.co/150x100/CCCCCC/333333?text=Imagem+Indisponível';">
+            <div class="menu-item" data-item-id="salmao">
+                <img src="https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=300&h=200&fit=crop&q=80" 
+                     alt="Salmão Grelhado" class="menu-item-image"
+                     onerror="this.onerror=null;this.src='https://placehold.co/300x200/FBBF24/333333?text=Salmão';">
                 <div class="menu-item-details">
-                    <div class="item-header">
-                        <h3 class="text-lg font-semibold">Salmão Grelhado com Legumes</h3>
-                        <span class="price text-lg font-semibold ml-4">R$ 80,00</span>
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="text-lg font-semibold text-gray-800">Salmão Grelhado com Legumes</h3>
+                        <span class="price">R$ 80,00</span>
                     </div>
-                    <p class="text-sm text-gray-600 mt-1">Salmão fresco grelhado na manteiga de ervas, servido com legumes da estação.</p>
+                    <p class="text-sm text-gray-600 mb-3 leading-relaxed">
+                        Salmão fresco grelhado na manteiga de ervas finas, servido com mix de legumes salteados.
+                    </p>
+                    <div class="item-counter">
+                        <button class="counter-btn" onclick="decrementItem('salmao')">−</button>
+                        <span class="font-semibold text-lg min-w-[20px] text-center" id="salmao-count">0</span>
+                        <button class="counter-btn" onclick="incrementItem('salmao')">+</button>
+                    </div>
                 </div>
             </div>
+            <div class="menu-item" data-item-id="risoto">
+                 <img src="https://images.unsplash.com/photo-1563379091339-03246963d51a?w=300&h=200&fit=crop&q=80" 
+                      alt="Risoto de Camarão" class="menu-item-image"
+                      onerror="this.onerror=null;this.src='https://placehold.co/300x200/FBBF24/333333?text=Risoto';">
+                 <div class="menu-item-details">
+                     <div class="flex justify-between items-start mb-2">
+                         <h3 class="text-lg font-semibold text-gray-800">Risoto de Camarão</h3>
+                         <span class="price">R$ 85,00</span>
+                     </div>
+                     <p class="text-sm text-gray-600 mb-3 leading-relaxed">
+                         Arroz arbóreo cremoso com camarões frescos, tomate cereja confitado e toque de limão siciliano.
+                     </p>
+                     <div class="item-counter">
+                         <button class="counter-btn" onclick="decrementItem('risoto')">+</button>
+                         <span class="font-semibold text-lg min-w-[20px] text-center" id="risoto-count">0</span>
+                         <button class="counter-btn" onclick="incrementItem('risoto')">+</button>
+                     </div>
+                 </div>
+            </div>
+        </section>
 
-            <div class="menu-item">
-                <img src="https://placehold.co/150x100/FBBF24/333333?text=Risoto" alt="Foto do Risoto de Camarão" class="menu-item-image" onerror="this.src='https://placehold.co/150x100/CCCCCC/333333?text=Imagem+Indisponível';">
+        <!-- Sobremesas Section -->
+        <section id="sobremesas" class="menu-category mb-10 fade-in">
+            <h2 class="text-gray-800">🍰 Sobremesas</h2>
+             <div class="menu-item" data-item-id="pudim">
+                <img src="https://images.unsplash.com/photo-1551024506-0bccd828d307?w=300&h=200&fit=crop&q=80" 
+                     alt="Pudim de Leite Condensado" class="menu-item-image"
+                     onerror="this.onerror=null;this.src='https://placehold.co/300x200/FBBF24/333333?text=Pudim';">
                 <div class="menu-item-details">
-                    <div class="item-header">
-                        <h3 class="text-lg font-semibold">Risoto de Camarão</h3>
-                        <span class="price text-lg font-semibold ml-4">R$ 85,00</span>
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="text-lg font-semibold text-gray-800">Pudim de Leite Condensado</h3>
+                        <span class="price">R$ 20,00</span>
                     </div>
-                    <p class="text-sm text-gray-600 mt-1">Arroz arbóreo cremoso com camarões frescos, tomate cereja e um toque de limão siciliano.</p>
+                    <p class="text-sm text-gray-600 mb-3 leading-relaxed">
+                        Tradicional pudim caseiro com calda de caramelo dourada e textura sedosa.
+                    </p>
+                    <div class="item-counter">
+                        <button class="counter-btn" onclick="decrementItem('pudim')">−</button>
+                        <span class="font-semibold text-lg min-w-[20px] text-center" id="pudim-count">0</span>
+                        <button class="counter-btn" onclick="incrementItem('pudim')">+</button>
+                    </div>
                 </div>
             </div>
-
-            <div class="menu-item">
-                <img src="https://placehold.co/150x100/FBBF24/333333?text=Lasanha" alt="Foto da Lasanha à Bolonhesa" class="menu-item-image" onerror="this.src='https://placehold.co/150x100/CCCCCC/333333?text=Imagem+Indisponível';">
+            <div class="menu-item" data-item-id="petit-gateau">
+                <img src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=300&h=200&fit=crop&q=80" 
+                     alt="Petit Gateau" class="menu-item-image"
+                     onerror="this.onerror=null;this.src='https://placehold.co/300x200/FBBF24/333333?text=Petit+Gateau';">
                 <div class="menu-item-details">
-                    <div class="item-header">
-                        <h3 class="text-lg font-semibold">Lasanha à Bolonhesa</h3>
-                        <span class="price text-lg font-semibold ml-4">R$ 65,00</span>
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="text-lg font-semibold text-gray-800">Petit Gateau</h3>
+                        <span class="price">R$ 28,00</span>
                     </div>
-                    <p class="text-sm text-gray-600 mt-1">Massa fresca, molho bolonhesa caseiro, molho branco e queijo gratinado.</p>
-                </div>
-            </div>
-
-            <div class="menu-item">
-                <img src="https://placehold.co/150x100/FBBF24/333333?text=Parmegiana" alt="Foto do Bife à Parmegiana" class="menu-item-image" onerror="this.src='https://placehold.co/150x100/CCCCCC/333333?text=Imagem+Indisponível';">
-                <div class="menu-item-details">
-                    <div class="item-header">
-                        <h3 class="text-lg font-semibold">Bife à Parmegiana</h3>
-                        <span class="price text-lg font-semibold ml-4">R$ 70,00</span>
+                    <p class="text-sm text-gray-600 mb-3 leading-relaxed">
+                        Bolinho de chocolate belga com recheio cremoso quente, acompanhado de sorvete artesanal.
+                    </p>
+                    <div class="item-counter">
+                        <button class="counter-btn" onclick="decrementItem('petit-gateau')">−</button>
+                        <span class="font-semibold text-lg min-w-[20px] text-center" id="petit-gateau-count">0</span>
+                        <button class="counter-btn" onclick="incrementItem('petit-gateau')">+</button>
                     </div>
-                    <p class="text-sm text-gray-600 mt-1">Bife empanado, coberto com molho de tomate, presunto e queijo mussarela. Acompanha arroz e fritas.</p>
                 </div>
             </div>
         </section>
 
-        <section id="sobremesas" class="menu-category mb-8 p-6 bg-white rounded-lg shadow">
-            <h2 class="text-2xl font-semibold text-yellow-600">Sobremesas</h2>
-            
-            <div class="menu-item">
-                <img src="https://placehold.co/150x100/FBBF24/333333?text=Pudim" alt="Foto do Pudim de Leite Condensado" class="menu-item-image" onerror="this.src='https://placehold.co/150x100/CCCCCC/333333?text=Imagem+Indisponível';">
-                <div class="menu-item-details">
-                    <div class="item-header">
-                        <h3 class="text-lg font-semibold">Pudim de Leite Condensado</h3>
-                        <span class="price text-lg font-semibold ml-4">R$ 20,00</span>
+        <!-- Bebidas Section -->
+        <section id="bebidas" class="menu-category mb-20 fade-in"> 
+            <h2 class="text-gray-800">🥤 Bebidas</h2>
+            <div class="grid gap-4 sm:grid-cols-1"> <!-- Simplified grid for drinks, full width on mobile -->
+                <div class="menu-item" data-item-id="agua">
+                    <div class="menu-item-details">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-lg font-semibold text-gray-800">Água Mineral</h3>
+                            <span class="price">R$ 6,00</span>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-3">Com ou sem gás - 500ml</p>
+                        <div class="item-counter">
+                            <button class="counter-btn" onclick="decrementItem('agua')">−</button>
+                            <span class="font-semibold text-lg min-w-[20px] text-center" id="agua-count">0</span>
+                            <button class="counter-btn" onclick="incrementItem('agua')">+</button>
+                        </div>
                     </div>
-                    <p class="text-sm text-gray-600 mt-1">Tradicional pudim caseiro com calda de caramelo.</p>
                 </div>
-            </div>
-
-            <div class="menu-item">
-                <img src="https://placehold.co/150x100/FBBF24/333333?text=Petit+Gateau" alt="Foto do Petit Gateau" class="menu-item-image" onerror="this.src='https://placehold.co/150x100/CCCCCC/333333?text=Imagem+Indisponível';">
-                <div class="menu-item-details">
-                    <div class="item-header">
-                        <h3 class="text-lg font-semibold">Petit Gateau</h3>
-                        <span class="price text-lg font-semibold ml-4">R$ 28,00</span>
+                <div class="menu-item" data-item-id="refrigerante">
+                    <div class="menu-item-details">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-lg font-semibold text-gray-800">Refrigerante Lata</h3>
+                            <span class="price">R$ 8,00</span>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-3">Coca-Cola, Guaraná, Sprite - 350ml</p>
+                        <div class="item-counter">
+                            <button class="counter-btn" onclick="decrementItem('refrigerante')">−</button>
+                            <span class="font-semibold text-lg min-w-[20px] text-center" id="refrigerante-count">0</span>
+                            <button class="counter-btn" onclick="incrementItem('refrigerante')">+</button>
+                        </div>
                     </div>
-                    <p class="text-sm text-gray-600 mt-1">Bolinho de chocolate com recheio cremoso, acompanhado de sorvete de creme.</p>
                 </div>
-            </div>
-
-            <div class="menu-item">
-                <img src="https://placehold.co/150x100/FBBF24/333333?text=Mousse" alt="Foto do Mousse de Maracujá" class="menu-item-image" onerror="this.src='https://placehold.co/150x100/CCCCCC/333333?text=Imagem+Indisponível';">
-                <div class="menu-item-details">
-                    <div class="item-header">
-                        <h3 class="text-lg font-semibold">Mousse de Maracujá</h3>
-                        <span class="price text-lg font-semibold ml-4">R$ 22,00</span>
+                <div class="menu-item" data-item-id="suco">
+                    <div class="menu-item-details">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-lg font-semibold text-gray-800">Suco Natural</h3>
+                            <span class="price">R$ 12,00</span>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-3">Laranja, Limão, Abacaxi com Hortelã - 400ml</p>
+                        <div class="item-counter">
+                            <button class="counter-btn" onclick="decrementItem('suco')">−</button>
+                            <span class="font-semibold text-lg min-w-[20px] text-center" id="suco-count">0</span>
+                            <button class="counter-btn" onclick="incrementItem('suco')">+</button>
+                        </div>
                     </div>
-                    <p class="text-sm text-gray-600 mt-1">Leve e refrescante, com calda de maracujá fresco.</p>
-                </div>
-            </div>
-        </section>
-
-        <section id="bebidas" class="menu-category p-6 bg-white rounded-lg shadow">
-            <h2 class="text-2xl font-semibold text-yellow-600">Bebidas</h2>
-            
-            <div class="menu-item">
-                <div class="menu-item-details w-full"> 
-                    <div class="item-header">
-                        <h3 class="text-lg font-semibold">Água Mineral</h3>
-                        <span class="price text-lg font-semibold ml-4">R$ 6,00</span>
-                    </div>
-                    <p class="text-sm text-gray-600 mt-1">Com ou sem gás.</p>
-                </div>
-            </div>
-
-            <div class="menu-item">
-                <div class="menu-item-details w-full">
-                    <div class="item-header">
-                        <h3 class="text-lg font-semibold">Refrigerante Lata</h3>
-                        <span class="price text-lg font-semibold ml-4">R$ 8,00</span>
-                    </div>
-                    <p class="text-sm text-gray-600 mt-1">Diversos sabores.</p>
-                </div>
-            </div>
-
-             <div class="menu-item">
-                <div class="menu-item-details w-full">
-                    <div class="item-header">
-                        <h3 class="text-lg font-semibold">Suco Natural</h3>
-                        <span class="price text-lg font-semibold ml-4">R$ 12,00</span>
-                    </div>
-                    <p class="text-sm text-gray-600 mt-1">Laranja, Limão, Abacaxi com Hortelã (Consulte outras opções).</p>
-                </div>
-            </div>
-
-            <div class="menu-item">
-                <div class="menu-item-details w-full">
-                    <div class="item-header">
-                        <h3 class="text-lg font-semibold">Cerveja Long Neck</h3>
-                        <span class="price text-lg font-semibold ml-4">R$ 15,00</span>
-                    </div>
-                    <p class="text-sm text-gray-600 mt-1">Nacional ou Importada (Consulte marcas disponíveis).</p>
                 </div>
             </div>
         </section>
     </main>
 
-    <footer class="bg-gray-800 text-white text-center py-8 mt-12">
-        <p>&copy; <span id="currentYear"></span> Nome do Restaurante. Todos os direitos reservados.</p>
-        <p class="text-sm mt-1">Endereço do Restaurante, Cidade - Estado</p>
-        <p class="text-sm mt-1">Telefone: (XX) XXXXX-XXXX</p>
-        <div class="mt-2">
-            <a href="#" class="text-yellow-400 hover:text-yellow-300 mx-2">Instagram</a>
-            <a href="#" class="text-yellow-400 hover:text-yellow-300 mx-2">Facebook</a>
-        </div>
-    </footer>
+    <div class="floating-nav">
+        <!-- Cart/Orders Button -->
+        <button class="nav-button cart-orders-button" onclick="openCartAndOrdersModal('cart')" title="Ver Carrinho / Pedidos">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="currentColor" class="h-7 w-7">
+                <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49A1.003 1.003 0 0020 4H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/>
+            </svg>
+        </button>
+        <!-- Scroll to Top Button -->
+        <button class="nav-button" onclick="scrollToTop()" title="Voltar ao Topo">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"/>
+            </svg>
+        </button>
+    </div>
 
-    <div id="messageModal" class="modal">
-        <div class="modal-content">
-            <span class="modal-close-button" onclick="closeModal()">&times;</span>
-            <p id="modalMessageText"></p>
+    <!-- Unified Cart and Orders Modal -->
+    <div id="cart-and-orders-backdrop" class="modal-backdrop"></div>
+    <div id="cart-and-orders-modal" class="modal-content">
+        <div class="modal-header">
+            <h2 class="text-xl font-bold text-gray-700">Meu Pedido</h2>
+            <button onclick="closeCartAndOrdersModal()" class="text-gray-500 hover:text-gray-700 text-3xl leading-none">&times;</button>
+        </div>
+        
+        <div class="tab-buttons px-4 sm:px-6">
+            <button id="tab-btn-cart" class="tab-button active" onclick="showTab('cart')">🛒 Carrinho</button>
+            <button id="tab-btn-history" class="tab-button" onclick="showTab('history')">📜 Histórico de Pedidos</button>
+        </div>
+
+        <div class="modal-body">
+            <!-- Cart Tab Content -->
+            <div id="tab-content-cart" class="tab-content active">
+                <div id="current-cart-items-container" class="space-y-3 mb-6">
+                    <!-- Cart items will be injected here by JS -->
+                    <p id="empty-cart-message" class="text-gray-500 text-center py-4">Seu carrinho está vazio.</p>
+                </div>
+                <div class="border-t pt-4">
+                    <div class="flex justify-between items-center font-bold text-lg mb-4">
+                        <span>Total do Pedido:</span>
+                        <span id="cart-total-price" class="text-green-600">R$ 0,00</span>
+                    </div>
+                    <form id="pre-order-info-form" class="space-y-4">
+                        <div class="form-group">
+                            <label for="customer-name">Seu Nome:</label>
+                            <input type="text" id="customer-name" name="customerName" placeholder="Nome Completo" class="w-full p-2 border rounded-lg" required>
+                            <p id="name-error" class="form-error-message hidden">Por favor, insira seu nome.</p>
+                        </div>
+                        <div class="form-group">
+                            <label for="customer-phone">Seu Telefone (WhatsApp):</label>
+                            <input type="text" id="customer-phone" name="customerPhone" placeholder="(XX) XXXXX-XXXX" class="w-full p-2 border rounded-lg" required>
+                            <p id="phone-error" class="form-error-message hidden">Por favor, insira um telefone válido.</p>
+                        </div>
+                        <div class="form-group radio-group">
+                            <label>Retirada ou Mesa?</label>
+                            <div>
+                                <label for="delivery-option-pickup">
+                                    <input type="radio" id="delivery-option-pickup" name="deliveryOption" value="retirada" checked> Retirada
+                                </label>
+                                <label for="delivery-option-table">
+                                    <input type="radio" id="delivery-option-table" name="deliveryOption" value="mesa"> Mesa
+                                </label>
+                            </div>
+                        </div>
+                        <div id="table-number-group" class="form-group">
+                            <label for="table-number">Número da Mesa:</label>
+                            <input type="number" id="table-number" name="tableNumber" placeholder="Ex: 5" class="w-full p-2 border rounded-lg">
+                            <p id="table-error" class="form-error-message hidden">Por favor, insira o número da mesa.</p>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Order History Tab Content -->
+            <div id="tab-content-history" class="tab-content">
+                <div id="order-history-container" class="space-y-4">
+                    <p id="empty-history-message" class="text-gray-500 text-center py-4">Nenhum pedido anterior encontrado.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <button onclick="closeCartAndOrdersModal()" class="px-6 py-3 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100 transition duration-200">
+                Continuar Comprando
+            </button>
+            <button id="send-order-button" class="px-6 py-3 rounded-lg bg-green-500 text-white font-semibold hover:bg-green-600 transition duration-200">
+                Enviar Pedido
+            </button>
         </div>
     </div>
 
+    <!-- Admin Login Modal -->
+    <div id="admin-login-backdrop" class="modal-backdrop"></div>
+    <div id="admin-login-modal" class="modal-content">
+        <div class="modal-header">
+            <h2 class="text-xl font-bold text-gray-700">Login Administrativo</h2>
+            <button onclick="closeAdminLoginModal()" class="text-gray-500 hover:text-gray-700 text-3xl leading-none">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form id="admin-login-form" class="space-y-4">
+                <div class="form-group">
+                    <label for="admin-username">Usuário:</label>
+                    <input type="text" id="admin-username" name="username" placeholder="admin" class="w-full p-2 border rounded-lg" required>
+                </div>
+                <div class="form-group">
+                    <label for="admin-password">Senha:</label>
+                    <input type="password" id="admin-password" name="password" placeholder="********" class="w-full p-2 border rounded-lg" required>
+                </div>
+                <p id="admin-login-error" class="form-error-message hidden text-center">Usuário ou senha incorretos.</p>
+                <button type="submit" class="w-full px-6 py-3 rounded-lg bg-blue-500 text-white font-semibold hover:bg-blue-600 transition duration-200">
+                    Entrar
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Admin Options Modal -->
+    <div id="admin-options-backdrop" class="modal-backdrop"></div>
+    <div id="admin-options-modal" class="modal-content">
+        <div class="modal-header">
+            <h2 class="text-xl font-bold text-gray-700">Opções Administrativas</h2>
+            <button onclick="closeAdminOptionsModal()" class="text-gray-500 hover:text-gray-700 text-3xl leading-none">&times;</button>
+        </div>
+        <div class="modal-body flex flex-col items-center justify-center space-y-6 py-10">
+            <button class="w-4/5 max-w-xs px-6 py-4 rounded-lg bg-yellow-500 text-white font-semibold text-lg hover:bg-yellow-600 transition duration-200 shadow-md">
+                Editar Cardápio
+            </button>
+         
+            <a href="./gerenciamento.html"><button class="w-4/5 max-w-xs px-6 py-4 rounded-lg bg-green-500 text-white font-semibold text-lg hover:bg-green-600 transition duration-200 shadow-md" onclick="openManageOrdersModal()">
+                Gerenciar Pedidos
+            </button></a>
+
+        </div>
+    </div>
+
+        <div class="modal-footer">
+            <button onclick="closeManageOrdersModal()" class="px-6 py-3 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100 transition duration-200">
+                Voltar ao Menu Principal
+            </button>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>Contato</h3>
+                <p>Endereço: Rua do Sabor, 123 - Centro</p>
+                <p>Cidade: Saborlândia - SP</p>
+                <p>Telefone: (11) 98765-4321</p>
+                <p>Email: contato@saborarte.com.br</p>
+            </div>
+            <div class="footer-section">
+                <h3>Horário de Funcionamento</h3>
+                <p>Segunda a Sexta: 11:00 - 23:00</p>
+                <p>Sábado e Domingo: 12:00 - 00:00</p>
+            </div>
+            <div class="footer-section">
+                <h3>Redes Sociais</h3>
+                <div class="social-icons">
+                    <a href="#" aria-label="Facebook"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.847c-4.013 0-4.153 3.393-4.153 4.922v2.078z"/></svg></a>
+                    <a href="#" aria-label="Instagram"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.204-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.069-4.85.069-3.204 0-3.584-.012-4.849-.069-3.251-.149-4.771-1.691-4.919-4.919-.058-1.265-.069-1.645-.069-4.849 0-3.204.012-3.584.069-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.073 4.948.073 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4s1.791-4 4-4 4 1.79 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg></a>
+                    <a href="#" aria-label="Twitter"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.459 0-6.255 2.796-6.255 6.256 0 .486.056.958.164 1.414-5.205-.261-9.83-2.755-12.924-6.552-.536.92-.84 1.983-.84 3.125 0 2.167 1.173 4.08 2.953 5.196-.909-.028-1.763-.279-2.519-.694v.079c0 3.02 2.13 5.544 4.953 6.107-.518.14-1.065.216-1.635.216-.4 0-.79-.039-1.169-.111.793 2.46 3.067 4.26 5.786 4.309-2.094 1.64-4.694 2.624-7.545 2.624-4.86 0-9.404-.902-12.71-2.463 1.936 3.097 5.016 5.176 8.411 5.176 10.106 0 15.65-8.373 15.65-15.65 0-.199-.004-.398-.013-.597.68-.465 1.27-1.06 1.745-1.723z"/></svg></a>
+                </div>
+            </div>
+        </div>
+        <a href="#" class="admin-footer-link" onclick="openAdminLoginModal()">Área Administrativa</a>
+        <p class="mt-4 text-gray-500">&copy; 2023 Restaurante Sabor & Arte. Todos os direitos reservados.</p>
+    </footer>
+
     <script>
-        // Define o ano atual no rodapé
-        document.getElementById('currentYear').textContent = new Date().getFullYear();
+        // --- Menu Item Data (simulated database) ---
+        const menuItems = {
+            'bruschetta': { name: 'Bruschetta Clássica', price: 25.00 },
+            'dadinhos': { name: 'Dadinhos de Tapioca', price: 30.00 },
+            'carpaccio': { name: 'Carpaccio de Carne', price: 35.00 },
+            'file-mignon': { name: 'Filé Mignon ao Molho Madeira', price: 75.00 },
+            'salmao': { name: 'Salmão Grelhado com Legumes', price: 80.00 },
+            'risoto': { name: 'Risoto de Camarão', price: 85.00 },
+            'pudim': { name: 'Pudim de Leite Condensado', price: 20.00 },
+            'petit-gateau': { name: 'Petit Gateau', price: 28.00 },
+            'agua': { name: 'Água Mineral', price: 6.00 },
+            'refrigerante': { name: 'Refrigerante Lata', price: 8.00 },
+            'suco': { name: 'Suco Natural', price: 12.00 }
+        };
 
-        // Funções do Modal
-        const modal = document.getElementById('messageModal');
-        const modalMessageText = document.getElementById('modalMessageText');
+        // --- Cart State ---
+        let cart = {}; // Stores item_id: quantity
+        let orderHistory = []; // Stores completed orders
 
-        function showModal(message) {
-            modalMessageText.textContent = message;
-            modal.style.display = "flex";
+        // --- Utility Functions ---
+        function formatCurrency(value) {
+            return `R$ ${value.toFixed(2).replace('.', ',')}`;
         }
 
-        function closeModal() {
-            modal.style.display = "none";
-        }
-
-        window.onclick = function(event) {
-            if (event.target == modal) {
-                closeModal();
+        // --- Menu Item Quantity Management ---
+        function updateItemCount(itemId, newCount) {
+            const countSpan = document.getElementById(`${itemId}-count`);
+            if (countSpan) {
+                countSpan.textContent = newCount;
+                // Update cart state
+                if (newCount > 0) {
+                    cart[itemId] = newCount;
+                } else {
+                    delete cart[itemId];
+                }
+                updateCartModal(); // Refresh cart display
             }
         }
-    </script>
 
+        function incrementItem(itemId) {
+            const currentCount = parseInt(document.getElementById(`${itemId}-count`).textContent);
+            updateItemCount(itemId, currentCount + 1);
+        }
+
+        function decrementItem(itemId) {
+            const currentCount = parseInt(document.getElementById(`${itemId}-count`).textContent);
+            if (currentCount > 0) {
+                updateItemCount(itemId, currentCount - 1);
+            }
+        }
+
+        // --- Scroll to Section Logic ---
+        function scrollToSection(id, button) {
+            const section = document.getElementById(id);
+            if (section) {
+                // Remove active class from all category buttons
+                document.querySelectorAll('.category-button').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                // Add active class to the clicked button
+                button.classList.add('active');
+
+                // Scroll to the section, accounting for fixed header
+                const headerOffset = document.querySelector('header').offsetHeight + 20; // Add some extra margin
+                const elementPosition = section.getBoundingClientRect().top + window.pageYOffset;
+                const offsetPosition = elementPosition - headerOffset;
+
+                window.scrollTo({
+                    top: offsetPosition,
+                    behavior: "smooth"
+                });
+            }
+        }
+
+        // --- Cart and Orders Modal Functions ---
+        const cartAndOrdersModal = document.getElementById('cart-and-orders-modal');
+        const cartAndOrdersBackdrop = document.getElementById('cart-and-orders-backdrop');
+        const currentCartItemsContainer = document.getElementById('current-cart-items-container');
+        const emptyCartMessage = document.getElementById('empty-cart-message');
+        const cartTotalPriceSpan = document.getElementById('cart-total-price');
+        const orderHistoryContainer = document.getElementById('order-history-container');
+        const emptyHistoryMessage = document.getElementById('empty-history-message');
+        const deliveryOptionPickup = document.getElementById('delivery-option-pickup');
+        const deliveryOptionTable = document.getElementById('delivery-option-table');
+        const tableNumberGroup = document.getElementById('table-number-group');
+        const customerNameInput = document.getElementById('customer-name');
+        const customerPhoneInput = document.getElementById('customer-phone');
+        const tableNumberInput = document.getElementById('table-number');
+        const nameError = document.getElementById('name-error');
+        const phoneError = document.getElementById('phone-error');
+        const tableError = document.getElementById('table-error');
+
+        function openCartAndOrdersModal(initialTab = 'cart') {
+            cartAndOrdersBackdrop.classList.add('show');
+            cartAndOrdersModal.classList.add('show');
+            updateCartModal(); // Ensure cart is up-to-date
+            showTab(initialTab); // Show the requested tab
+        }
+
+        function closeCartAndOrdersModal() {
+            cartAndOrdersModal.classList.remove('show');
+            cartAndOrdersBackdrop.classList.remove('show');
+            // Clear form errors when closing
+            nameError.classList.add('hidden');
+            phoneError.classList.add('hidden');
+            tableError.classList.add('hidden');
+        }
+
+        cartAndOrdersBackdrop.addEventListener('click', closeCartAndOrdersModal);
+
+        function showTab(tabId) {
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+
+            document.getElementById(`tab-btn-${tabId}`).classList.add('active');
+            document.getElementById(`tab-content-${tabId}`).classList.add('active');
+        }
+
+        function updateCartModal() {
+            currentCartItemsContainer.innerHTML = ''; // Clear previous items
+            let total = 0;
+            let hasItems = false;
+
+            for (const itemId in cart) {
+                const quantity = cart[itemId];
+                if (quantity > 0) {
+                    hasItems = true;
+                    const item = menuItems[itemId];
+                    const itemSubtotal = item.price * quantity;
+                    total += itemSubtotal;
+
+                    const cartItemDiv = document.createElement('div');
+                    cartItemDiv.classList.add('cart-item');
+                    cartItemDiv.innerHTML = `
+                        <div class="cart-item-details">
+                            <span class="cart-item-name">${item.name}</span>
+                            <span class="cart-item-price-unit">(${formatCurrency(item.price)} cada)</span>
+                        </div>
+                        <div class="cart-item-actions">
+                            <button class="counter-btn !w-8 !h-8 !text-base" onclick="decrementCartItem('${itemId}')">−</button>
+                            <span class="cart-item-quantity">${quantity}</span>
+                            <button class="counter-btn !w-8 !h-8 !text-base" onclick="incrementCartItem('${itemId}')">+</button>
+                            <span class="cart-item-subtotal">${formatCurrency(itemSubtotal)}</span>
+                            <button class="remove-item-btn" onclick="removeItemFromCart('${itemId}')">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                                </svg>
+                            </button>
+                        </div>
+                    `;
+                    currentCartItemsContainer.appendChild(cartItemDiv);
+                }
+            }
+
+            if (!hasItems) {
+                emptyCartMessage.classList.remove('hidden');
+            } else {
+                emptyCartMessage.classList.add('hidden');
+            }
+            cartTotalPriceSpan.textContent = formatCurrency(total);
+        }
+
+        function incrementCartItem(itemId) {
+            const currentCount = cart[itemId] || 0;
+            updateItemCount(itemId, currentCount + 1);
+        }
+
+        function decrementCartItem(itemId) {
+            const currentCount = cart[itemId] || 0;
+            if (currentCount > 0) {
+                updateItemCount(itemId, currentCount - 1);
+            }
+        }
+
+        function removeItemFromCart(itemId) {
+            updateItemCount(itemId, 0); // Set quantity to 0 to remove from cart
+        }
+
+        // Toggle table number input based on delivery option
+        deliveryOptionPickup.addEventListener('change', () => {
+            if (deliveryOptionPickup.checked) {
+                tableNumberGroup.style.display = 'none';
+                tableNumberInput.removeAttribute('required');
+                tableNumberInput.value = ''; // Clear table number if switching to pickup
+                tableError.classList.add('hidden'); // Hide error
+            }
+        });
+
+        deliveryOptionTable.addEventListener('change', () => {
+            if (deliveryOptionTable.checked) {
+                tableNumberGroup.style.display = 'block';
+                tableNumberInput.setAttribute('required', 'required');
+            }
+        });
+
+        // Handle Send Order Button
+        document.getElementById('send-order-button').addEventListener('click', function() {
+            let isValid = true;
+
+            // Validate Name
+            if (customerNameInput.value.trim() === '') {
+                nameError.classList.remove('hidden');
+                isValid = false;
+            } else {
+                nameError.classList.add('hidden');
+            }
+
+            // Validate Phone (simple check for non-empty)
+            if (customerPhoneInput.value.trim() === '') {
+                phoneError.classList.remove('hidden');
+                isValid = false;
+            } else {
+                phoneError.classList.add('hidden');
+            }
+
+            // Validate Table Number if 'Mesa' is selected
+            if (deliveryOptionTable.checked && tableNumberInput.value.trim() === '') {
+                tableError.classList.remove('hidden');
+                isValid = false;
+            } else {
+                tableError.classList.add('hidden');
+            }
+
+            if (!isValid) {
+                // If validation fails, do not proceed with order
+                return;
+            }
+
+            // Check if cart is empty
+            const cartItemCount = Object.values(cart).reduce((sum, qty) => sum + qty, 0);
+            if (cartItemCount === 0) {
+                alert("Seu carrinho está vazio. Adicione itens antes de enviar o pedido.");
+                return;
+            }
+
+            // Construct order details
+            const orderDetails = {
+                id: `ORD-${Date.now()}`,
+                customerName: customerNameInput.value.trim(),
+                customerPhone: customerPhoneInput.value.trim(),
+                deliveryOption: deliveryOptionPickup.checked ? 'Retirada' : 'Mesa',
+                tableNumber: deliveryOptionTable.checked ? tableNumberInput.value.trim() : null,
+                items: Object.keys(cart).map(itemId => ({
+                    id: itemId,
+                    name: menuItems[itemId].name,
+                    quantity: cart[itemId],
+                    price: menuItems[itemId].price,
+                    subtotal: menuItems[itemId].price * cart[itemId]
+                })),
+                total: parseFloat(cartTotalPriceSpan.textContent.replace('R$', '').replace(',', '.')),
+                status: 'Em Espera', // Initial status for new orders
+                timestamp: new Date().toLocaleString('pt-BR')
+            };
+
+            orderHistory.unshift(orderDetails); // Add to the beginning of history
+            updateOrderHistoryModal(); // Refresh history display
+            
+            // Simulate sending order (e.g., to a backend or WhatsApp)
+            sendOrderToWhatsApp(orderDetails);
+
+            // Clear cart and reset counts
+            for (const itemId in cart) {
+                updateItemCount(itemId, 0);
+            }
+            cart = {}; // Reset cart object
+            updateCartModal(); // Update cart display to show empty
+            customerNameInput.value = '';
+            customerPhoneInput.value = '';
+            tableNumberInput.value = '';
+            deliveryOptionPickup.checked = true; // Reset to pickup
+            tableNumberGroup.style.display = 'none';
+
+            // Switch to history tab after sending order
+            showTab('history');
+            alert("Pedido enviado com sucesso! Acompanhe o status no histórico de pedidos.");
+        });
+
+        function updateOrderHistoryModal() {
+            orderHistoryContainer.innerHTML = ''; // Clear previous history
+            if (orderHistory.length === 0) {
+                emptyHistoryMessage.classList.remove('hidden');
+            } else {
+                emptyHistoryMessage.classList.add('hidden');
+                orderHistory.forEach(order => {
+                    const orderDiv = document.createElement('div');
+                    orderDiv.classList.add('order-history-item');
+                    
+                    let itemsHtml = order.items.map(item => 
+                        `<li>${item.quantity}x ${item.name} (${formatCurrency(item.subtotal)})</li>`
+                    ).join('');
+
+                    orderDiv.innerHTML = `
+                        <h4>Pedido #${order.id} <span class="status-tag status-${order.status.replace(/\s/g, '-') /* Replaces spaces with hyphens */}">${order.status}</span></h4>
+                        <p><strong>Cliente:</strong> ${order.customerName}</p>
+                        <p><strong>Telefone:</strong> ${order.customerPhone}</p>
+                        <p><strong>Opção:</strong> ${order.deliveryOption} ${order.tableNumber ? `(Mesa: ${order.tableNumber})` : ''}</p>
+                        <p><strong>Itens:</strong></p>
+                        <ul class="list-disc list-inside text-sm text-gray-600 mb-2">${itemsHtml}</ul>
+                        <p><strong>Total:</strong> <span class="price">${formatCurrency(order.total)}</span></p>
+                        <p class="text-xs text-gray-500 mt-2"><em>${order.timestamp}</em></p>
+                    `;
+                    orderHistoryContainer.appendChild(orderDiv);
+                });
+            }
+        }
+
+        function sendOrderToWhatsApp(order) {
+            let message = `*Novo Pedido - Restaurante Sabor & Arte*\n\n`;
+            message += `*Cliente:* ${order.customerName}\n`;
+            message += `*Telefone:* ${order.customerPhone}\n`;
+            message += `*Opção:* ${order.deliveryOption}`;
+            if (order.tableNumber) {
+                message += ` (Mesa: ${order.tableNumber})`;
+            }
+            message += `\n\n*Itens do Pedido:*\n`;
+            order.items.forEach(item => {
+                message += `- ${item.quantity}x ${item.name} (${formatCurrency(item.subtotal)})\n`;
+            });
+            message += `\n*Total do Pedido:* ${formatCurrency(order.total)}\n`;
+            message += `*Status:* ${order.status}\n`;
+            message += `_Horário: ${order.timestamp}_\n`;
+
+            const whatsappUrl = `https://wa.me/+5511999999999?text=${encodeURIComponent(message)}`; // Replace with your WhatsApp number
+            window.open(whatsappUrl, '_blank');
+        }
+
+        // --- Scroll to Top Function ---
+        function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: "smooth"
+            });
+        }
+
+        // --- Admin Login and Options Modals ---
+        const adminLoginModal = document.getElementById('admin-login-modal');
+        const adminLoginBackdrop = document.getElementById('admin-login-backdrop');
+        const adminLoginForm = document.getElementById('admin-login-form');
+        const adminUsernameInput = document.getElementById('admin-username');
+        const adminPasswordInput = document.getElementById('admin-password');
+        const adminLoginError = document.getElementById('admin-login-error');
+
+        const adminOptionsModal = document.getElementById('admin-options-modal');
+        const adminOptionsBackdrop = document.getElementById('admin-options-backdrop');
+
+        // Hardcoded admin credentials (for demonstration purposes)
+        const ADMIN_USERNAME = 'admin';
+        const ADMIN_PASSWORD = 'password123';
+
+        function openAdminLoginModal() {
+            adminLoginBackdrop.classList.add('show');
+            adminLoginModal.classList.add('show');
+            adminLoginError.classList.add('hidden'); // Hide error on open
+            adminUsernameInput.value = ''; // Clear fields
+            adminPasswordInput.value = '';
+        }
+
+        function closeAdminLoginModal() {
+            adminLoginModal.classList.remove('show');
+            adminLoginBackdrop.classList.remove('show');
+        }
+
+        adminLoginBackdrop.addEventListener('click', closeAdminLoginModal);
+
+        adminLoginForm.addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent default form submission
+
+            const username = adminUsernameInput.value;
+            const password = adminPasswordInput.value;
+
+            if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+                closeAdminLoginModal();
+                openAdminOptionsModal();
+            } else {
+                adminLoginError.classList.remove('hidden');
+            }
+        });
+
+        function openAdminOptionsModal() {
+            adminOptionsBackdrop.classList.add('show');
+            adminOptionsModal.classList.add('show');
+        }
+
+        function closeAdminOptionsModal() {
+            adminOptionsModal.classList.remove('show');
+            adminOptionsBackdrop.classList.remove('show');
+        }
+
+        adminOptionsBackdrop.addEventListener('click', closeAdminOptionsModal);
+
+        // --- Manage Orders Modal Functions ---
+        const manageOrdersModal = document.getElementById('manage-orders-modal');
+        const manageOrdersBackdrop = document.getElementById('manage-orders-backdrop');
+
+        function openManageOrdersModal() {
+            adminOptionsModal.classList.remove('show'); // Close admin options modal
+            adminOptionsBackdrop.classList.remove('show'); // Hide its backdrop
+
+            manageOrdersBackdrop.classList.add('show');
+            manageOrdersModal.classList.add('show');
+            showManageOrdersTab('pending'); // Default to "Pedidos em Espera"
+        }
+
+        function closeManageOrdersModal() {
+            manageOrdersModal.classList.remove('show');
+            manageOrdersBackdrop.classList.remove('show');
+        }
+
+        manageOrdersBackdrop.addEventListener('click', closeManageOrdersModal);
+
+        function showManageOrdersTab(tabId) {
+            document.querySelectorAll('#manage-orders-modal .tab-button').forEach(button => {
+                button.classList.remove('active');
+            });
+            document.querySelectorAll('#manage-orders-modal .tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+
+            document.getElementById(`manage-tab-${tabId}`).classList.add('active');
+            document.getElementById(`manage-content-${tabId}`).classList.add('active');
+
+            updateManageOrdersDisplay(tabId);
+        }
+
+        function updateManageOrdersDisplay(tabId) {
+            const pendingContainer = document.getElementById('pending-orders-container');
+            const inProductionContainer = document.getElementById('in-production-orders-container');
+            const finishedContainer = document.getElementById('finished-orders-container');
+            const cancelledContainer = document.getElementById('cancelled-orders-container');
+            const allOrdersContainer = document.getElementById('all-orders-container');
+
+            // Clear all containers
+            pendingContainer.innerHTML = '';
+            inProductionContainer.innerHTML = '';
+            finishedContainer.innerHTML = '';
+            cancelledContainer.innerHTML = '';
+            allOrdersContainer.innerHTML = '';
+
+            let pendingCount = 0;
+            let inProductionCount = 0;
+            let finishedCount = 0;
+            let cancelledCount = 0;
+
+            orderHistory.forEach(order => {
+                const orderDiv = document.createElement('div');
+                orderDiv.classList.add('order-history-item'); // Reusing existing style
+                
+                let itemsHtml = order.items.map(item => 
+                    `<li>${item.quantity}x ${item.name} (${formatCurrency(item.subtotal)})</li>`
+                ).join('');
+
+                let actionButtons = '';
+                if (order.status === 'Em Espera') {
+                    actionButtons = `
+                        <button class="px-3 py-1 bg-blue-500 text-white rounded-md text-sm hover:bg-blue-600 transition duration-200" onclick="changeOrderStatus('${order.id}', 'Em Produção')">Mover para Produção</button>
+                        <button class="px-3 py-1 bg-red-500 text-white rounded-md text-sm hover:bg-red-600 transition duration-200" onclick="changeOrderStatus('${order.id}', 'Cancelado')">Cancelar</button>
+                    `;
+                    pendingCount++;
+                } else if (order.status === 'Em Produção') {
+                    actionButtons = `
+                        <button class="px-3 py-1 bg-green-500 text-white rounded-md text-sm hover:bg-green-600 transition duration-200" onclick="changeOrderStatus('${order.id}', 'Finalizado')">Finalizar Pedido</button>
+                        <button class="px-3 py-1 bg-red-500 text-white rounded-md text-sm hover:bg-red-600 transition duration-200" onclick="changeOrderStatus('${order.id}', 'Cancelado')">Cancelar</button>
+                    `;
+                    inProductionCount++;
+                } else if (order.status === 'Finalizado') {
+                    actionButtons = `
+                        <button class="px-3 py-1 bg-gray-500 text-white rounded-md text-sm cursor-not-allowed" disabled>Pedido Finalizado</button>
+                    `;
+                    finishedCount++;
+                } else if (order.status === 'Cancelado') {
+                    actionButtons = `
+                        <button class="px-3 py-1 bg-gray-500 text-white rounded-md text-sm cursor-not-allowed" disabled>Pedido Cancelado</button>
+                    `;
+                    cancelledCount++;
+                }
+
+                orderDiv.innerHTML = `
+                    <h4>Pedido #${order.id} <span class="status-tag status-${order.status.replace(/\s/g, '-') /* Replaces spaces with hyphens */}">${order.status}</span></h4>
+                    <p><strong>Cliente:</strong> ${order.customerName}</p>
+                    <p><strong>Telefone:</strong> ${order.customerPhone}</p>
+                    <p><strong>Opção:</strong> ${order.deliveryOption} ${order.tableNumber ? `(Mesa: ${order.tableNumber})` : ''}</p>
+                    <p><strong>Itens:</strong></p>
+                    <ul class="list-disc list-inside text-sm text-gray-600 mb-2">${itemsHtml}</ul>
+                    <p><strong>Total:</strong> <span class="price">${formatCurrency(order.total)}</span></p>
+                    <p class="text-xs text-gray-500 mt-2"><em>${order.timestamp}</em></p>
+                    <div class="flex justify-end gap-2 mt-4">
+                        ${actionButtons}
+                    </div>
+                `;
+
+                // Append to respective containers based on status
+                if (order.status === 'Em Espera') {
+                    pendingContainer.appendChild(orderDiv);
+                } else if (order.status === 'Em Produção') {
+                    inProductionContainer.appendChild(orderDiv);
+                } else if (order.status === 'Finalizado') {
+                    finishedContainer.appendChild(orderDiv);
+                } else if (order.status === 'Cancelado') {
+                    cancelledContainer.appendChild(orderDiv);
+                }
+                allOrdersContainer.appendChild(orderDiv.cloneNode(true)); // Clone for "Gestão de Pedidos"
+            });
+
+            // Update empty messages
+            if (pendingCount === 0) pendingContainer.innerHTML = '<p class="text-gray-500 text-center py-4">Nenhum pedido em espera no momento.</p>';
+            if (inProductionCount === 0) inProductionContainer.innerHTML = '<p class="text-gray-500 text-center py-4">Nenhum pedido em produção no momento.</p>';
+            if (finishedCount === 0) finishedContainer.innerHTML = '<p class="text-gray-500 text-center py-4">Nenhum pedido finalizado no momento.</p>';
+            if (cancelledCount === 0) cancelledContainer.innerHTML = '<p class="text-gray-500 text-center py-4">Nenhum pedido cancelado no momento.</p>';
+            if (orderHistory.length === 0) allOrdersContainer.innerHTML = '<p class="text-gray-500 text-center py-4">Nenhum pedido para gerenciar.</p>';
+        }
+
+        function changeOrderStatus(orderId, newStatus) {
+            const orderIndex = orderHistory.findIndex(order => order.id === orderId);
+            if (orderIndex !== -1) {
+                orderHistory[orderIndex].status = newStatus;
+                // Re-render the current tab to reflect the change
+                const currentTab = document.querySelector('#manage-orders-modal .tab-button.active').id.replace('manage-tab-', '');
+                updateManageOrdersDisplay(currentTab);
+                alert(`Pedido ${orderId} movido para: ${newStatus}`);
+            }
+        }
+
+        // --- Initial Load ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize cart display
+            updateCartModal();
+            updateOrderHistoryModal();
+
+            // Set up intersection observer for category highlighting
+            const sections = document.querySelectorAll('.menu-category');
+            const options = {
+                root: null, // viewport
+                rootMargin: '-100px 0px -50% 0px', // Adjust this to fine-tune when a section becomes "active"
+                threshold: 0 // As soon as any part of the target enters the viewport
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const sectionId = entry.target.id;
+                        document.querySelectorAll('.category-button').forEach(button => {
+                            if (button.onclick.toString().includes(`'${sectionId}'`)) {
+                                button.classList.add('active');
+                            } else {
+                                button.classList.remove('active');
+                            }
+                        });
+                    }
+                });
+            }, options);
+
+            sections.forEach(section => {
+                observer.observe(section);
+            });
+        });
+    </script>
 </body>
 </html>

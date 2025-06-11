@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Cardápio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; overflow-x: hidden; background-color: #f9fafb; color: #1f2937; }
+        .glass-effect { backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); background: rgba(255, 255, 255, 0.9); border-bottom: 1px solid #e5e7eb; }
+        .section-heading { position: relative; padding-bottom: 12px; margin-bottom: 24px; font-size: 1.75rem; color: #111827; }
+        .section-heading::after { content: ''; position: absolute; bottom: 0; left: 0; width: 60px; height: 4px; background: linear-gradient(90deg, #F59E0B, #FBBF24); border-radius: 2px; }
+        .item-card { border-radius: 16px; padding: 20px; margin-bottom: 20px; background: #ffffff; border: 1px solid #e5e7eb; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -1px rgba(0, 0, 0, 0.04); }
+        .item-card:hover { transform: translateY(-4px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); border-color: #FBBF24; }
+        .item-image { width: 100%; height: 200px; object-fit: cover; border-radius: 12px; margin-bottom: 16px; background-color: #f3f4f6; }
+        @media (min-width: 640px) {
+            .item-card { display: flex; }
+            .item-image { width: 140px; height: 100px; margin-right: 20px; margin-bottom: 0; flex-shrink: 0; }
+        }
+        .btn-primary { background: linear-gradient(135deg, #F59E0B, #FBBF24); color: white; font-weight: 600; padding: 12px 24px; border-radius: 10px; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3); }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(245, 158, 11, 0.5); }
+        .btn-secondary { background: #e5e7eb; color: #374151; font-weight: 600; padding: 12px 24px; border-radius: 10px; transition: all 0.3s ease; }
+        .btn-secondary:hover { background: #d1d5db; }
+        .btn-danger { background: #ef4444; color: white; font-weight: 600; padding: 8px 16px; border-radius: 8px; transition: all 0.3s ease; }
+        .btn-danger:hover { background: #dc2626; }
+        .btn-edit { background: #3b82f6; color: white; font-weight: 600; padding: 8px 16px; border-radius: 8px; transition: all 0.3s ease; }
+        .btn-edit:hover { background: #2563eb; }
+        .form-input { width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; box-sizing: border-box; transition: border-color 0.2s ease, box-shadow 0.2s ease; }
+        .form-input:focus { border-color: #F59E0B; box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2); outline: none; }
+        .no-items-message { text-align: center; color: #6b7280; padding: 40px 20px; border: 1px dashed #d1d5db; border-radius: 12px; margin-top: 30px; }
+
+        /* Modal Styles */
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            z-index: 190;
+            display: none; /* Hidden by default */
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .modal-backdrop.show { display: block; opacity: 1; }
+
+        .modal-content {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.95);
+            opacity: 0;
+            background-color: white;
+            padding: 0;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            z-index: 200;
+            width: calc(100% - 32px);
+            max-width: 600px;
+            max-height: 90vh;
+            overflow: hidden;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            display: flex; /* Always flex for internal layout */
+            flex-direction: column;
+        }
+        .modal-content.show { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+
+        .modal-header { padding: 20px 24px; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; }
+        .modal-body { padding: 24px; overflow-y: auto; flex-grow: 1; }
+        .modal-footer { padding: 20px 24px; border-top: 1px solid #e5e7eb; background-color: #f9fafb; display: flex; justify-content: flex-end; gap: 12px; }
+
+        @media (max-width: 640px) {
+            .modal-content { width: calc(100% - 24px); }
+            .modal-header, .modal-body, .modal-footer { padding: 16px; }
+            .modal-footer { flex-direction: column-reverse; gap: 10px; }
+            .modal-footer button { width: 100%; }
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gray-50 text-gray-800 font-inter antialiased">
+    <header class="glass-effect sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-5 text-center">
+            <h1 class="text-3xl font-bold bg-gradient-to-r from-yellow-500 to-orange-500 bg-clip-text text-transparent">
+                Administração do Cardápio
+            </h1>
+            <p class="text-sm text-gray-600 mt-1 font-medium">Edite e gerencie seus itens e categorias</p>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-8">
+        <!-- Seção de Gerenciamento de Categorias -->
+        <section class="mb-12 p-6 bg-white rounded-xl shadow-lg border border-gray-200">
+            <h2 class="section-heading">Categorias do Cardápio</h2>
+            <div id="category-list" class="mb-6 flex flex-wrap items-center gap-3">
+                <!-- Categorias serão carregadas aqui pelo JavaScript -->
+            </div>
+            <div class="flex flex-col sm:flex-row gap-3">
+                <input
+                    type="text"
+                    id="new-category-name"
+                    placeholder="Nova Categoria"
+                    class="form-input flex-grow"
+                />
+                <button id="add-category-btn" class="btn-primary">
+                    <i class="fas fa-plus mr-2"></i>Adicionar Categoria
+                </button>
+            </div>
+        </section>
+
+        <!-- Seção de Adição/Edição de Item -->
+        <section class="mb-12 p-6 bg-white rounded-xl shadow-lg border border-gray-200">
+            <h2 id="item-form-heading" class="section-heading">Adicionar Novo Item</h2>
+
+            <!-- Seleção de Categoria -->
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="item-category-select">
+                    Selecione a Categoria:
+                </label>
+                <select id="item-category-select" class="form-input">
+                    <option value="">-- Selecione uma Categoria --</option>
+                    <!-- Opções de categoria serão carregadas aqui pelo JavaScript -->
+                </select>
+            </div>
+
+            <div id="item-form-container" class="mt-6 p-4 border border-gray-200 rounded-lg bg-gray-50 hidden">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">
+                    Detalhes do Item em <span id="current-category-display" class="text-orange-500"></span>
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="col-span-2">
+                        <label for="item-name" class="block text-gray-700 text-sm font-bold mb-2">
+                            Nome do Item:
+                        </label>
+                        <input
+                            type="text"
+                            id="item-name"
+                            name="name"
+                            class="form-input"
+                            placeholder="Ex: Pizza Margherita"
+                        />
+                    </div>
+                    <div class="col-span-2">
+                        <label for="item-description" class="block text-gray-700 text-sm font-bold mb-2">
+                            Descrição:
+                        </label>
+                        <textarea
+                            id="item-description"
+                            name="description"
+                            class="form-input h-24 resize-y"
+                            placeholder="Ingredientes e detalhes do prato..."
+                        ></textarea>
+                        <button id="generate-description-btn" class="mt-2 btn-secondary w-full py-2 text-sm flex items-center justify-center">
+                            <i class="fas fa-magic mr-2"></i> Gerar Descrição ✨
+                        </button>
+                    </div>
+                    <div>
+                        <label for="item-price" class="block text-gray-700 text-sm font-bold mb-2">
+                            Preço (R$):
+                        </label>
+                        <input
+                            type="number"
+                            id="item-price"
+                            name="price"
+                            class="form-input"
+                            placeholder="Ex: 45.90"
+                            step="0.01"
+                        />
+                    </div>
+                    <div class="col-span-2">
+                        <label for="item-image-upload" class="block text-gray-700 text-sm font-bold mb-2">
+                            Carregar Imagem:
+                        </label>
+                        <input
+                            type="file"
+                            id="item-image-upload"
+                            name="imageUpload"
+                            accept="image/*"
+                            class="form-input mb-2 p-2 file:mr-4 file:py-2 file:px-4
+                                file:rounded-full file:border-0
+                                file:text-sm file:font-semibold
+                                file:bg-orange-50 file:text-orange-700
+                                hover:file:bg-orange-100"
+                        />
+                        <p class="text-xs text-gray-500 mb-2">Ou digite uma URL de imagem abaixo:</p>
+                        <input
+                            type="text"
+                            id="item-image-url"
+                            name="imageUrl"
+                            class="form-input mb-2"
+                            placeholder="Opcional: URL da imagem do item"
+                        />
+                        <img id="item-image-preview" src="https://placehold.co/300x200/FBBF24/333333?text=Sem%20Imagem" alt="Pré-visualização da Imagem" class="mt-4 w-full h-48 object-cover rounded-lg border border-gray-200" />
+                    </div>
+                </div>
+                <div class="flex justify-end gap-3 mt-6">
+                    <button id="save-item-btn" class="btn-primary">
+                        <i class="fas fa-plus mr-2"></i> Adicionar Item
+                    </button>
+                    <button id="cancel-item-edit-btn" class="btn-secondary hidden">
+                        Cancelar Edição
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Seção de Configurações do Rodapé -->
+        <section class="mb-12 p-6 bg-white rounded-xl shadow-lg border border-gray-200">
+            <h2 class="section-heading">Configurações do Rodapé</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="col-span-2">
+                    <label for="footer-copyright-text" class="block text-gray-700 text-sm font-bold mb-2">
+                        Texto de Copyright:
+                    </label>
+                    <input
+                        type="text"
+                        id="footer-copyright-text"
+                        class="form-input"
+                        placeholder="Ex: © 2024 Restaurante Sabor Perfeito."
+                    />
+                </div>
+                <div class="col-span-2">
+                    <label for="footer-message-text" class="block text-gray-700 text-sm font-bold mb-2">
+                        Mensagem Adicional do Rodapé:
+                    </label>
+                    <input
+                        type="text"
+                        id="footer-message-text"
+                        class="form-input"
+                        placeholder="Ex: Desenvolvido com ❤️ para a melhor experiência gastronômica."
+                    />
+                </div>
+            </div>
+            <div class="flex justify-end gap-3 mt-6">
+                <button id="save-footer-btn" class="btn-primary">
+                    <i class="fas fa-save mr-2"></i> Salvar Rodapé
+                </button>
+            </div>
+        </section>
+
+        <!-- Seção de Informações de Contacto do Rodapé -->
+        <section class="mb-12 p-6 bg-white rounded-xl shadow-lg border border-gray-200">
+            <h2 class="section-heading">Informações de Contacto</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="col-span-2">
+                    <label for="contact-phone" class="block text-gray-700 text-sm font-bold mb-2">
+                        Telefone:
+                    </label>
+                    <input
+                        type="text"
+                        id="contact-phone"
+                        class="form-input"
+                        placeholder="Ex: +351 123 456 789"
+                    />
+                </div>
+                <div class="col-span-2">
+                    <label for="contact-email" class="block text-gray-700 text-sm font-bold mb-2">
+                        Email:
+                    </label>
+                    <input
+                        type="email"
+                        id="contact-email"
+                        class="form-input"
+                        placeholder="Ex: info@restaurante.com"
+                    />
+                </div>
+                <div class="col-span-2">
+                    <label for="contact-address" class="block text-gray-700 text-sm font-bold mb-2">
+                        Morada:
+                    </label>
+                    <textarea
+                        id="contact-address"
+                        class="form-input h-20 resize-y"
+                        placeholder="Ex: Rua do Sabor, 123, Lisboa, Portugal"
+                    ></textarea>
+                </div>
+            </div>
+            <div class="flex justify-end gap-3 mt-6">
+                <button id="save-contact-btn" class="btn-primary">
+                    <i class="fas fa-save mr-2"></i> Salvar Contactos
+                </button>
+            </div>
+        </section>
+
+        <!-- Seção de Horário de Funcionamento -->
+        <section class="mb-12 p-6 bg-white rounded-xl shadow-lg border border-gray-200">
+            <h2 class="section-heading">Horário de Funcionamento</h2>
+            <div class="grid grid-cols-1 gap-4">
+                <div class="col-span-full">
+                    <label for="operating-hours-text" class="block text-gray-700 text-sm font-bold mb-2">
+                        Horário:
+                    </label>
+                    <textarea
+                        id="operating-hours-text"
+                        class="form-input h-32 resize-y"
+                        placeholder="Ex: Seg-Sex: 12h-15h, 19h-23h&#10;Sáb-Dom: 12h-23h"
+                    ></textarea>
+                </div>
+            </div>
+            <div class="flex justify-end gap-3 mt-6">
+                <button id="save-operating-hours-btn" class="btn-primary">
+                    <i class="fas fa-save mr-2"></i> Salvar Horário
+                </button>
+            </div>
+        </section>
+
+        <!-- Listagem de Itens do Cardápio por Categoria -->
+        <div id="menu-items-listing">
+            <!-- Itens do cardápio serão carregados aqui pelo JavaScript -->
+        </div>
+    </main>
+
+    <footer class="bg-gray-800 text-gray-300 py-8 text-center">
+        <div class="container mx-auto px-4">
+            <p id="footer-copyright"></p>
+            <p id="footer-message" class="mt-2 text-sm"></p>
+            <div class="mt-4 text-sm text-gray-400">
+                <p id="footer-phone"></p>
+                <p id="footer-email"></p>
+                <p id="footer-address"></p>
+                <p id="footer-operating-hours" class="mt-2"></p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Modal HTML Structure -->
+    <div id="global-modal" class="modal-backdrop">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title" class="text-xl font-semibold text-gray-800"></h3>
+                <button id="modal-close-btn" class="text-gray-500 hover:text-gray-700 text-2xl leading-none">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p id="modal-message"></p>
+            </div>
+            <div class="modal-footer">
+                <button id="modal-cancel-btn" class="px-5 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100 transition-colors duration-200 hidden">
+                    Cancelar
+                </button>
+                <button id="modal-confirm-btn" class="px-5 py-2 rounded-lg text-white font-medium transition-colors duration-200">
+                    Confirmar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const BASE_URL = 'http://localhost:3000/api'; // URL base do seu backend Node.js
+
+        let menu = {};
+        let footerData = {};
+        let editingItemId = null;
+        let selectedCategorySlug = '';
+        let editingCategorySlug = null;
+        let editingCategoryName = '';
+
+        // Funções de Utilitários
+        function slugify(text) {
+            return text.toString().normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Remove acentos
+                .toLowerCase()
+                .replace(/\s+/g, '-')
+                .replace(/[^\w-]+/g, '')
+                .replace(/--+/g, '-')
+                .replace(/^-+/, '')
+                .replace(/-+$/, '');
+        }
+
+        function getCategoryDisplayName(slug) {
+            return slug.replace(/-/g, ' ').split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+        }
+
+        // Funções do Modal
+        const modal = document.getElementById('global-modal');
+        const modalTitle = document.getElementById('modal-title');
+        const modalMessage = document.getElementById('modal-message');
+        const modalConfirmBtn = document.getElementById('modal-confirm-btn');
+        const modalCancelBtn = document.getElementById('modal-cancel-btn');
+        const modalCloseBtn = document.getElementById('modal-close-btn');
+
+        function openModal(title, message, onConfirm, onCancel, type = 'confirm') {
+            modalTitle.textContent = title;
+            modalMessage.textContent = message;
+            modalConfirmBtn.onclick = () => { onConfirm(); closeModal(); };
+            modalCancelBtn.onclick = () => { onCancel(); closeModal(); };
+            modalCloseBtn.onclick = () => { onCancel(); closeModal(); }; // Close button also acts as cancel
+
+            if (type === 'confirm') {
+                modalCancelBtn.classList.remove('hidden');
+                modalConfirmBtn.textContent = 'Confirmar';
+                modalConfirmBtn.classList.remove('bg-blue-500', 'hover:bg-blue-600');
+                modalConfirmBtn.classList.add('bg-red-500', 'hover:bg-red-600');
+            } else {
+                modalCancelBtn.classList.add('hidden');
+                modalConfirmBtn.textContent = 'Fechar';
+                modalConfirmBtn.classList.remove('bg-red-500', 'hover:bg-red-600');
+                modalConfirmBtn.classList.add('bg-blue-500', 'hover:bg-blue-600');
+            }
+            modal.classList.add('show');
+            modal.querySelector('.modal-content').classList.add('show');
+        }
+
+        function closeModal() {
+            modal.classList.remove('show');
+            modal.querySelector('.modal-content').classList.remove('show');
+        }
+
+        // --- Funções de Persistência (agora com Fetch API) ---
+        async function loadAppData() {
+            try {
+                const menuResponse = await fetch(`${BASE_URL}/menu-items`);
+                if (!menuResponse.ok) throw new Error('Erro ao carregar dados do menu.');
+                menu = await menuResponse.json();
+
+                const footerResponse = await fetch(`${BASE_URL}/footer`);
+                if (!footerResponse.ok) throw new Error('Erro ao carregar dados do rodapé.');
+                footerData = await footerResponse.json();
+
+                renderAll();
+            } catch (error) {
+                console.error("Erro ao carregar dados do backend:", error);
+                openModal('Erro', 'Não foi possível conectar ao servidor. Verifique se o backend Node.js está rodando.', () => {}, () => {}, 'alert');
+            }
+        }
+
+        // --- Renderização Geral ---
+        function renderAll() {
+            renderCategories();
+            renderMenuItemsListing();
+            populateCategorySelect();
+            populateFooterSettings();
+            renderFooterPreview(); // Renderiza o rodapé na pré-visualização
+        }
+
+        function renderCategories() {
+            const categoryListDiv = document.getElementById('category-list');
+            categoryListDiv.innerHTML = ''; // Limpa antes de renderizar
+
+            if (Object.keys(menu).length === 0) {
+                categoryListDiv.innerHTML = '<p class="text-gray-500">Nenhuma categoria adicionada ainda.</p>';
+                return;
+            }
+
+            Object.keys(menu).forEach(categorySlug => {
+                const categoryDisplayName = getCategoryDisplayName(categorySlug);
+                const categoryElement = document.createElement('div');
+                categoryElement.className = "flex items-center bg-gray-100 rounded-lg px-4 py-2 border border-gray-200";
+
+                if (editingCategorySlug === categorySlug) {
+                    const input = document.createElement('input');
+                    input.type = 'text';
+                    input.value = editingCategoryName;
+                    input.className = 'form-input py-1 px-2 text-sm mr-2';
+                    input.oninput = (e) => editingCategoryName = e.target.value;
+                    input.onkeydown = (e) => {
+                        if (e.key === 'Enter') saveEditCategory();
+                        if (e.key === 'Escape') cancelEditCategory();
+                    };
+                    categoryElement.appendChild(input);
+
+                    const saveBtn = document.createElement('button');
+                    saveBtn.className = 'bg-green-500 hover:bg-green-600 text-white p-2 rounded-full text-xs mr-1';
+                    saveBtn.title = 'Salvar';
+                    saveBtn.innerHTML = '<i class="fas fa-check"></i>';
+                    saveBtn.onclick = saveEditCategory;
+                    categoryElement.appendChild(saveBtn);
+
+                    const cancelBtn = document.createElement('button');
+                    cancelBtn.className = 'bg-gray-500 hover:bg-gray-600 text-white p-2 rounded-full text-xs';
+                    cancelBtn.title = 'Cancelar';
+                    cancelBtn.innerHTML = '<i class="fas fa-times"></i>';
+                    cancelBtn.onclick = cancelEditCategory;
+                    categoryElement.appendChild(cancelBtn);
+
+                    input.focus();
+                } else {
+                    const span = document.createElement('span');
+                    span.className = 'font-medium text-gray-700 mr-2';
+                    span.textContent = categoryDisplayName;
+                    categoryElement.appendChild(span);
+
+                    const editBtn = document.createElement('button');
+                    editBtn.className = 'bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-full text-xs mr-1';
+                    editBtn.title = 'Editar Categoria';
+                    editBtn.innerHTML = '<i class="fas fa-pencil-alt"></i>';
+                    editBtn.onclick = () => startEditCategory(categorySlug, categoryDisplayName);
+                    categoryElement.appendChild(editBtn);
+
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.className = 'bg-red-500 hover:bg-red-600 text-white p-2 rounded-full text-xs';
+                    deleteBtn.title = 'Excluir Categoria';
+                    deleteBtn.innerHTML = '<i class="fas fa-trash-alt"></i>';
+                    deleteBtn.onclick = () => handleDeleteCategory(categorySlug, categoryDisplayName);
+                    categoryElement.appendChild(deleteBtn);
+                }
+
+                categoryListDiv.appendChild(categoryElement);
+            });
+        }
+
+        function renderMenuItemsListing() {
+            const menuItemsListingDiv = document.getElementById('menu-items-listing');
+            menuItemsListingDiv.innerHTML = ''; // Limpa antes de renderizar
+
+            if (Object.keys(menu).length === 0) {
+                menuItemsListingDiv.innerHTML = `
+                    <div class="no-items-message">
+                        <p class="text-lg mb-2">Adicione uma categoria primeiro para gerenciar itens.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            Object.keys(menu).forEach(categorySlug => {
+                const categoryDisplayName = getCategoryDisplayName(categorySlug);
+                const section = document.createElement('section');
+                section.className = "mb-10 p-6 bg-white rounded-xl shadow-lg border border-gray-200";
+
+                section.innerHTML = `
+                    <h2 class="section-heading">
+                        Itens em ${categoryDisplayName}
+                        <button onclick="startAddItem('${categorySlug}')" class="ml-3 bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded-md text-sm transition-colors duration-200" title="Adicionar novo item nesta categoria">
+                            <i class="fas fa-plus"></i> Novo Item
+                        </button>
+                    </h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6" id="items-in-${categorySlug}">
+                        <!-- Itens da categoria serão inseridos aqui -->
+                    </div>
+                `;
+                menuItemsListingDiv.appendChild(section);
+
+                const itemsContainer = section.querySelector(`#items-in-${categorySlug}`);
+
+                if (menu[categorySlug].length === 0) {
+                    itemsContainer.innerHTML = `
+                        <div class="no-items-message col-span-full">
+                            <p class="text-lg mb-2">Nenhum item nesta categoria.</p>
+                            <button onclick="startAddItem('${categorySlug}')" class="btn-primary inline-flex items-center">
+                                <i class="fas fa-plus mr-2"></i> Adicionar Primeiro Item
+                            </button>
+                        </div>
+                    `;
+                } else {
+                    menu[categorySlug].forEach(item => {
+                        const itemCard = document.createElement('div');
+                        itemCard.className = "item-card flex flex-col sm:flex-row items-start";
+                        itemCard.innerHTML = `
+                            <img
+                                src="${item.imageUrl}"
+                                alt="${item.name}"
+                                class="item-image flex-shrink-0"
+                                onerror="this.onerror=null;this.src='https://placehold.co/300x200/FBBF24/333333?text=${encodeURIComponent(item.name.substring(0, 10))}';"
+                            >
+                            <div class="flex-grow">
+                                <h3 class="text-lg font-semibold text-gray-800">${item.name}</h3>
+                                <p class="text-sm text-gray-600 mb-2">${item.description}</p>
+                                <p class="font-bold text-green-600 mb-3">R$ ${item.price.toFixed(2).replace('.', ',')}</p>
+                                <div class="flex gap-2">
+                                    <button onclick="startEditItem('${categorySlug}', '${item.id}')" class="btn-edit text-sm">
+                                        <i class="fas fa-pencil-alt mr-1"></i> Editar
+                                    </button>
+                                    <button onclick="handleDeleteItem('${categorySlug}', '${item.id}', '${item.name}')" class="btn-danger text-sm">
+                                        <i class="fas fa-trash-alt mr-1"></i> Excluir
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                        itemsContainer.appendChild(itemCard);
+                    });
+                }
+            });
+        }
+
+        function populateCategorySelect() {
+            const select = document.getElementById('item-category-select');
+            select.innerHTML = '<option value="">-- Selecione uma Categoria --</option>'; // Limpa e adiciona a opção padrão
+            for (const categorySlug in menu) {
+                const option = document.createElement('option');
+                option.value = categorySlug;
+                option.textContent = getCategoryDisplayName(categorySlug);
+                select.appendChild(option);
+            }
+            if (selectedCategorySlug) {
+                select.value = selectedCategorySlug;
+                showItemForm(selectedCategorySlug);
+            } else {
+                document.getElementById('item-form-container').classList.add('hidden');
+            }
+        }
+
+        function populateFooterSettings() {
+            document.getElementById('footer-copyright-text').value = footerData.copyright || '';
+            document.getElementById('footer-message-text').value = footerData.message || '';
+            document.getElementById('contact-phone').value = footerData.contacts.phone || '';
+            document.getElementById('contact-email').value = footerData.contacts.email || '';
+            document.getElementById('contact-address').value = footerData.contacts.address || '';
+            document.getElementById('operating-hours-text').value = footerData.operatingHours || '';
+        }
+
+        function renderFooterPreview() {
+            document.getElementById('footer-copyright').innerHTML = footerData.copyright || '';
+            document.getElementById('footer-message').innerHTML = footerData.message || '';
+            document.getElementById('footer-phone').textContent = `Telefone: ${footerData.contacts.phone || 'N/A'}`;
+            document.getElementById('footer-email').textContent = `Email: ${footerData.contacts.email || 'N/A'}`;
+            document.getElementById('footer-address').textContent = `Morada: ${footerData.contacts.address || 'N/A'}`;
+            document.getElementById('footer-operating-hours').innerHTML = `Horário: <br>${footerData.operatingHours ? footerData.operatingHours.replace(/\n/g, '<br>') : 'N/A'}`;
+        }
+
+        // --- Gerenciamento de Categorias ---
+        document.getElementById('add-category-btn').addEventListener('click', async () => {
+            const newCategoryNameInput = document.getElementById('new-category-name');
+            const name = newCategoryNameInput.value.trim();
+            if (!name) {
+                openModal('Erro', 'O nome da categoria não pode ser vazio.', () => {}, () => {}, 'alert');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${BASE_URL}/categories`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name })
+                });
+
+                if (response.status === 409) {
+                    openModal('Erro', 'Esta categoria já existe.', () => {}, () => {}, 'alert');
+                    return;
+                }
+                if (!response.ok) throw new Error('Falha ao adicionar categoria.');
+
+                const data = await response.json();
+                menu[data.slug] = []; // Adiciona a nova categoria no objeto local
+                newCategoryNameInput.value = ''; // Limpa o campo
+                renderAll(); // Re-renderiza tudo
+                openModal('Sucesso', `Categoria "${data.name}" adicionada.`, () => {}, () => {}, 'alert');
+            } catch (error) {
+                console.error('Erro ao adicionar categoria:', error);
+                openModal('Erro', 'Não foi possível adicionar a categoria.', () => {}, () => {}, 'alert');
+            }
+        });
+
+        function startEditCategory(slug, displayName) {
+            editingCategorySlug = slug;
+            editingCategoryName = displayName;
+            renderCategories(); // Re-renderiza para mostrar o input de edição
+        }
+
+        async function saveEditCategory() {
+            if (!editingCategorySlug || !editingCategoryName.trim()) {
+                openModal('Erro', 'O nome da categoria não pode ser vazio.', () => {}, () => {}, 'alert');
+                return;
+            }
+
+            const oldSlug = editingCategorySlug;
+            const newName = editingCategoryName.trim();
+            const newSlug = slugify(newName);
+
+            try {
+                const response = await fetch(`${BASE_URL}/categories/${oldSlug}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ newName })
+                });
+
+                if (response.status === 409) {
+                    openModal('Erro', 'Já existe uma categoria com este novo nome.', () => {}, () => {}, 'alert');
+                    return;
+                }
+                if (!response.ok) throw new Error('Falha ao atualizar categoria.');
+
+                // Atualiza o objeto 'menu' localmente
+                if (oldSlug !== newSlug) {
+                    menu[newSlug] = menu[oldSlug];
+                    delete menu[oldSlug];
+                    // Atualiza o selectedCategorySlug se o item form estiver ativo
+                    if (selectedCategorySlug === oldSlug) {
+                        selectedCategorySlug = newSlug;
+                    }
+                }
+                editingCategorySlug = null;
+                editingCategoryName = '';
+                renderAll();
+                openModal('Sucesso', `Categoria "${newName}" atualizada.`, () => {}, () => {}, 'alert');
+            } catch (error) {
+                console.error('Erro ao salvar edição da categoria:', error);
+                openModal('Erro', 'Não foi possível salvar as alterações da categoria.', () => {}, () => {}, 'alert');
+            }
+        }
+
+        function cancelEditCategory() {
+            editingCategorySlug = null;
+            editingCategoryName = '';
+            renderCategories(); // Re-renderiza para voltar ao estado normal
+        }
+
+        function handleDeleteCategory(slug, displayName) {
+            openModal(
+                'Confirmar Exclusão',
+                `Tem certeza que deseja excluir a categoria "${displayName}"? Todos os itens dentro dela serão perdidos.`,
+                async () => {
+                    try {
+                        const response = await fetch(`${BASE_URL}/categories/${slug}`, {
+                            method: 'DELETE'
+                        });
+                        if (!response.ok) throw new Error('Falha ao excluir categoria.');
+
+                        delete menu[slug]; // Remove a categoria do objeto local
+                        if (selectedCategorySlug === slug) {
+                            selectedCategorySlug = ''; // Reseta se a categoria selecionada foi excluída
+                            document.getElementById('item-form-container').classList.add('hidden');
+                        }
+                        renderAll();
+                        openModal('Sucesso', `Categoria "${displayName}" excluída.`, () => {}, () => {}, 'alert');
+                    } catch (error) {
+                        console.error('Erro ao excluir categoria:', error);
+                        openModal('Erro', 'Não foi possível excluir a categoria.', () => {}, () => {}, 'alert');
+                    }
+                },
+                () => { console.log('Exclusão de categoria cancelada.'); }
+            );
+        }
+
+        // --- Gerenciamento de Itens ---
+        const itemCategorySelect = document.getElementById('item-category-select');
+        const itemFormContainer = document.getElementById('item-form-container');
+        const currentCategoryDisplay = document.getElementById('current-category-display');
+        const itemFormHeading = document.getElementById('item-form-heading');
+        const saveItemBtn = document.getElementById('save-item-btn');
+        const cancelItemEditBtn = document.getElementById('cancel-item-edit-btn');
+        const itemNameInput = document.getElementById('item-name');
+        const itemDescriptionInput = document.getElementById('item-description');
+        const itemPriceInput = document.getElementById('item-price');
+        const itemImageUpload = document.getElementById('item-image-upload');
+        const itemImageUrlInput = document.getElementById('item-image-url');
+        const itemImagePreview = document.getElementById('item-image-preview');
+        const generateDescriptionBtn = document.getElementById('generate-description-btn');
+
+        itemCategorySelect.addEventListener('change', (e) => {
+            selectedCategorySlug = e.target.value;
+            if (selectedCategorySlug) {
+                showItemForm(selectedCategorySlug);
+            } else {
+                itemFormContainer.classList.add('hidden');
+            }
+            resetItemForm(); // Reseta o formulário ao trocar de categoria
+        });
+
+        function showItemForm(categorySlug) {
+            itemFormContainer.classList.remove('hidden');
+            currentCategoryDisplay.textContent = getCategoryDisplayName(categorySlug);
+        }
+
+        function resetItemForm() {
+            editingItemId = null;
+            itemFormHeading.textContent = 'Adicionar Novo Item';
+            saveItemBtn.innerHTML = '<i class="fas fa-plus mr-2"></i> Adicionar Item';
+            cancelItemEditBtn.classList.add('hidden');
+
+            itemNameInput.value = '';
+            itemDescriptionInput.value = '';
+            itemPriceInput.value = '';
+            itemImageUpload.value = ''; // Limpa o input de arquivo
+            itemImageUrlInput.value = '';
+            itemImagePreview.src = 'https://placehold.co/300x200/FBBF24/333333?text=Sem%20Imagem';
+        }
+
+        function startAddItem(categorySlug) {
+            selectedCategorySlug = categorySlug;
+            document.getElementById('item-category-select').value = categorySlug;
+            showItemForm(categorySlug);
+            resetItemForm();
+            // Rola para a seção do formulário de item
+            itemFormContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        async function startEditItem(categorySlug, itemId) {
+            const item = menu[categorySlug].find(i => i.id === itemId);
+            if (!item) {
+                openModal('Erro', 'Item não encontrado para edição.', () => {}, () => {}, 'alert');
+                return;
+            }
+
+            editingItemId = itemId;
+            selectedCategorySlug = categorySlug;
+
+            itemFormHeading.textContent = 'Editar Item Existente';
+            saveItemBtn.innerHTML = '<i class="fas fa-save mr-2"></i> Salvar Alterações';
+            cancelItemEditBtn.classList.remove('hidden');
+
+            document.getElementById('item-category-select').value = categorySlug;
+            showItemForm(categorySlug);
+
+            itemNameInput.value = item.name;
+            itemDescriptionInput.value = item.description;
+            itemPriceInput.value = item.price;
+            itemImageUrlInput.value = item.imageUrl || ''; // Preenche a URL se existir
+            itemImagePreview.src = item.imageUrl || 'https://placehold.co/300x200/FBBF24/333333?text=Sem%20Imagem';
+            itemImageUpload.value = ''; // Limpa o input de arquivo ao carregar URL/existente
+
+            // Rola para a seção do formulário de item
+            itemFormContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        cancelItemEditBtn.addEventListener('click', () => {
+            resetItemForm();
+            itemFormContainer.classList.add('hidden');
+            selectedCategorySlug = ''; // Limpa a categoria selecionada no select
+            document.getElementById('item-category-select').value = '';
+        });
+
+        // Pré-visualização da imagem
+        itemImageUrlInput.addEventListener('input', () => {
+            itemImagePreview.src = itemImageUrlInput.value || 'https://placehold.co/300x200/FBBF24/333333?text=Sem%20Imagem';
+        });
+        itemImageUpload.addEventListener('change', (e) => {
+            if (e.target.files && e.target.files[0]) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    itemImagePreview.src = event.target.result;
+                    itemImageUrlInput.value = ''; // Limpa a URL se um arquivo for selecionado
+                };
+                reader.readAsDataURL(e.target.files[0]);
+            }
+        });
+
+
+        saveItemBtn.addEventListener('click', async () => {
+            const name = itemNameInput.value.trim();
+            const description = itemDescriptionInput.value.trim();
+            const price = parseFloat(itemPriceInput.value);
+            const imageUrl = itemImageUrlInput.value.trim() || itemImagePreview.src; // Pega a URL ou a imagem pré-visualizada
+
+            if (!selectedCategorySlug) {
+                openModal('Erro', 'Por favor, selecione uma categoria para o item.', () => {}, () => {}, 'alert');
+                return;
+            }
+            if (!name || isNaN(price) || price <= 0) {
+                openModal('Erro', 'Nome do item e preço válido são obrigatórios.', () => {}, () => {}, 'alert');
+                return;
+            }
+
+            const itemData = {
+                name,
+                description,
+                price,
+                imageUrl: imageUrl === 'https://placehold.co/300x200/FBBF24/333333?text=Sem%20Imagem' ? '' : imageUrl // Não salva placeholder como URL
+            };
+
+            try {
+                let response;
+                if (editingItemId) {
+                    // Edição de item existente
+                    response = await fetch(`${BASE_URL}/menu-items/${selectedCategorySlug}/${editingItemId}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(itemData)
+                    });
+                    if (!response.ok) throw new Error('Falha ao atualizar item.');
+                    const data = await response.json();
+                    // Atualiza o item no array local 'menu'
+                    const itemIndex = menu[selectedCategorySlug].findIndex(item => item.id === editingItemId);
+                    if (itemIndex !== -1) {
+                        menu[selectedCategorySlug][itemIndex] = data.item;
+                    }
+                    openModal('Sucesso', `Item "${name}" atualizado com sucesso!`, () => {}, () => {}, 'alert');
+                } else {
+                    // Adição de novo item
+                    itemData.categorySlug = selectedCategorySlug; // Adiciona a categoria para o POST
+                    response = await fetch(`${BASE_URL}/menu-items`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(itemData)
+                    });
+                    if (!response.ok) throw new Error('Falha ao adicionar item.');
+                    const data = await response.json();
+                    menu[selectedCategorySlug].push(data.item); // Adiciona o novo item no array local
+                    openModal('Sucesso', `Item "${name}" adicionado com sucesso!`, () => {}, () => {}, 'alert');
+                }
+
+                resetItemForm();
+                itemFormContainer.classList.add('hidden'); // Esconde o formulário após salvar
+                renderAll(); // Re-renderiza a lista de itens
+            } catch (error) {
+                console.error('Erro ao salvar item:', error);
+                openModal('Erro', 'Não foi possível salvar o item.', () => {}, () => {}, 'alert');
+            }
+        });
+
+        function handleDeleteItem(categorySlug, itemId, itemName) {
+            openModal(
+                'Confirmar Exclusão',
+                `Tem certeza que deseja excluir o item "${itemName}" da categoria "${getCategoryDisplayName(categorySlug)}"?`,
+                async () => {
+                    try {
+                        const response = await fetch(`${BASE_URL}/menu-items/${categorySlug}/${itemId}`, {
+                            method: 'DELETE'
+                        });
+                        if (!response.ok) throw new Error('Falha ao excluir item.');
+
+                        // Remove o item do array local 'menu'
+                        menu[categorySlug] = menu[categorySlug].filter(item => item.id !== itemId);
+                        renderMenuItemsListing(); // Re-renderiza a lista de itens
+                        openModal('Sucesso', `Item "${itemName}" excluído.`, () => {}, () => {}, 'alert');
+                    } catch (error) {
+                        console.error('Erro ao excluir item:', error);
+                        openModal('Erro', 'Não foi possível excluir o item.', () => {}, () => {}, 'alert');
+                    }
+                },
+                () => { console.log('Exclusão de item cancelada.'); }
+            );
+        }
+
+        // --- Geração de Descrição com LLM ---
+        generateDescriptionBtn.addEventListener('click', async () => {
+            const itemName = itemNameInput.value.trim();
+            if (!itemName) {
+                openModal('Atenção', 'Por favor, insira o nome do item antes de gerar uma descrição.', () => {}, () => {}, 'alert');
+                return;
+            }
+
+            generateDescriptionBtn.textContent = 'Gerando...';
+            generateDescriptionBtn.disabled = true;
+
+            try {
+                const response = await fetch(`${BASE_URL}/generate-description`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ itemName })
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`Erro na API Gemini: ${response.status} - ${errorText}`);
+                }
+
+                const data = await response.json();
+                itemDescriptionInput.value = data.description;
+                openModal('Sucesso', 'Descrição gerada!', () => {}, () => {}, 'alert');
+            } catch (error) {
+                console.error('Erro ao gerar descrição:', error);
+                openModal('Erro', `Não foi possível gerar a descrição. ${error.message}`, () => {}, () => {}, 'alert');
+            } finally {
+                generateDescriptionBtn.textContent = '✨ Gerar Descrição ✨';
+                generateDescriptionBtn.disabled = false;
+            }
+        });
+
+        // --- Salvamento de Configurações do Rodapé e Contactos ---
+        document.getElementById('save-footer-btn').addEventListener('click', async () => {
+            const copyright = document.getElementById('footer-copyright-text').value.trim();
+            const message = document.getElementById('footer-message-text').value.trim();
+
+            const updatedFooter = { copyright, message };
+
+            try {
+                const response = await fetch(`${BASE_URL}/footer`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(updatedFooter)
+                });
+                if (!response.ok) throw new Error('Falha ao salvar rodapé.');
+                footerData = await response.json().then(data => data.footer); // Atualiza dados locais
+                renderFooterPreview();
+                openModal('Sucesso', 'Configurações do rodapé salvas!', () => {}, () => {}, 'alert');
+            } catch (error) {
+                console.error('Erro ao salvar rodapé:', error);
+                openModal('Erro', 'Não foi possível salvar as configurações do rodapé.', () => {}, () => {}, 'alert');
+            }
+        });
+
+        document.getElementById('save-contact-btn').addEventListener('click', async () => {
+            const phone = document.getElementById('contact-phone').value.trim();
+            const email = document.getElementById('contact-email').value.trim();
+            const address = document.getElementById('contact-address').value.trim();
+
+            const updatedContacts = { contacts: { phone, email, address } };
+
+            try {
+                const response = await fetch(`${BASE_URL}/footer`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(updatedContacts)
+                });
+                if (!response.ok) throw new Error('Falha ao salvar contactos.');
+                footerData = await response.json().then(data => data.footer); // Atualiza dados locais
+                renderFooterPreview();
+                openModal('Sucesso', 'Informações de contacto salvas!', () => {}, () => {}, 'alert');
+            } catch (error) {
+                console.error('Erro ao salvar contactos:', error);
+                openModal('Erro', 'Não foi possível salvar as informações de contacto.', () => {}, () => {}, 'alert');
+            }
+        });
+
+        document.getElementById('save-operating-hours-btn').addEventListener('click', async () => {
+            const operatingHours = document.getElementById('operating-hours-text').value.trim();
+
+            const updatedHours = { operatingHours };
+
+            try {
+                const response = await fetch(`${BASE_URL}/footer`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(updatedHours)
+                });
+                if (!response.ok) throw new Error('Falha ao salvar horário.');
+                footerData = await response.json().then(data => data.footer); // Atualiza dados locais
+                renderFooterPreview();
+                openModal('Sucesso', 'Horário de funcionamento salvo!', () => {}, () => {}, 'alert');
+            } catch (error) {
+                console.error('Erro ao salvar horário:', error);
+                openModal('Erro', 'Não foi possível salvar o horário de funcionamento.', () => {}, () => {}, 'alert');
+            }
+        });
+
+
+        // Inicializa o aplicativo ao carregar a página
+        window.onload = loadAppData;
+    </script>
+</body>
+</html>

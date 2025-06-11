@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Cardápio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; overflow-x: hidden; background-color: #f9fafb; color: #1f2937; }
+        .glass-effect { backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); background: rgba(255, 255, 255, 0.9); border-bottom: 1px solid #e5e7eb; }
+        .section-heading { position: relative; padding-bottom: 12px; margin-bottom: 24px; font-size: 1.75rem; color: #111827; }
+        .section-heading::after { content: ''; position: absolute; bottom: 0; left: 0; width: 60px; height: 4px; background: linear-gradient(90deg, #F59E0B, #FBBF24); border-radius: 2px; }
+        .item-card { border-radius: 16px; padding: 20px; margin-bottom: 20px; background: #ffffff; border: 1px solid #e5e7eb; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -1px rgba(0, 0, 0, 0.04); }
+        .item-card:hover { transform: translateY(-4px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); border-color: #FBBF24; }
+        .item-image { width: 100%; height: 200px; object-fit: cover; border-radius: 12px; margin-bottom: 16px; background-color: #f3f4f6; }
+        @media (min-width: 640px) {
+            .item-card { display: flex; }
+            .item-image { width: 140px; height: 100px; margin-right: 20px; margin-bottom: 0; flex-shrink: 0; }
+        }
+        .btn-primary { background: linear-gradient(135deg, #F59E0B, #FBBF24); color: white; font-weight: 600; padding: 12px 24px; border-radius: 10px; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3); }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(245, 158, 11, 0.5); }
+        .btn-secondary { background: #e5e7eb; color: #374151; font-weight: 600; padding: 12px 24px; border-radius: 10px; transition: all 0.3s ease; }
+        .btn-secondary:hover { background: #d1d5db; }
+        .btn-danger { background: #ef4444; color: white; font-weight: 600; padding: 8px 16px; border-radius: 8px; transition: all 0.3s ease; }
+        .btn-danger:hover { background: #dc2626; }
+        .btn-edit { background: #3b82f6; color: white; font-weight: 600; padding: 8px 16px; border-radius: 8px; transition: all 0.3s ease; }
+        .btn-edit:hover { background: #2563eb; }
+        .form-input { width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; box-sizing: border-box; transition: border-color 0.2s ease, box-shadow 0.2s ease; }
+        .form-input:focus { border-color: #F59E0B; box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2); outline: none; }
+        .no-items-message { text-align: center; color: #6b7280; padding: 40px 20px; border: 1px dashed #d1d5db; border-radius: 12px; margin-top: 30px; }
+
+        /* Modal Styles */
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            z-index: 190;
+            display: none; /* Hidden by default */
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .modal-backdrop.show { display: block; opacity: 1; }
+
+        .modal-content {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.95);
+            opacity: 0;
+            background-color: white;
+            padding: 0;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            z-index: 200;
+            width: calc(100% - 32px);
+            max-width: 600px;
+            max-height: 90vh;
+            overflow: hidden;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            display: flex; /* Always flex for internal layout */
+            flex-direction: column;
+        }
+        .modal-content.show { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+
+        .modal-header { padding: 20px 24px; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; }
+        .modal-body { padding: 24px; overflow-y: auto; flex-grow: 1; }
+        .modal-footer { padding: 20px 24px; border-top: 1px solid #e5e7eb; background-color: #f9fafb; display: flex; justify-content: flex-end; gap: 12px; }
+
+        @media (max-width: 640px) {
+            .modal-content { width: calc(100% - 24px); }
+            .modal-header, .modal-body, .modal-footer { padding: 16px; }
+            .modal-footer { flex-direction: column-reverse; gap: 10px; }
+            .modal-footer button { width: 100%; }
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gray-50 text-gray-800 font-inter antialiased">
+    <header class="glass-effect sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-5 text-center">
+            <h1 class="text-3xl font-bold bg-gradient-to-r from-yellow-500 to-orange-500 bg-clip-text text-transparent">
+                Administração do Cardápio
+            </h1>
+            <p class="text-sm text-gray-600 mt-1 font-medium">Edite e gerencie seus itens e categorias</p>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-8">
+        <!-- Seção de Gerenciamento de Categorias -->
+        <section class="mb-12 p-6 bg-white rounded-xl shadow-lg border border-gray-200">
+            <h2 class="section-heading">Categorias do Cardápio</h2>
+            <div id="category-list" class="mb-6 flex flex-wrap items-center gap-3">
+                <!-- Categorias serão carregadas aqui pelo JavaScript -->
+            </div>
+            <div class="flex flex-col sm:flex-row gap-3">
+                <input
+                    type="text"
+                    id="new-category-name"
+                    placeholder="Nova Categoria"
+                    class="form-input flex-grow"
+                />
+                <button id="add-category-btn" class="btn-primary">
+                    <i class="fas fa-plus mr-2"></i>Adicionar Categoria
+                </button>
+            </div>
+        </section>
+
+        <!-- Seção de Adição/Edição de Item -->
+        <section class="mb-12 p-6 bg-white rounded-xl shadow-lg border border-gray-200">
+            <h2 id="item-form-heading" class="section-heading">Adicionar Novo Item</h2>
+
+            <!-- Seleção de Categoria -->
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="item-category-select">
+                    Selecione a Categoria:
+                </label>
+                <select id="item-category-select" class="form-input">
+                    <option value="">-- Selecione uma Categoria --</option>
+                    <!-- Opções de categoria serão carregadas aqui pelo JavaScript -->
+                </select>
+            </div>
+
+            <div id="item-form-container" class="mt-6 p-4 border border-gray-200 rounded-lg bg-gray-50 hidden">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">
+                    Detalhes do Item em <span id="current-category-display" class="text-orange-500"></span>
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="col-span-2">
+                        <label for="item-name" class="block text-gray-700 text-sm font-bold mb-2">
+                            Nome do Item:
+                        </label>
+                        <input
+                            type="text"
+                            id="item-name"
+                            name="name"
+                            class="form-input"
+                            placeholder="Ex: Pizza Margherita"
+                        />
+                    </div>
+                    <div class="col-span-2">
+                        <label for="item-description" class="block text-gray-700 text-sm font-bold mb-2">
+                            Descrição:
+                        </label>
+                        <textarea
+                            id="item-description"
+                            name="description"
+                            class="form-input h-24 resize-y"
+                            placeholder="Ingredientes e detalhes do prato..."
+                        ></textarea>
+                        <button id="generate-description-btn" class="mt-2 btn-secondary w-full py-2 text-sm flex items-center justify-center">
+                            <i class="fas fa-magic mr-2"></i> Gerar Descrição ✨
+                        </button>
+                    </div>
+                    <div>
+                        <label for="item-price" class="block text-gray-700 text-sm font-bold mb-2">
+                            Preço (R$):
+                        </label>
+                        <input
+                            type="number"
+                            id="item-price"
+                            name="price"
+                            class="form-input"
+                            placeholder="Ex: 45.90"
+                            step="0.01"
+                        />
+                    </div>
+                    <div class="col-span-2">
+                        <label for="item-image-upload" class="block text-gray-700 text-sm font-bold mb-2">
+                            Carregar Imagem:
+                        </label>
+                        <input
+                            type="file"
+                            id="item-image-upload"
+                            name="imageUpload"
+                            accept="image/*"
+                            class="form-input mb-2 p-2 file:mr-4 file:py-2 file:px-4
+                                file:rounded-full file:border-0
+                                file:text-sm file:font-semibold
+                                file:bg-orange-50 file:text-orange-700
+                                hover:file:bg-orange-100"
+                        />
+                        <p class="text-xs text-gray-500 mb-2">Ou digite uma URL de imagem abaixo:</p>
+                        <input
+                            type="text"
+                            id="item-image-url"
+                            name="imageUrl"
+                            class="form-input mb-2"
+                            placeholder="Opcional: URL da imagem do item"
+                        />
+                        <img id="item-image-preview" src="https://placehold.co/300x200/FBBF24/333333?text=Sem%20Imagem" alt="Pré-visualização da Imagem" class="mt-4 w-full h-48 object-cover rounded-lg border border-gray-200" />
+                    </div>
+                </div>
+                <div class="flex justify-end gap-3 mt-6">
+                    <button id="save-item-btn" class="btn-primary">
+                        <i class="fas fa-plus mr-2"></i> Adicionar Item
+                    </button>
+                    <button id="cancel-item-edit-btn" class="btn-secondary hidden">
+                        Cancelar Edição
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Seção de Configurações do Rodapé -->
+        <section class="mb-12 p-6 bg-white rounded-xl shadow-lg border border-gray-200">
+            <h2 class="section-heading">Configurações do Rodapé</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="col-span-2">
+                    <label for="footer-copyright-text" class="block text-gray-700 text-sm font-bold mb-2">
+                        Texto de Copyright:
+                    </label>
+                    <input
+                        type="text"
+                        id="footer-copyright-text"
+                        class="form-input"
+                        placeholder="Ex: © 2024 Restaurante Sabor Perfeito."
+                    />
+                </div>
+                <div class="col-span-2">
+                    <label for="footer-message-text" class="block text-gray-700 text-sm font-bold mb-2">
+                        Mensagem Adicional do Rodapé:
+                    </label>
+                    <input
+                        type="text"
+                        id="footer-message-text"
+                        class="form-input"
+                        placeholder="Ex: Desenvolvido com ❤️ para a melhor experiência gastronômica."
+                    />
+                </div>
+            </div>
+            <div class="flex justify-end gap-3 mt-6">
+                <button id="save-footer-btn" class="btn-primary">
+                    <i class="fas fa-save mr-2"></i> Salvar Rodapé
+                </button>
+            </div>
+        </section>
+
+        <!-- Seção de Informações de Contacto do Rodapé -->
+        <section class="mb-12 p-6 bg-white rounded-xl shadow-lg border border-gray-200">
+            <h2 class="section-heading">Informações de Contacto</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="col-span-2">
+                    <label for="contact-phone" class="block text-gray-700 text-sm font-bold mb-2">
+                        Telefone:
+                    </label>
+                    <input
+                        type="text"
+                        id="contact-phone"
+                        class="form-input"
+                        placeholder="Ex: +351 123 456 789"
+                    />
+                </div>
+                <div class="col-span-2">
+                    <label for="contact-email" class="block text-gray-700 text-sm font-bold mb-2">
+                        Email:
+                    </label>
+                    <input
+                        type="email"
+                        id="contact-email"
+                        class="form-input"
+                        placeholder="Ex: info@restaurante.com"
+                    />
+                </div>
+                <div class="col-span-2">
+                    <label for="contact-address" class="block text-gray-700 text-sm font-bold mb-2">
+                        Morada:
+                    </label>
+                    <textarea
+                        id="contact-address"
+                        class="form-input h-20 resize-y"
+                        placeholder="Ex: Rua do Sabor, 123, Lisboa, Portugal"
+                    ></textarea>
+                </div>
+            </div>
+            <div class="flex justify-end gap-3 mt-6">
+                <button id="save-contact-btn" class="btn-primary">
+                    <i class="fas fa-save mr-2"></i> Salvar Contactos
+                </button>
+            </div>
+        </section>
+
+        <!-- Seção de Horário de Funcionamento -->
+        <section class="mb-12 p-6 bg-white rounded-xl shadow-lg border border-gray-200">
+            <h2 class="section-heading">Horário de Funcionamento</h2>
+            <div class="grid grid-cols-1 gap-4">
+                <div class="col-span-full">
+                    <label for="operating-hours-text" class="block text-gray-700 text-sm font-bold mb-2">
+                        Horário:
+                    </label>
+                    <textarea
+                        id="operating-hours-text"
+                        class="form-input h-32 resize-y"
+                        placeholder="Ex: Seg-Sex: 12h-15h, 19h-23h&#10;Sáb-Dom: 12h-23h"
+                    ></textarea>
+                </div>
+            </div>
+            <div class="flex justify-end gap-3 mt-6">
+                <button id="save-operating-hours-btn" class="btn-primary">
+                    <i class="fas fa-save mr-2"></i> Salvar Horário
+                </button>
+            </div>
+        </section>
+
+        <!-- Listagem de Itens do Cardápio por Categoria -->
+        <div id="menu-items-listing">
+            <!-- Itens do cardápio serão carregados aqui pelo JavaScript -->
+        </div>
+    </main>
+
+    <footer class="bg-gray-800 text-gray-300 py-8 text-center">
+        <div class="container mx-auto px-4">
+            <p id="footer-copyright"></p>
+            <p id="footer-message" class="mt-2 text-sm"></p>
+            <div class="mt-4 text-sm text-gray-400">
+                <p id="footer-phone"></p>
+                <p id="footer-email"></p>
+                <p id="footer-address"></p>
+                <p id="footer-operating-hours" class="mt-2"></p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Modal HTML Structure -->
+    <div id="global-modal" class="modal-backdrop">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title" class="text-xl font-semibold text-gray-800"></h3>
+                <button id="modal-close-btn" class="text-gray-500 hover:text-gray-700 text-2xl leading-none">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p id="modal-message"></p>
+            </div>
+            <div class="modal-footer">
+                <button id="modal-cancel-btn" class="px-5 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100 transition-colors duration-200 hidden">
+                    Cancelar
+                </button>
+                <button id="modal-confirm-btn" class="px-5 py-2 rounded-lg text-white font-medium transition-colors duration-200">
+                    Confirmar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Dados iniciais da aplicação (cardápio e rodapé)
+        const initialAppData = {
+            menu: {
+                "entradas": [
+                    { id: "bruschetta", name: "Bruschetta Clássica", description: "Pão italiano tostado com tomates frescos, alho, manjericão e azeite extra virgem.", price: 25.00, imageUrl: "https://images.unsplash.com/photo-1572441713132-51c75654db73?w=300&h=200&fit=crop&q=80" },
+                    { id: "dadinhos", name: "Dadinhos de Tapioca", description: "Cubinhos dourados de tapioca com queijo coalho, acompanhados de geleia de pimenta artesanal.", price: 30.00, imageUrl: "https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=300&h=200&fit=crop&q=80" },
+                    { id: "carpaccio", name: "Carpaccio de Carne", description: "Finas fatias de carne premium, molho de alcaparras, mostarda dijon e lascas de parmesão.", price: 35.00, imageUrl: "https://images.unsplash.com/photo-1594212699903-ec8a3eca50f5?w=300&h=200&fit=crop&q=80" }
+                ],
+                "pratos-principais": [
+                    { id: "file-mignon", name: "Filé Mignon ao Molho Madeira", description: "Corte nobre grelhado ao ponto, molho madeira encorpado, arroz à piamontese e batatas noisette.", price: 75.00, imageUrl: "https://images.unsplash.com/photo-1558030006-450675393462?w=300&h=200&fit=crop&q=80" },
+                    { id: "salmao", name: "Salmão Grelhado com Legumes", description: "Salmão fresco grelhado na manteiga de ervas finas, servido com mix de legumes salteados.", price: 80.00, imageUrl: "https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=300&h=200&fit=crop&q=80" },
+                    { id: "risoto", name: "Risoto de Camarão", description: "Arroz arbóreo cremoso com camarões frescos, tomate cereja confitado e toque de limão siciliano.", price: 85.00, imageUrl: "https://images.unsplash.com/photo-1563379091339-03246963d51a?w=300&h=200&fit=crop&q=80" }
+                ],
+                "sobremesas": [
+                    { id: "pudim", name: "Pudim de Leite Condensado", description: "Tradicional pudim caseiro com calda de caramelo dourada e textura sedosa.", price: 20.00, imageUrl: "https://images.unsplash.com/photo-1551024506-0bccd828d307?w=300&h=200&fit=crop&q=80" },
+                    { id: "petit-gateau", name: "Petit Gateau", description: "Bolinho de chocolate belga com recheio cremoso quente, acompanhado de sorvete artesanal.", price: 28.00, imageUrl: "https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=300&h=200&fit=crop&q=80" }
+                ],
+                "bebidas": [
+                    { id: "agua", name: "Água Mineral", description: "Com ou sem gás - 500ml", price: 6.00, imageUrl: "https://placehold.co/300x200/FBBF24/333333?text=Água" },
+                    { id: "refrigerante", name: "Refrigerante Lata", description: "Coca-Cola, Guaraná, Sprite - 350ml", price: 8.00, imageUrl: "https://placehold.co/300x200/FBBF24/333333?text=Refrigerante" }
+                ]
+            },
+            footer: {
+                copyright: '&copy; 2024 Restaurante Sabor Perfeito. Todos os direitos reservados.',
+                message: 'Desenvolvido com <i class="fas fa-heart text-red-500"></i> para a melhor experiência gastronômica.',
+                contacts: {
+                    phone: '+351 123 456 789',
+                    email: 'info@restaurante.com',
+                    address: 'Rua do Sabor, 123, Lisboa, Portugal'
+                },
+                operatingHours: 'Seg-Sex: 12h-15h, 19h-23h\nSáb-Dom: 12h-23h' // Novo campo
+            }
+        };
+
+        let menu = {};
+        let footerData = {};
+        let editingItemId = null;
+        let selectedCategorySlug = '';
+        let editingCategorySlug = null;
+        let editingCategoryName = '';
+
+        // Funções de Utilitários
+        function slugify(text) {
+            return text.toString().toLowerCase()
+                .replace(/\s+/g, '-')
+                .replace(/[^\w-]+/g, '')
+                .replace(/--+/g, '-')
+                .replace(/^-+/, '')
+                .replace(/-+$/, '');
+        }
+
+        function getCategoryDisplayName(slug) {
+            return slug.replace(/-/g, ' ').split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+        }
+
+        // Funções do Modal
+        const modal = document.getElementById('global-modal');
+        const modalTitle = document.getElementById('modal-title');
+        const modalMessage = document.getElementById('modal-message');
+        const modalConfirmBtn = document.getElementById('modal-confirm-btn');
+        const modalCancelBtn = document.getElementById('modal-cancel-btn');
+        const modalCloseBtn = document.getElementById('modal-close-btn');
+
+        function openModal(title, message, onConfirm, onCancel, type = 'confirm') {
+            modalTitle.textContent = title;
+            modalMessage.textContent = message;
+            modalConfirmBtn.onclick = () => { onConfirm(); closeModal(); };
+            modalCancelBtn.onclick = () => { onCancel(); closeModal(); };
+            modalCloseBtn.onclick = () => { onCancel(); closeModal(); }; // Close button also acts as cancel
+
+            if (type === 'confirm') {
+                modalCancelBtn.classList.remove('hidden');
+                modalConfirmBtn.textContent = 'Confirmar';
+                modalConfirmBtn.classList.remove('bg-blue-500', 'hover:bg-blue-600');
+                modalConfirmBtn.classList.add('bg-red-500', 'hover:bg-red-600');
+            } else {
+                modalCancelBtn.classList.add('hidden');
+                modalConfirmBtn.textContent = 'Fechar';
+                modalConfirmBtn.classList.remove('bg-red-500', 'hover:bg-red-600');
+                modalConfirmBtn.classList.add('bg-blue-500', 'hover:bg-blue-600');
+            }
+            modal.classList.add('show');
+            modal.querySelector('.modal-content').classList.add('show');
+        }
+
+        function closeModal() {
+            modal.classList.remove('show');
+            modal.querySelector('.modal-content').classList.remove('show');
+        }
+
+        // Funções de Persistência
+        function loadAppData() {
+            try {
+                const storedMenu = localStorage.getItem('restaurantMenu');
+                const storedFooter = localStorage.getItem('appFooter');
+
+                if (storedMenu) {
+                    menu = JSON.parse(storedMenu);
+                } else {
+                    menu = initialAppData.menu;
+                    saveMenu();
+                }
+
+                if (storedFooter) {
+                    footerData = JSON.parse(storedFooter);
+                } else {
+                    footerData = initialAppData.footer;
+                    saveFooter();
+                }
+            } catch (error) {
+                console.error("Erro ao carregar dados do localStorage:", error);
+                menu = initialAppData.menu;
+                footerData = initialAppData.footer;
+                saveMenu();
+                saveFooter();
+            }
+        }
+
+        function saveMenu() {
+            localStorage.setItem('restaurantMenu', JSON.stringify(menu));
+        }
+
+        function saveFooter() {
+            localStorage.setItem('appFooter', JSON.stringify(footerData));
+        }
+
+        // --- Renderização Geral ---
+        function renderAll() {
+            renderCategories();
+            renderMenuItemsListing();
+            populateCategorySelect();
+            renderFooter(); // Renderiza o rodapé também
+            populateFooterSettings(); // Preenche os campos de edição do rodapé e contactos
+        }
+
+        function renderCategories() {
+            const categoryListDiv = document.getElementById('category-list');
+            categoryListDiv.innerHTML = ''; // Limpa antes de renderizar
+
+            if (Object.keys(menu).length === 0) {
+                categoryListDiv.innerHTML = '<p class="text-gray-500">Nenhuma categoria adicionada ainda.</p>';
+                return;
+            }
+
+            Object.keys(menu).forEach(categorySlug => {
+                const categoryDisplayName = getCategoryDisplayName(categorySlug);
+                const categoryElement = document.createElement('div');
+                categoryElement.className = "flex items-center bg-gray-100 rounded-lg px-4 py-2 border border-gray-200";
+
+                if (editingCategorySlug === categorySlug) {
+                    const input = document.createElement('input');
+                    input.type = 'text';
+                    input.value = editingCategoryName;
+                    input.className = 'form-input py-1 px-2 text-sm mr-2';
+                    input.oninput = (e) => editingCategoryName = e.target.value;
+                    input.onkeydown = (e) => {
+                        if (e.key === 'Enter') saveEditCategory();
+                        if (e.key === 'Escape') cancelEditCategory();
+                    };
+                    categoryElement.appendChild(input);
+
+                    const saveBtn = document.createElement('button');
+                    saveBtn.className = 'bg-green-500 hover:bg-green-600 text-white p-2 rounded-full text-xs mr-1';
+                    saveBtn.title = 'Salvar';
+                    saveBtn.innerHTML = '<i class="fas fa-check"></i>';
+                    saveBtn.onclick = saveEditCategory;
+                    categoryElement.appendChild(saveBtn);
+
+                    const cancelBtn = document.createElement('button');
+                    cancelBtn.className = 'bg-gray-500 hover:bg-gray-600 text-white p-2 rounded-full text-xs';
+                    cancelBtn.title = 'Cancelar';
+                    cancelBtn.innerHTML = '<i class="fas fa-times"></i>';
+                    cancelBtn.onclick = cancelEditCategory;
+                    categoryElement.appendChild(cancelBtn);
+
+                    input.focus();
+                } else {
+                    const span = document.createElement('span');
+                    span.className = 'font-medium text-gray-700 mr-2';
+                    span.textContent = categoryDisplayName;
+                    categoryElement.appendChild(span);
+
+                    const editBtn = document.createElement('button');
+                    editBtn.className = 'bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-full text-xs mr-1';
+                    editBtn.title = 'Editar Categoria';
+                    editBtn.innerHTML = '<i class="fas fa-pencil-alt"></i>';
+                    editBtn.onclick = () => startEditCategory(categorySlug, categoryDisplayName);
+                    categoryElement.appendChild(editBtn);
+
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.className = 'bg-red-500 hover:bg-red-600 text-white p-2 rounded-full text-xs';
+                    deleteBtn.title = 'Excluir Categoria';
+                    deleteBtn.innerHTML = '<i class="fas fa-trash-alt"></i>';
+                    deleteBtn.onclick = () => handleDeleteCategory(categorySlug, categoryDisplayName);
+                    categoryElement.appendChild(deleteBtn);
+                }
+
+                categoryListDiv.appendChild(categoryElement);
+            });
+        }
+
+        function renderMenuItemsListing() {
+            const menuItemsListingDiv = document.getElementById('menu-items-listing');
+            menuItemsListingDiv.innerHTML = ''; // Limpa antes de renderizar
+
+            if (Object.keys(menu).length === 0) {
+                menuItemsListingDiv.innerHTML = `
+                    <div class="no-items-message">
+                        <p class="text-lg mb-2">Adicione uma categoria primeiro.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            Object.keys(menu).forEach(categorySlug => {
+                const categoryDisplayName = getCategoryDisplayName(categorySlug);
+                const section = document.createElement('section');
+                section.className = "mb-10 p-6 bg-white rounded-xl shadow-lg border border-gray-200";
+
+                section.innerHTML = `
+                    <h2 class="section-heading">
+                        Itens em ${categoryDisplayName}
+                        <button onclick="startAddItem('${categorySlug}')" class="ml-3 bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded-md text-sm transition-colors duration-200" title="Adicionar novo item nesta categoria">
+                            <i class="fas fa-plus"></i> Novo Item
+                        </button>
+                    </h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6" id="items-in-${categorySlug}">
+                        <!-- Itens da categoria serão inseridos aqui -->
+                    </div>
+                `;
+                menuItemsListingDiv.appendChild(section);
+
+                const itemsContainer = section.querySelector(`#items-in-${categorySlug}`);
+
+                if (menu[categorySlug].length === 0) {
+                    itemsContainer.innerHTML = `
+                        <div class="no-items-message col-span-full">
+                            <p class="text-lg mb-2">Nenhum item nesta categoria.</p>
+                            <button onclick="startAddItem('${categorySlug}')" class="btn-primary inline-flex items-center">
+                                <i class="fas fa-plus mr-2"></i> Adicionar Primeiro Item
+                            </button>
+                        </div>
+                    `;
+                } else {
+                    menu[categorySlug].forEach(item => {
+                        const itemCard = document.createElement('div');
+                        itemCard.className = "item-card flex flex-col sm:flex-row items-start";
+                        itemCard.innerHTML = `
+                            <img
+                                src="${item.imageUrl}"
+                                alt="${item.name}"
+                                class="item-image flex-shrink-0"
+                                onerror="this.onerror=null;this.src='https://placehold.co/140x100/FBBF24/333333?text=${encodeURIComponent(item.name.substring(0,10))}';"
+                            />
+                            <div class="flex-grow w-full sm:w-auto mt-4 sm:mt-0 sm:ml-4">
+                                <h3 class="text-lg font-semibold text-gray-800 mb-1">${item.name}</h3>
+                                <p class="text-sm text-gray-600 mb-2 leading-relaxed">${item.description}</p>
+                                <p class="text-md font-bold text-green-600 mb-3">R$ ${item.price.toFixed(2).replace('.', ',')}</p>
+                                <div class="flex gap-2">
+                                    <button onclick="startEditItem('${categorySlug}', '${item.id}')" class="btn-edit text-sm flex items-center">
+                                        <i class="fas fa-pencil-alt mr-1"></i> Editar
+                                    </button>
+                                    <button onclick="handleDeleteItem('${categorySlug}', '${item.id}', '${item.name}')" class="btn-danger text-sm flex items-center">
+                                        <i class="fas fa-trash-alt mr-1"></i> Excluir
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                        itemsContainer.appendChild(itemCard);
+                    });
+                }
+            });
+        }
+
+        function populateCategorySelect() {
+            const selectElement = document.getElementById('item-category-select');
+            selectElement.innerHTML = '<option value="">-- Selecione uma Categoria --</option>'; // Limpa e adiciona a opção padrão
+
+            Object.keys(menu).forEach(categorySlug => {
+                const option = document.createElement('option');
+                option.value = categorySlug;
+                option.textContent = getCategoryDisplayName(categorySlug);
+                selectElement.appendChild(option);
+            });
+
+            // Re-seleciona a categoria atual se houver uma
+            selectElement.value = selectedCategorySlug;
+            // Habilita/desabilita o select com base no modo de edição de item
+            selectElement.disabled = editingItemId !== null;
+        }
+
+        // --- Renderização e Lógica do Rodapé ---
+        function renderFooter() {
+            const footerCopyright = document.getElementById('footer-copyright');
+            const footerMessage = document.getElementById('footer-message');
+            const footerPhone = document.getElementById('footer-phone');
+            const footerEmail = document.getElementById('footer-email');
+            const footerAddress = document.getElementById('footer-address');
+            const footerOperatingHours = document.getElementById('footer-operating-hours'); // Novo elemento
+
+            footerCopyright.innerHTML = footerData.copyright;
+            footerMessage.innerHTML = footerData.message;
+            footerPhone.innerHTML = footerData.contacts.phone ? `<i class="fas fa-phone-alt mr-2"></i> ${footerData.contacts.phone}` : '';
+            footerEmail.innerHTML = footerData.contacts.email ? `<i class="fas fa-envelope mr-2"></i> ${footerData.contacts.email}` : '';
+            footerAddress.innerHTML = footerData.contacts.address ? `<i class="fas fa-map-marker-alt mr-2"></i> ${footerData.contacts.address}` : '';
+            footerOperatingHours.innerHTML = footerData.operatingHours ? `<i class="fas fa-clock mr-2"></i> ${footerData.operatingHours.replace(/\n/g, '<br>')}` : ''; // Exibe com quebras de linha
+        }
+
+        function populateFooterSettings() {
+            document.getElementById('footer-copyright-text').value = footerData.copyright.replace(/<[^>]*>?/gm, ''); // Remove HTML para edição
+            document.getElementById('footer-message-text').value = footerData.message.replace(/<[^>]*>?/gm, ''); // Remove HTML para edição
+            document.getElementById('contact-phone').value = footerData.contacts.phone || '';
+            document.getElementById('contact-email').value = footerData.contacts.email || '';
+            document.getElementById('contact-address').value = footerData.contacts.address || '';
+            document.getElementById('operating-hours-text').value = footerData.operatingHours || ''; // Preenche o campo de horário
+        }
+
+        function saveFooterSettings() {
+            footerData.copyright = document.getElementById('footer-copyright-text').value.trim();
+            footerData.message = document.getElementById('footer-message-text').value.trim();
+            saveFooter();
+            renderAll();
+            openModal("Rodapé Salvo", "As configurações de copyright e mensagem foram salvas com sucesso!", () => {}, () => {}, 'alert');
+        }
+
+        function saveContactSettings() {
+            footerData.contacts.phone = document.getElementById('contact-phone').value.trim();
+            footerData.contacts.email = document.getElementById('contact-email').value.trim();
+            footerData.contacts.address = document.getElementById('contact-address').value.trim();
+            saveFooter();
+            renderAll();
+            openModal("Contactos Salvos", "As informações de contacto foram salvas com sucesso!", () => {}, () => {}, 'alert');
+        }
+
+        function saveOperatingHoursSettings() {
+            footerData.operatingHours = document.getElementById('operating-hours-text').value.trim();
+            saveFooter();
+            renderAll();
+            openModal("Horário Salvo", "O horário de funcionamento foi salvo com sucesso!", () => {}, () => {}, 'alert');
+        }
+
+        // --- Gerenciamento de Categorias ---
+        document.getElementById('add-category-btn').addEventListener('click', handleAddCategory);
+
+        function handleAddCategory() {
+            const newCategoryInput = document.getElementById('new-category-name');
+            const newCategoryName = newCategoryInput.value.trim();
+
+            if (!newCategoryName) {
+                openModal("Erro", "O nome da categoria não pode ser vazio.", () => {}, () => {}, 'alert');
+                return;
+            }
+
+            const categorySlug = slugify(newCategoryName);
+            if (menu[categorySlug]) {
+                openModal("Erro", `A categoria "${newCategoryName}" já existe.`, () => {}, () => {}, 'alert');
+                return;
+            }
+
+            menu[categorySlug] = []; // Adiciona nova categoria vazia
+            saveMenu();
+            newCategoryInput.value = ''; // Limpa o input
+            renderAll(); // Re-renderiza o menu
+        }
+
+        function startEditCategory(slug, name) {
+            editingCategorySlug = slug;
+            editingCategoryName = name;
+            renderCategories(); // Re-renderiza para mostrar o input de edição
+        }
+
+        function saveEditCategory() {
+            if (!editingCategoryName.trim()) {
+                openModal("Erro", "O nome da categoria não pode ser vazio.", () => {}, () => {}, 'alert');
+                return;
+            }
+
+            const newSlug = slugify(editingCategoryName);
+
+            if (newSlug !== editingCategorySlug && menu[newSlug]) {
+                openModal("Erro", `Já existe uma categoria com o nome "${editingCategoryName}".`, () => {}, () => {}, 'alert');
+                return;
+            }
+
+            if (newSlug !== editingCategorySlug) {
+                // Renomeia a chave no objeto
+                menu[newSlug] = menu[editingCategorySlug];
+                delete menu[editingCategorySlug];
+            }
+            // Não precisamos iterar sobre os itens para atualizar o 'category' slug,
+            // pois o objeto 'item' não armazena seu slug de categoria no nosso modelo atual.
+
+            editingCategorySlug = null;
+            editingCategoryName = '';
+            saveMenu();
+            renderAll();
+        }
+
+        function cancelEditCategory() {
+            editingCategorySlug = null;
+            editingCategoryName = '';
+            renderCategories(); // Re-renderiza para voltar ao estado normal
+        }
+
+        function handleDeleteCategory(categorySlug, categoryDisplayName) {
+            openModal(
+                "Confirmar Exclusão",
+                `Tem certeza que deseja excluir a categoria "${categoryDisplayName}" e todos os seus itens?`,
+                () => {
+                    delete menu[categorySlug];
+                    saveMenu();
+                    renderAll();
+                },
+                () => {} // Função vazia para cancelar
+            );
+        }
+
+        // --- Gerenciamento de Itens ---
+        const itemCategorySelect = document.getElementById('item-category-select');
+        const itemFormContainer = document.getElementById('item-form-container');
+        const itemFormHeading = document.getElementById('item-form-heading');
+        const currentCategoryDisplay = document.getElementById('current-category-display');
+        const itemNameInput = document.getElementById('item-name');
+        const itemDescriptionInput = document.getElementById('item-description');
+        const itemPriceInput = document.getElementById('item-price');
+        const itemImageUrlInput = document.getElementById('item-image-url');
+        const itemImageUploadInput = document.getElementById('item-image-upload'); // Nova referência para input file
+        const saveItemBtn = document.getElementById('save-item-btn');
+        const cancelItemEditBtn = document.getElementById('cancel-item-edit-btn');
+        const itemImagePreview = document.getElementById('item-image-preview'); // Nova referência
+        const generateDescriptionBtn = document.getElementById('generate-description-btn'); // Nova referência para o botão Gemini
+
+        // Adiciona listeners
+        itemCategorySelect.addEventListener('change', (e) => {
+            startAddItem(e.target.value);
+        });
+        saveItemBtn.addEventListener('click', handleSaveItem);
+        cancelItemEditBtn.addEventListener('click', cancelItemEdit);
+        itemImageUploadInput.addEventListener('change', handleImageUpload); // Listener para o input de arquivo
+        itemImageUrlInput.addEventListener('input', updateImagePreviewFromURL); // Listener para o input de URL
+        document.getElementById('save-footer-btn').addEventListener('click', saveFooterSettings); // Listener para o botão de salvar rodapé
+        document.getElementById('save-contact-btn').addEventListener('click', saveContactSettings); // Listener para salvar contactos
+        document.getElementById('save-operating-hours-btn').addEventListener('click', saveOperatingHoursSettings); // NOVO: Listener para salvar horário
+        generateDescriptionBtn.addEventListener('click', generateItemDescription); // Listener para o botão Gerar Descrição
+
+        // Variável para armazenar a imagem em base64 do upload
+        let uploadedImageBase64 = null;
+
+        function handleImageUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    uploadedImageBase64 = e.target.result; // Armazena a imagem em base64
+                    itemImagePreview.src = uploadedImageBase64; // Atualiza a pré-visualização
+                    itemImageUrlInput.value = ''; // Limpa o campo de URL se uma imagem for carregada
+                };
+                reader.onerror = () => {
+                    console.error("Erro ao ler o arquivo de imagem.");
+                    openModal("Erro de Leitura", "Não foi possível ler o arquivo de imagem.", () => {}, () => {}, 'alert');
+                    itemImagePreview.src = 'https://placehold.co/300x200/FBBF24/333333?text=Erro%20de%20Leitura';
+                    uploadedImageBase64 = null;
+                };
+                reader.readAsDataURL(file); // Lê o arquivo como URL de dados (base64)
+            } else {
+                uploadedImageBase64 = null;
+                updateImagePreviewFromURL(); // Se nenhum arquivo, tenta a URL existente
+            }
+        }
+
+        function updateImagePreviewFromURL() {
+            const imageUrl = itemImageUrlInput.value.trim();
+            if (imageUrl) {
+                itemImagePreview.src = imageUrl;
+                uploadedImageBase64 = null; // Zera a imagem base64 se uma URL for inserida
+            } else if (!uploadedImageBase64) {
+                itemImagePreview.src = 'https://placehold.co/300x200/FBBF24/333333?text=Sem%20Imagem';
+            }
+        }
+
+        function startAddItem(categorySlug) {
+            selectedCategorySlug = categorySlug;
+            editingItemId = null;
+            itemFormHeading.textContent = 'Adicionar Novo Item';
+            saveItemBtn.innerHTML = '<i class="fas fa-plus mr-2"></i> Adicionar Item';
+            cancelItemEditBtn.classList.add('hidden');
+            itemCategorySelect.disabled = false; // Permite alterar a categoria ao adicionar novo item
+
+            // Limpa o formulário e a pré-visualização
+            itemNameInput.value = '';
+            itemDescriptionInput.value = '';
+            itemPriceInput.value = '';
+            itemImageUrlInput.value = '';
+            itemImageUploadInput.value = ''; // Limpa o input de arquivo
+            uploadedImageBase64 = null; // Reseta a imagem base64
+            itemImagePreview.src = 'https://placehold.co/300x200/FBBF24/333333?text=Sem%20Imagem'; // Reseta a pré-visualização
+
+            if (categorySlug) {
+                currentCategoryDisplay.textContent = getCategoryDisplayName(categorySlug);
+                itemFormContainer.classList.remove('hidden');
+            } else {
+                itemFormContainer.classList.add('hidden');
+            }
+        }
+
+        function startEditItem(categorySlug, itemId) {
+            selectedCategorySlug = categorySlug;
+            editingItemId = itemId;
+            itemFormHeading.textContent = 'Editar Item do Cardápio';
+            saveItemBtn.innerHTML = '<i class="fas fa-save mr-2"></i> Salvar Alterações';
+            cancelItemEditBtn.classList.remove('hidden');
+            itemCategorySelect.disabled = true; // Desabilita a alteração de categoria durante a edição
+
+            const itemToEdit = menu[categorySlug].find(item => item.id === itemId);
+            if (itemToEdit) {
+                itemNameInput.value = itemToEdit.name;
+                itemDescriptionInput.value = itemToEdit.description;
+                itemPriceInput.value = itemToEdit.price;
+                itemImageUrlInput.value = itemToEdit.imageUrl.startsWith('http') ? itemToEdit.imageUrl : ''; // Popula URL se for URL externa
+                itemImageUploadInput.value = ''; // Limpa o input de arquivo ao editar
+                uploadedImageBase64 = itemToEdit.imageUrl.startsWith('data:') ? itemToEdit.imageUrl : null; // Se for base64, guarda
+
+                currentCategoryDisplay.textContent = getCategoryDisplayName(categorySlug);
+                itemCategorySelect.value = categorySlug;
+                itemFormContainer.classList.remove('hidden');
+                updateImagePreview(); // Atualiza a pré-visualização com a URL do item ou base64
+            } else {
+                openModal("Erro", "Item não encontrado para edição.", () => {}, () => {}, 'alert');
+                cancelItemEdit();
+            }
+        }
+
+        // Função para atualizar a pré-visualização, priorizando a imagem base64 se presente
+        function updateImagePreview() {
+            if (uploadedImageBase64) {
+                itemImagePreview.src = uploadedImageBase64;
+            } else {
+                updateImagePreviewFromURL();
+            }
+        }
+
+        async function generateItemDescription() {
+            const itemName = itemNameInput.value.trim();
+            if (!itemName) {
+                openModal("Entrada Necessária", "Por favor, digite o nome do item antes de gerar uma descrição.", () => {}, () => {}, 'alert');
+                return;
+            }
+
+            generateDescriptionBtn.disabled = true;
+            generateDescriptionBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Gerando...';
+
+            const prompt = `Crie uma descrição de menu de restaurante curta e atraente (máximo 50 palavras) para um item de comida chamado '${itemName}'. Concentre-se em sabor e qualidade.`;
+
+            let chatHistory = [];
+            chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+            const payload = { contents: chatHistory };
+            const apiKey = ""; // Deixe como está. A chave será fornecida pelo ambiente Canvas.
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    const errorBody = await response.json();
+                    throw new Error(`Erro da API: ${response.status} - ${errorBody.error.message || response.statusText}`);
+                }
+
+                const result = await response.json();
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    const generatedText = result.candidates[0].content.parts[0].text;
+                    itemDescriptionInput.value = generatedText;
+                } else {
+                    openModal("Erro de Geração", "Não foi possível gerar uma descrição. Tente novamente ou ajuste o nome do item.", () => {}, () => {}, 'alert');
+                }
+            } catch (error) {
+                console.error("Erro ao chamar a API Gemini:", error);
+                openModal("Erro na API", `Ocorreu um erro ao conectar com o serviço de IA: ${error.message}`, () => {}, () => {}, 'alert');
+            } finally {
+                generateDescriptionBtn.disabled = false;
+                generateDescriptionBtn.innerHTML = '<i class="fas fa-magic mr-2"></i> Gerar Descrição ✨';
+            }
+        }
+
+
+        function handleSaveItem() {
+            const name = itemNameInput.value.trim();
+            const description = itemDescriptionInput.value.trim();
+            const price = parseFloat(itemPriceInput.value);
+            let finalImageUrl = '';
+
+            // Prioriza a imagem carregada via upload, depois a URL, senão o placeholder
+            if (uploadedImageBase64) {
+                finalImageUrl = uploadedImageBase64;
+            } else if (itemImageUrlInput.value.trim()) {
+                finalImageUrl = itemImageUrlInput.value.trim();
+            } else {
+                finalImageUrl = `https://placehold.co/300x200/FBBF24/333333?text=${encodeURIComponent(name || 'Sem Imagem')}`;
+            }
+
+            // Validação
+            if (!selectedCategorySlug || !name || !description || isNaN(price)) {
+                openModal("Erro", "Todos os campos (Nome, Descrição, Preço) são obrigatórios.", () => {}, () => {}, 'alert');
+                return;
+            }
+
+            const itemData = {
+                id: editingItemId || slugify(name), // Usa o ID existente ou cria um novo
+                name: name,
+                description: description,
+                price: price,
+                imageUrl: finalImageUrl
+            };
+
+            if (editingItemId) {
+                // Edição de item existente
+                const itemIndex = menu[selectedCategorySlug].findIndex(item => item.id === editingItemId);
+                if (itemIndex > -1) {
+                    menu[selectedCategorySlug][itemIndex] = itemData;
+                } else {
+                    // Deveria estar aqui, mas caso não encontre (erro lógico ou id inválido), adiciona como novo
+                    menu[selectedCategorySlug].push(itemData);
+                }
+            } else {
+                // Adição de novo item
+                if (menu[selectedCategorySlug].some(item => item.id === itemData.id)) {
+                    openModal("Erro", `Um item com o nome "${itemData.name}" já existe nesta categoria.`, () => {}, () => {}, 'alert');
+                    return;
+                }
+                menu[selectedCategorySlug].push(itemData);
+            }
+
+            saveMenu();
+            renderAll();
+            cancelItemEdit(); // Limpa o formulário e reseta o modo
+        }
+
+        function cancelItemEdit() {
+            editingItemId = null;
+            selectedCategorySlug = '';
+            itemFormHeading.textContent = 'Adicionar Novo Item';
+            saveItemBtn.innerHTML = '<i class="fas fa-plus mr-2"></i> Adicionar Item';
+            cancelItemEditBtn.classList.add('hidden');
+            itemCategorySelect.disabled = false; // Habilita o select
+            itemCategorySelect.value = ''; // Reseta a seleção
+
+            // Limpa o formulário e a pré-visualização
+            itemNameInput.value = '';
+            itemDescriptionInput.value = '';
+            itemPriceInput.value = '';
+            itemImageUrlInput.value = '';
+            itemImageUploadInput.value = ''; // Limpa o input de arquivo
+            uploadedImageBase64 = null; // Reseta a imagem base64
+            itemImagePreview.src = 'https://placehold.co/300x200/FBBF24/333333?text=Sem%20Imagem'; // Reseta a pré-visualização
+            itemFormContainer.classList.add('hidden');
+        }
+
+        function handleDeleteItem(categorySlug, itemId, itemName) {
+            openModal(
+                "Confirmar Exclusão",
+                `Tem certeza que deseja excluir "${itemName}" desta categoria?`,
+                () => {
+                    menu[categorySlug] = menu[categorySlug].filter(item => item.id !== itemId);
+                    saveMenu();
+                    renderAll();
+                },
+                () => {} // Função vazia para cancelar
+            );
+        }
+
+        // Inicializa a aplicação quando o DOM estiver completamente carregado
+        document.addEventListener('DOMContentLoaded', () => {
+            loadAppData(); // Carrega dados do cardápio e do rodapé
+            renderAll(); // Renderiza todos os componentes
+        });
+    </script>
+</body>
+</html>

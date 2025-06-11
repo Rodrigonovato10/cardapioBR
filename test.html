@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Pagamento via Pix</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    #pixCode { font-size: 14px; word-break: break-all; background: #f0f0f0; padding: 10px; margin-top: 10px; border-radius: 5px; }
+    button { padding: 10px 15px; font-size: 16px; }
+  </style>
+</head>
+<body>
+
+  <h2>Total do pedido: R$ <span id="valor">25.50</span></h2>
+
+  <button onclick="gerarPix()">Gerar código Pix</button>
+
+  <div id="resultado" style="display:none;">
+    <h3>Copia e Cola Pix:</h3>
+    <div id="pixCode"></div>
+    <button onclick="copiarPix()">Copiar código</button>
+    <br><br>
+    <img id="qrCode" alt="QR Code Pix" />
+  </div>
+
+  <script>
+
+  function gerarPix() {
+    const valor = 25.50;
+    const chave = "61482920336"; // sua chave Pix
+    const nome = "Robson Lanchonete";
+    const cidade = "São João";
+    const identificador = "PEDIDO1";
+
+    function montarPayload() {
+      const payload = 
+        "000201" +
+        "26360014BR.GOV.BCB.PIX" +
+        "01" + chave.length.toString().padStart(2, '0') + chave +
+        "52040000" +
+        "5303986" + // moeda BRL
+        "5405" + valor.toFixed(2).replace('.', '') +
+        "5802BR" +
+        "59" + nome.length.toString().padStart(2, '0') + nome +
+        "60" + cidade.length.toString().padStart(2, '0') + cidade +
+        "62070503" + identificador +
+        "6304";
+
+      return payload + calcularCRC16(payload);
+    }
+
+    function calcularCRC16(str) {
+      let crc = 0xFFFF;
+      for (let i = 0; i < str.length; i++) {
+        crc ^= str.charCodeAt(i) << 8;
+        for (let j = 0; j < 8; j++) {
+          if ((crc & 0x8000) !== 0) {
+            crc = (crc << 1) ^ 0x1021;
+          } else {
+            crc <<= 1;
+          }
+          crc &= 0xFFFF;
+        }
+      }
+      return crc.toString(16).toUpperCase().padStart(4, '0');
+    }
+
+    const payload = montarPayload();
+
+    // Mostra o código e QR Code
+    document.getElementById("pixCode").textContent = payload;
+    document.getElementById("resultado").style.display = "block";
+    const qrUrl = "https://chart.googleapis.com/chart?cht=qr&chl=" + encodeURIComponent(payload) + "&chs=250x250";
+    document.getElementById("qrCode").src = qrUrl;
+  }
+
+  function copiarPix() {
+    const texto = document.getElementById("pixCode").textContent;
+    navigator.clipboard.writeText(texto).then(() => {
+      alert("Código Pix copiado!");
+    });
+  }
+
+
+  </script>
+
+</body>
+</html>

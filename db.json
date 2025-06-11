@@ -1,0 +1,302 @@
+{
+  "menu": {
+    "pratos-principais": [
+      {
+        "id": "file-mignon",
+        "name": "Filé Mignon ao Molho Madeira",
+        "description": "Corte nobre grelhado ao ponto, molho madeira encorpado, arroz à piamontese e batatas noisette.",
+        "price": 75,
+        "imageUrl": "https://images.unsplash.com/photo-1558030006-450675393462?w=300&h=200&fit=crop&q=80"
+      },
+      {
+        "id": "salmao",
+        "name": "Salmão Grelhado com Legumes",
+        "description": "Salmão fresco grelhado na manteiga de ervas finas, servido com mix de legumes salteados.",
+        "price": 80,
+        "imageUrl": "https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=300&h=200&fit=crop&q=80"
+      },
+      {
+        "id": "risoto",
+        "name": "Risoto de Camarão",
+        "description": "Arroz arbóreo cremoso com camarões frescos, tomate cereja confitado e toque de limão siciliano.",
+        "price": 85,
+        "imageUrl": "https://images.unsplash.com/photo-1563379091339-03246963d51a?w=300&h=200&fit=crop&q=80"
+      }
+    ],
+    "sobremesas": [
+      {
+        "id": "pudim",
+        "name": "Pudim de Leite Condensado",
+        "description": "Tradicional pudim caseiro com calda de caramelo dourada e textura sedosa.",
+        "price": 20,
+        "imageUrl": "https://images.unsplash.com/photo-1551024506-0bccd828d307?w=300&h=200&fit=crop&q=80"
+      },
+      {
+        "id": "petit-gateau",
+        "name": "Petit Gateau",
+        "description": "Bolinho de chocolate belga com recheio cremoso quente, acompanhado de sorvete artesanal.",
+        "price": 28,
+        "imageUrl": "https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=300&h=200&fit=crop&q=80"
+      }
+    ],
+    "bebidas": [
+      {
+        "id": "agua",
+        "name": "Água Mineral",
+        "description": "Com ou sem gás - 500ml",
+        "price": 6,
+        "imageUrl": "https://placehold.co/300x200/FBBF24/333333?text=Água"
+      },
+      {
+        "id": "refrigerante",
+        "name": "Refrigerante Lata",
+        "description": "Coca-Cola, Guaraná, Sprite - 350ml",
+        "price": 8,
+        "imageUrl": "https://placehold.co/300x200/FBBF24/333333?text=Refrigerante"
+      }
+    ],
+    "lanche": []
+  },
+  "footer": {
+    "copyright": "&copy; 2024 Restaurante Sabor Perfeito. Todos os direitos reservados.",
+    "message": "Desenvolvido com <i class=\"fas fa-heart text-red-500\"></i> para a melhor experiência gastronômica.",
+    "contacts": {
+      "phone": "+351 123 456 000",
+      "email": "info@restaurante.com",
+      "address": "São João, 123, Apinagés, Brasil"
+    },
+    "operatingHours": "Seg-Sex: 12h-15h, 19h-23h\nSáb-Dom: 12h-23h"
+  },
+  "orders": [
+    {
+      "id": "a0e36d9b-6ca3-4271-a4a6-48c1f67e20e9",
+      "customerName": "luis",
+      "items": [
+        {
+          "name": "Filé Mignon ao Molho Madeira",
+          "qty": 2,
+          "price": 75
+        }
+      ],
+      "total": 150,
+      "status": "pending",
+      "orderTime": "2025-06-09T19:16:54.775Z",
+      "finishTime": null,
+      "orderType": "mesa",
+      "tableNumber": 5,
+      "deliveryAddress": null,
+      "paymentMethod": "pix",
+      "notes": ""
+    },
+    {
+      "id": "aea97bd5-4957-4c44-aea0-a3ae5104ac09",
+      "customerName": "Luis Rodrigo",
+      "items": [
+        {
+          "name": "Salmão Grelhado com Legumes",
+          "qty": 1,
+          "price": 80
+        },
+        {
+          "name": "Filé Mignon ao Molho Madeira",
+          "qty": 1,
+          "price": 75
+        },
+        {
+          "name": "Pudim de Leite Condensado",
+          "qty": 1,
+          "price": 20
+        },
+        {
+          "name": "Petit Gateau",
+          "qty": 1,
+          "price": 28
+        }
+      ],
+      "total": 203,
+      "status": "pending",
+      "orderTime": "2025-06-09T19:24:08.101Z",
+      "finishTime": null,
+      "orderType": "mesa",
+      "tableNumber": 6,
+      "deliveryAddress": null,
+      "paymentMethod": "pagar_balcao_mesa",
+      "notes": ""
+    },
+    {
+      "id": "fb5b782b-cd02-4732-8b0a-b7ee583ff3e5",
+      "customerName": "Ruth",
+      "items": [
+        {
+          "name": "Salmão Grelhado com Legumes",
+          "qty": 1,
+          "price": 80
+        },
+        {
+          "name": "Filé Mignon ao Molho Madeira",
+          "qty": 1,
+          "price": 75
+        },
+        {
+          "name": "Pudim de Leite Condensado",
+          "qty": 1,
+          "price": 20
+        },
+        {
+          "name": "Petit Gateau",
+          "qty": 1,
+          "price": 28
+        }
+      ],
+      "total": 203,
+      "status": "pending",
+      "orderTime": "2025-06-09T19:47:01.699Z",
+      "finishTime": null,
+      "orderType": "balcao",
+      "tableNumber": null,
+      "deliveryAddress": null,
+      "paymentMethod": "pix",
+      "notes": ""
+    },
+    {
+      "id": "dc88eb10-b479-4636-bed9-5daa2c6c2312",
+      "customerName": "Vasco",
+      "items": [
+        {
+          "name": "Salmão Grelhado com Legumes",
+          "qty": 1,
+          "price": 80
+        },
+        {
+          "name": "Filé Mignon ao Molho Madeira",
+          "qty": 1,
+          "price": 75
+        },
+        {
+          "name": "Risoto de Camarão",
+          "qty": 1,
+          "price": 85
+        },
+        {
+          "name": "Pudim de Leite Condensado",
+          "qty": 1,
+          "price": 20
+        },
+        {
+          "name": "Petit Gateau",
+          "qty": 1,
+          "price": 28
+        }
+      ],
+      "total": 288,
+      "status": "pending",
+      "orderTime": "2025-06-09T23:59:20.020Z",
+      "finishTime": null,
+      "orderType": "balcao",
+      "tableNumber": null,
+      "deliveryAddress": null,
+      "paymentMethod": "pix",
+      "notes": ""
+    },
+    {
+      "id": "73bc9b11-f75d-4128-8f27-1263852f0d5b",
+      "customerName": "Valber",
+      "items": [
+        {
+          "name": "Filé Mignon ao Molho Madeira",
+          "qty": 1,
+          "price": 75
+        },
+        {
+          "name": "Salmão Grelhado com Legumes",
+          "qty": 1,
+          "price": 80
+        },
+        {
+          "name": "Risoto de Camarão",
+          "qty": 1,
+          "price": 85
+        }
+      ],
+      "total": 240,
+      "status": "pending",
+      "orderTime": "2025-06-10T00:03:29.317Z",
+      "finishTime": null,
+      "orderType": "mesa",
+      "tableNumber": 9,
+      "deliveryAddress": null,
+      "paymentMethod": "pix",
+      "notes": ""
+    },
+    {
+      "id": "fd87992b-e8dc-4410-9b9c-edd07c76d917",
+      "customerName": "Marco BB",
+      "items": [
+        {
+          "name": "Salmão Grelhado com Legumes",
+          "qty": 1,
+          "price": 80
+        },
+        {
+          "name": "Filé Mignon ao Molho Madeira",
+          "qty": 1,
+          "price": 75
+        },
+        {
+          "name": "Pudim de Leite Condensado",
+          "qty": 1,
+          "price": 20
+        },
+        {
+          "name": "Petit Gateau",
+          "qty": 1,
+          "price": 28
+        }
+      ],
+      "total": 203,
+      "status": "pending",
+      "orderTime": "2025-06-11T18:22:01.527Z",
+      "finishTime": null,
+      "orderType": "balcao",
+      "tableNumber": null,
+      "deliveryAddress": null,
+      "paymentMethod": "pagar_balcao_cartao",
+      "notes": ""
+    },
+    {
+      "id": "5e4c2595-ea02-47b5-b5a1-4fd507e13b31",
+      "customerName": "Migel",
+      "items": [
+        {
+          "name": "Salmão Grelhado com Legumes",
+          "qty": 1,
+          "price": 80
+        },
+        {
+          "name": "Filé Mignon ao Molho Madeira",
+          "qty": 1,
+          "price": 75
+        },
+        {
+          "name": "Petit Gateau",
+          "qty": 1,
+          "price": 28
+        },
+        {
+          "name": "Pudim de Leite Condensado",
+          "qty": 1,
+          "price": 20
+        }
+      ],
+      "total": 203,
+      "status": "pending",
+      "orderTime": "2025-06-11T19:15:55.629Z",
+      "finishTime": null,
+      "orderType": "balcao",
+      "tableNumber": null,
+      "deliveryAddress": null,
+      "paymentMethod": "pagar_balcao_cartao",
+      "notes": "Com bastante tomate"
+    }
+  ]
+}

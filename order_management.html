@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestão de Pedidos - Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9fafb;
+            color: #1f2937;
+            overflow-x: hidden;
+        }
+
+        .glass-effect {
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        /* Status colors and gradients */
+        .status-pending { background: linear-gradient(135deg, #FEF3C7, #FDE68A); color: #92400E; } /* Yellow */
+        .status-in-production { background: linear-gradient(135deg, #DBEAFE, #BFDBFE); color: #1E40AF; } /* Blue */
+        .status-finished { background: linear-gradient(135deg, #D1FAE5, #A7F3D0); color: #065F46; } /* Green */
+        .status-cancelled { background: linear-gradient(135deg, #FEE2E2, #FECACA); color: #991B1B; } /* Red */
+        .status-awaiting-payment { background: linear-gradient(135deg, #FEE2E2, #FECACA); color: #991B1B; } /* Red for awaiting payment */
+
+        .order-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 2px solid transparent;
+        }
+
+        .order-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border-color: #F59E0B; /* Orange-ish highlight on hover */
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        /* Stats card backgrounds */
+        .stats-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); /* Purple */
+        }
+
+        .stats-card-green {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); /* Green */
+        }
+
+        .stats-card-orange {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); /* Pink/Red */
+        }
+
+        .stats-card-blue {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); /* Light Blue */
+        }
+
+        .notification-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            max-width: 400px;
+            width: calc(100% - 40px);
+        }
+
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.6); /* Darker backdrop */
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            z-index: 190;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .modal-backdrop.show { display: block; opacity: 1; }
+
+        .modal-content {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.95);
+            opacity: 0;
+            background-color: white;
+            padding: 0; /* Padding will be handled by inner divs */
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            z-index: 200;
+            width: calc(100% - 32px); /* More padding on sides */
+            max-width: 600px; /* Wider modal */
+            max-height: 90vh; /* Taller modal */
+            overflow: hidden; /* Prevent content overflow before inner scroll */
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            display: none;
+            flex-direction: column; /* For header, content, footer structure */
+        }
+        .modal-content.show { display: flex; transform: translate(-50%, -50%) scale(1); opacity: 1; }
+
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .modal-body {
+            padding: 24px;
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+        .modal-footer {
+            padding: 20px 24px;
+            border-top: 1px solid #e5e7eb;
+            background-color: #f9fafb; /* Light gray for footer */
+            display: flex;
+            justify-content: flex-end; /* Align buttons to the right */
+            gap: 12px; /* Space between buttons */
+        }
+
+        /* Active tab styling */
+        .tab-button.active {
+            border-color: #F59E0B; /* Tailwind orange-500 equivalent */
+            color: #F59E0B;
+        }
+
+        /* Specific button styles for actions */
+        .btn-action {
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap; /* Prevent wrapping */
+        }
+        .btn-paid {
+            background-color: #22C55E; /* green-500 */
+            color: white;
+            border: 1px solid #22C55E;
+        }
+        .btn-paid:hover { background-color: #16A34A; } /* green-600 */
+
+        .btn-in-production {
+            background-color: #3B82F6; /* blue-500 */
+            color: white;
+            border: 1px solid #3B82F6;
+        }
+        .btn-in-production:hover { background-color: #2563EB; } /* blue-600 */
+
+        .btn-finished {
+            background-color: #F59E0B; /* orange-500 */
+            color: white;
+            border: 1px solid #F59E0B;
+        }
+        .btn-finished:hover { background-color: #D97706; } /* orange-600 */
+
+        .btn-cancelled {
+            background-color: #EF4444; /* red-500 */
+            color: white;
+            border: 1px solid #EF4444;
+        }
+        .btn-cancelled:hover { background-color: #DC2626; } /* red-600 */
+
+        .btn-secondary {
+            background-color: #E5E7EB; /* gray-200 */
+            color: #374151; /* gray-700 */
+            border: 1px solid #D1D5DB; /* gray-300 */
+        }
+        .btn-secondary:hover { background-color: #D1D5DB; } /* gray-300 */
+
+
+        @media (max-width: 640px) {
+            .modal-content { width: calc(100% - 24px); }
+            .modal-header, .modal-body { padding: 16px; }
+            .modal-footer { padding: 16px; flex-direction: column-reverse; gap: 10px; }
+            .modal-footer button { width: 100%; }
+
+            .tab-button {
+                padding: 12px 8px; /* Smaller padding for tabs on mobile */
+                font-size: 0.75rem; /* Smaller font for tabs */
+            }
+            .order-card h3 {
+                flex-direction: column;
+                align-items: flex-start;
+                font-size: 1.2rem;
+            }
+            .order-card h3 .status-tag {
+                margin-top: 8px;
+                margin-left: 0;
+            }
+            .action-buttons {
+                flex-direction: column; /* Stack action buttons on mobile */
+                align-items: stretch;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+
+    <header class="glass-effect sticky top-0 z-40 border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h1 class="text-2xl font-bold bg-gradient-to-r from-yellow-500 to-orange-500 bg-clip-text text-transparent">
+                        Gestão de Pedidos
+                    </h1>
+                    <p class="text-sm text-gray-600">Restaurante Sabor & Arte</p>
+                    <p id="user-id-display" class="text-xs text-gray-500 mt-1">Status: Conectado ao Backend</p>
+                </div>
+                <div class="flex items-center space-x-2 sm:space-x-4">
+                    <button id="auto-refresh-btn" class="px-3 py-2 sm:px-4 text-xs sm:text-sm bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
+                        🔄 Auto Refresh: ON
+                    </button>
+                    <button id="export-data-btn" class="px-3 py-2 sm:px-4 text-xs sm:text-sm bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors">
+                        📊 Exportar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="stats-card text-white p-6 rounded-xl shadow-lg">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-white/80 text-sm">Pedidos (Filtro)</p>
+                        <p class="text-3xl font-bold" id="total-orders">0</p>
+                    </div>
+                    <div class="text-4xl opacity-80">📋</div>
+                </div>
+            </div>
+            
+            <div class="stats-card-green text-white p-6 rounded-xl shadow-lg">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-white/80 text-sm">Faturamento (Filtro)</p>
+                        <p class="text-3xl font-bold" id="total-revenue">R$ 0,00</p>
+                    </div>
+                    <div class="text-4xl opacity-80">💰</div>
+                </div>
+            </div>
+            
+            <div class="stats-card-orange text-white p-6 rounded-xl shadow-lg">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-white/80 text-sm">Pendentes (Filtro)</p>
+                        <p class="text-3xl font-bold" id="pending-orders">0</p>
+                    </div>
+                    <div class="text-4xl opacity-80">⏱️</div>
+                </div>
+            </div>
+            
+            <div class="stats-card-blue text-white p-6 rounded-xl shadow-lg">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-white/80 text-sm">Tempo Médio Entrega</p>
+                        <p class="text-3xl font-bold" id="avg-time">0 min</p>
+                    </div>
+                    <div class="text-4xl opacity-80">⏰</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Botões de navegação de abas (cinco pilares) -->
+        <div class="flex bg-white rounded-xl shadow-lg overflow-hidden mb-8" role="tablist">
+            <button 
+                id="manage-tab-pending" 
+                class="tab-button flex-1 px-6 py-4 text-sm font-medium text-center border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                data-tab="pending"
+            >
+                Em Espera
+            </button>
+            <button 
+                id="manage-tab-in-production" 
+                class="tab-button flex-1 px-6 py-4 text-sm font-medium text-center border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                data-tab="in-production"
+            >
+                Em Produção
+            </button>
+            <button 
+                id="manage-tab-finished" 
+                class="tab-button flex-1 px-6 py-4 text-sm font-medium text-center border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                data-tab="finished"
+            >
+                Finalizados
+            </button>
+            <button 
+                id="manage-tab-cancelled" 
+                class="tab-button flex-1 px-6 py-4 text-sm font-medium text-center border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                data-tab="cancelled"
+            >
+                Cancelados
+            </button>
+            <button 
+                id="manage-tab-all" 
+                class="tab-button flex-1 px-6 py-4 text-sm font-medium text-center border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                data-tab="all"
+            >
+                Todos os Pedidos
+            </button>
+        </div>
+
+        <!-- Container para os pedidos -->
+        <div id="orders-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <p class="col-span-full text-center text-gray-500">Carregando pedidos...</p>
+            <!-- Pedidos serão carregados aqui -->
+        </div>
+    </div>
+
+    <!-- Modal HTML Structure -->
+    <div id="global-modal" class="modal-backdrop">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title" class="text-xl font-semibold text-gray-800"></h3>
+                <button id="modal-close-btn" class="text-gray-500 hover:text-gray-700 text-2xl leading-none">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p id="modal-message"></p>
+            </div>
+            <div class="modal-footer">
+                <button id="modal-cancel-btn" class="px-5 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100 transition-colors duration-200 hidden">
+                    Cancelar
+                </button>
+                <button id="modal-confirm-btn" class="px-5 py-2 rounded-lg text-white font-medium transition-colors duration-200">
+                    Confirmar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const BASE_URL = 'http://localhost:3000/api'; // URL base do seu backend Node.js
+
+        let currentFilter = 'pending'; // Default filter
+        let allOrders = []; // Stores all fetched orders
+        let autoRefreshInterval = null; // To store the interval ID for auto-refresh
+
+        // --- Modal functions ---
+        const modal = document.getElementById('global-modal');
+        const modalTitle = document.getElementById('modal-title');
+        const modalMessage = document.getElementById('modal-message');
+        const modalConfirmBtn = document.getElementById('modal-confirm-btn');
+        const modalCancelBtn = document.getElementById('modal-cancel-btn');
+        const modalCloseBtn = document.getElementById('modal-close-btn');
+
+        function openModal(title, message, onConfirm, onCancel, type = 'confirm') {
+            modalTitle.textContent = title;
+            modalMessage.textContent = message;
+            modalConfirmBtn.onclick = () => { onConfirm(); closeModal(); };
+            modalCancelBtn.onclick = () => { onCancel(); closeModal(); };
+            modalCloseBtn.onclick = () => { onCancel(); closeModal(); };
+
+            if (type === 'confirm') {
+                modalCancelBtn.classList.remove('hidden');
+                modalConfirmBtn.textContent = 'Confirmar';
+                modalConfirmBtn.classList.remove('bg-blue-500', 'hover:bg-blue-600');
+                modalConfirmBtn.classList.add('bg-red-500', 'hover:bg-red-600');
+            } else { // 'alert' type
+                modalCancelBtn.classList.add('hidden');
+                modalConfirmBtn.textContent = 'Fechar';
+                modalConfirmBtn.classList.remove('bg-red-500', 'hover:bg-red-600');
+                modalConfirmBtn.classList.add('bg-blue-500', 'hover:bg-blue-600');
+            }
+            modal.classList.add('show');
+            modal.querySelector('.modal-content').classList.add('show');
+        }
+
+        function closeModal() {
+            modal.classList.remove('show');
+            modal.querySelector('.modal-content').classList.remove('show');
+        }
+
+
+        // --- Data Fetching and Display ---
+
+        // Function to fetch orders from the backend
+        async function fetchOrders() {
+            try {
+                const response = await fetch(`${BASE_URL}/orders`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                allOrders = data.map(order => ({
+                    ...order,
+                    orderTime: new Date(order.orderTime), // Convert ISO string to Date object
+                    finishTime: order.finishTime ? new Date(order.finishTime) : null // Convert if exists
+                }));
+                displayOrders(currentFilter); // Re-render with fetched data
+                console.log("Pedidos carregados do backend.");
+            } catch (error) {
+                console.error("Erro ao carregar pedidos:", error);
+                document.getElementById('orders-container').innerHTML = `
+                    <p class="col-span-full text-center text-red-500">Erro ao carregar pedidos: ${error.message}. Verifique se o backend está rodando.</p>
+                `;
+                openModal('Erro de Conexão', `Não foi possível carregar os pedidos. Verifique se o servidor backend está em execução. Detalhes: ${error.message}`, () => {}, () => {}, 'alert');
+            }
+        }
+
+        // Function to format currency
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(amount);
+        }
+
+        // Function to update statistics based on filtered orders
+        function updateStats(filteredOrders) {
+            const totalOrdersElement = document.getElementById('total-orders');
+            const totalRevenueElement = document.getElementById('total-revenue');
+            const pendingOrdersElement = document.getElementById('pending-orders');
+            const avgTimeElement = document.getElementById('avg-time');
+
+            const total = filteredOrders.length;
+            const revenue = filteredOrders.reduce((sum, order) => sum + order.total, 0);
+            // Now pending includes 'pending' AND 'awaiting-payment'
+            const pending = filteredOrders.filter(order => order.status === 'pending' || order.status === 'awaiting-payment').length;
+            
+            // Calculate average delivery time for finished orders
+            const finishedOrders = allOrders.filter(order => order.status === 'finished' && order.finishTime && order.orderTime);
+            let avgTime = 0;
+            if (finishedOrders.length > 0) {
+                const totalDeliveryTime = finishedOrders.reduce((sum, order) => {
+                    return sum + (order.finishTime.getTime() - order.orderTime.getTime());
+                }, 0);
+                avgTime = Math.round(totalDeliveryTime / finishedOrders.length / (1000 * 60)); // Convert ms to minutes
+            }
+
+            totalOrdersElement.textContent = total;
+            totalRevenueElement.textContent = formatCurrency(revenue);
+            pendingOrdersElement.textContent = pending;
+            avgTimeElement.textContent = `${avgTime} min`;
+        }
+
+        // Function to create an individual order card HTML
+        function createOrderCard(order) {
+            const statusMap = {
+                'pending': 'Em Espera',
+                'in-production': 'Em Produção',
+                'finished': 'Finalizado',
+                'cancelled': 'Cancelado',
+                'awaiting-payment': 'Aguardando Pagamento' // Novo status
+            };
+            const statusClassMap = {
+                'pending': 'status-pending',
+                'in-production': 'status-in-production',
+                'finished': 'status-finished',
+                'cancelled': 'status-cancelled',
+                'awaiting-payment': 'status-awaiting-payment' // Novo status class
+            };
+
+            // Determine if the order is "balcão" or "mesa" for customer display
+            let orderTypeDisplay = '';
+            if (order.orderType === 'balcao') {
+                orderTypeDisplay = 'Balcão';
+            } else if (order.orderType === 'mesa') {
+                orderTypeDisplay = `Mesa ${order.tableNumber || 'N/A'}`;
+            } else { // Fallback for other types like 'entrega' (delivery)
+                orderTypeDisplay = `Entrega`;
+            }
+
+            // Message for awaiting payment
+            let paymentDueMessage = '';
+            let pulseClass = '';
+            if (order.status === 'awaiting-payment') {
+                paymentDueMessage = '<span class="text-red-700 font-bold ml-2">(PAGAMENTO PENDENTE NO BALCÃO)</span>';
+                pulseClass = 'pulse-animation'; // Apply pulse to the order card for pending payments
+            }
+
+            // Generate items list HTML
+            const itemsHtml = order.items.map(item => `
+                <li class="flex justify-between text-gray-700 text-sm">
+                    <span>${item.qty}x ${item.name}</span>
+                    <span>${formatCurrency(item.price)}</span>
+                </li>
+            `).join('');
+
+            const orderTimeStr = order.orderTime ? order.orderTime.toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' }) : 'N/A';
+            const finishTimeStr = order.finishTime ? order.finishTime.toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' }) : 'N/A';
+
+            return `
+                <div id="order-${order.id}" class="order-card bg-white rounded-xl shadow-lg p-6 animate-fade-in ${pulseClass}">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <h3 class="text-xl font-semibold text-gray-800">Pedido #${order.id.substring(0, 8)}</h3>
+                            <p class="text-gray-600">Cliente: ${order.customerName}</p>
+                            <p class="text-gray-600 text-sm">Tipo: ${orderTypeDisplay}</p>
+                            ${order.notes ? `<p class="text-gray-600 text-sm">Notas: ${order.notes}</p>` : ''}
+                            <p class="text-gray-500 text-xs mt-1">Realizado: ${orderTimeStr}</p>
+                            ${order.status === 'finished' ? `<p class="text-gray-500 text-xs">Finalizado: ${finishTimeStr}</p>` : ''}
+                        </div>
+                        <span class="px-3 py-1 rounded-full text-xs font-semibold ${statusClassMap[order.status]}">
+                            ${statusMap[order.status]} ${paymentDueMessage}
+                        </span>
+                    </div>
+                    <div class="mb-4">
+                        <h4 class="font-medium text-gray-700 mb-2">Itens:</h4>
+                        <ul class="space-y-1">
+                            ${itemsHtml}
+                        </ul>
+                    </div>
+                    <div class="border-t border-gray-200 pt-4 flex justify-between items-center flex-wrap gap-2">
+                        <span class="text-lg font-bold text-gray-900">Total: ${formatCurrency(order.total)}</span>
+                        
+                        <!-- Botões de Ação Dinâmicos -->
+                        <div class="flex flex-wrap gap-2 justify-end">
+                            ${order.status === 'awaiting-payment' ?
+                                `<button class="btn-action btn-paid" onclick="updateOrderStatus('${order.id}', 'in-production')">
+                                    <i class="fas fa-money-bill-wave mr-1"></i> Pago (Em Produção)
+                                </button>` : ''
+                            }
+                            ${(order.status === 'pending' || order.status === 'awaiting-payment') ?
+                                `<button class="btn-action btn-in-production" onclick="updateOrderStatus('${order.id}', 'in-production')">
+                                    <i class="fas fa-hourglass-half mr-1"></i> Em Produção
+                                </button>` : ''
+                            }
+                            ${order.status === 'in-production' ?
+                                `<button class="btn-action btn-finished" onclick="updateOrderStatus('${order.id}', 'finished')">
+                                    <i class="fas fa-check-circle mr-1"></i> Finalizar
+                                </button>` : ''
+                            }
+                            ${(order.status === 'pending' || order.status === 'awaiting-payment' || order.status === 'in-production') ?
+                                `<button class="btn-action btn-cancelled" onclick="confirmCancelOrder('${order.id}')">
+                                    <i class="fas fa-times-circle mr-1"></i> Cancelar
+                                </button>` : ''
+                            }
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Function to display orders based on the current filter
+        function displayOrders(filter = currentFilter) {
+            currentFilter = filter; // Update the global currentFilter
+            const ordersContainer = document.getElementById('orders-container');
+            ordersContainer.innerHTML = ''; // Clear existing orders
+
+            // Remove active class from all buttons and add to the current one
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                if (btn.dataset.tab === filter) {
+                    btn.classList.add('active', 'border-yellow-500', 'text-yellow-600');
+                    btn.classList.remove('border-transparent', 'text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300');
+                } else {
+                    btn.classList.remove('active', 'border-yellow-500', 'text-yellow-600');
+                    btn.classList.add('border-transparent', 'text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300');
+                }
+            });
+
+
+            const filteredOrders = allOrders.filter(order => {
+                if (filter === 'all') {
+                    return true;
+                }
+                // 'pending' tab now includes both 'pending' and 'awaiting-payment'
+                if (filter === 'pending') {
+                    return order.status === 'pending' || order.status === 'awaiting-payment';
+                }
+                return order.status === filter;
+            });
+
+            if (filteredOrders.length === 0) {
+                ordersContainer.innerHTML = `
+                    <div class="col-span-full text-center py-10 text-gray-500 text-lg">
+                        Nenhum pedido encontrado para o status "${document.querySelector(`.tab-button[data-tab="${filter}"]`).textContent}".
+                    </div>
+                `;
+            } else {
+                filteredOrders.forEach(order => {
+                    ordersContainer.insertAdjacentHTML('beforeend', createOrderCard(order));
+                });
+            }
+            updateStats(filteredOrders);
+        }
+
+        // Function to update order status in backend
+        async function updateOrderStatus(orderId, newStatus) {
+            try {
+                const response = await fetch(`${BASE_URL}/orders/${orderId}/status`, { // Use PATCH method
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ newStatus: newStatus })
+                });
+
+                if (!response.ok) {
+                    const errorDetails = await response.json();
+                    throw new Error(errorDetails.message || 'Falha ao atualizar status do pedido.');
+                }
+                console.log(`Status do pedido ${orderId} atualizado para ${newStatus} no backend.`);
+                openModal('Sucesso!', `Status do pedido ${orderId.substring(0,8).toUpperCase()} atualizado para "${getStatusDisplayName(newStatus)}"!`, () => {}, () => {}, 'alert');
+                
+                fetchOrders(); // Recarrega a lista de pedidos para refletir a mudança
+            } catch (error) {
+                console.error("Erro ao atualizar status do pedido:", error);
+                openModal('Erro de Atualização', `Não foi possível atualizar o status do pedido. Detalhes: ${error.message}`, () => {}, () => {}, 'alert');
+            }
+        }
+
+        // Function to confirm order cancellation
+        function confirmCancelOrder(orderId) {
+            openModal(
+                'Confirmar Cancelamento',
+                `Tem certeza que deseja cancelar o pedido ${orderId.substring(0,8).toUpperCase()}? Esta ação não pode ser desfeita.`,
+                () => updateOrderStatus(orderId, 'cancelled'), // On confirm
+                () => {}, // On cancel (do nothing)
+                'confirm'
+            );
+        }
+
+        // Event listeners for tab buttons
+        document.querySelectorAll('.tab-button').forEach(button => {
+            button.addEventListener('click', () => {
+                displayOrders(button.dataset.tab);
+            });
+        });
+
+        // Auto Refresh functionality
+        function toggleAutoRefresh() {
+            const button = document.getElementById('auto-refresh-btn');
+            if (autoRefreshInterval) {
+                clearInterval(autoRefreshInterval);
+                autoRefreshInterval = null;
+                button.textContent = "🔄 Auto Refresh: OFF";
+                console.log("Auto Refresh DESATIVADO.");
+            } else {
+                // Fetch every 5 seconds (5000 milliseconds)
+                autoRefreshInterval = setInterval(fetchOrders, 5000);
+                button.textContent = "🔄 Auto Refresh: ON";
+                console.log("Auto Refresh ATIVADO (a cada 5 segundos).");
+                fetchOrders(); // Initial fetch immediately
+            }
+        }
+
+        // Export data functionality
+        function exportData() {
+            // Create a CSV string from allOrders
+            if (allOrders.length === 0) {
+                openModal('Exportar Dados', 'Não há pedidos para exportar.', () => {}, () => {}, 'alert');
+                return;
+            }
+
+            let csvContent = "data:text/csv;charset=utf-8,";
+            
+            // CSV Header
+            const headers = ["ID do Pedido", "Nome do Cliente", "Tipo de Pedido", "Número da Mesa", "Endereço de Entrega", "Método de Pagamento", "Itens do Pedido", "Total", "Status", "Hora do Pedido", "Hora de Finalização", "Notas"];
+            csvContent += headers.join(";") + "\r\n";
+
+            // CSV Rows
+            allOrders.forEach(order => {
+                const itemsStr = order.items.map(item => `${item.qty}x ${item.name} (${formatCurrency(item.price)})`).join(" | ");
+                const row = [
+                    `"${order.id}"`,
+                    `"${order.customerName}"`,
+                    `"${getStatusDisplayName(order.orderType)}"` , // Adjust to get readable type
+                    `"${order.tableNumber || ''}"`,
+                    `"${order.deliveryAddress || ''}"`,
+                    `"${order.paymentMethod || ''}"`,
+                    `"${itemsStr}"`,
+                    `"${order.total.toFixed(2).replace('.', ',')}"`, // Format total as string
+                    `"${getStatusDisplayName(order.status)}"` , // Adjust to get readable status
+                    `"${order.orderTime ? order.orderTime.toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'medium' }) : ''}"`,
+                    `"${order.finishTime ? order.finishTime.toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'medium' }) : ''}"`,
+                    `"${order.notes || ''}"`
+                ].join(";");
+                csvContent += row + "\r\n";
+            });
+
+            // Create a download link
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "pedidos_restaurante.csv");
+            document.body.appendChild(link); // Required for Firefox
+            link.click();
+            document.body.removeChild(link); // Clean up
+
+            openModal('Exportar Dados', 'Os pedidos foram exportados com sucesso para "pedidos_restaurante.csv".', () => {}, () => {}, 'alert');
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            // Set default active tab
+            const defaultTabButton = document.getElementById('manage-tab-pending');
+            if (defaultTabButton) {
+                defaultTabButton.classList.add('active', 'border-yellow-500', 'text-yellow-600');
+                defaultTabButton.classList.remove('border-transparent', 'text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300');
+            }
+
+            // Attach event listeners
+            document.getElementById('auto-refresh-btn').addEventListener('click', toggleAutoRefresh);
+            document.getElementById('export-data-btn').addEventListener('click', exportData);
+
+            // Initial fetch of orders (start auto-refresh by default)
+            toggleAutoRefresh(); // Starts auto-refresh and fetches data
+        });
+    </script>
+</body>
+</html>
