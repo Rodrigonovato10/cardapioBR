@@ -6,6 +6,7 @@
     <title>Gestão de Pedidos - Admin</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         body {
@@ -215,7 +216,7 @@
         }
     </style>
 </head>
-<body class="bg-gray-50">
+<body>
 
     <header class="glass-effect sticky top-0 z-40 border-b border-gray-200">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
@@ -391,6 +392,23 @@
             modal.querySelector('.modal-content').classList.remove('show');
         }
 
+        // --- Funções de Utilitários ---
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(amount);
+        }
+
+        // Função para obter o nome de exibição do status
+        function getStatusDisplayName(statusSlug) {
+            const statusMap = {
+                'pending': 'Em Espera',
+                'in-production': 'Em Produção',
+                'finished': 'Finalizado',
+                'cancelled': 'Cancelado',
+                'awaiting-payment': 'Aguardando Pagamento'
+            };
+            return statusMap[statusSlug] || statusSlug; // Retorna o nome de exibição ou o próprio slug se não encontrado
+        }
+
 
         // --- Data Fetching and Display ---
 
@@ -416,11 +434,6 @@
                 `;
                 openModal('Erro de Conexão', `Não foi possível carregar os pedidos. Verifique se o servidor backend está em execução. Detalhes: ${error.message}`, () => {}, () => {}, 'alert');
             }
-        }
-
-        // Function to format currency
-        function formatCurrency(amount) {
-            return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(amount);
         }
 
         // Function to update statistics based on filtered orders
@@ -504,9 +517,9 @@
                             <h3 class="text-xl font-semibold text-gray-800">Pedido #${order.id.substring(0, 8)}</h3>
                             <p class="text-gray-600">Cliente: ${order.customerName}</p>
                             <p class="text-gray-600 text-sm">Tipo: ${orderTypeDisplay}</p>
-                            ${order.notes ? `<p class="text-gray-600 text-sm">Notas: ${order.notes}</p>` : ''}
+                            ${order.notes ? `<p class="text-gray-600 text-sm">Observações: ${order.notes}</p>` : ''}
                             <p class="text-gray-500 text-xs mt-1">Realizado: ${orderTimeStr}</p>
-                            ${order.status === 'finished' ? `<p class="text-gray-500 text-xs">Finalizado: ${finishTimeStr}</p>` : ''}
+                            ${order.finishTime ? `<p class="text-gray-500 text-xs">Finalizado: ${finishTimeStr}</p>` : ''}
                         </div>
                         <span class="px-3 py-1 rounded-full text-xs font-semibold ${statusClassMap[order.status]}">
                             ${statusMap[order.status]} ${paymentDueMessage}
@@ -553,6 +566,8 @@
         function displayOrders(filter = currentFilter) {
             currentFilter = filter; // Update the global currentFilter
             const ordersContainer = document.getElementById('orders-container');
+            if (!ordersContainer) return;
+
             ordersContainer.innerHTML = ''; // Clear existing orders
 
             // Remove active class from all buttons and add to the current one
@@ -603,14 +618,14 @@
 
                 if (!response.ok) {
                     const errorDetails = await response.json();
-                    throw new Error(errorDetails.message || 'Falha ao atualizar status do pedido.');
+                    throw new Error(errorDetails.message || 'Falha ao atualizar status.');
                 }
                 console.log(`Status do pedido ${orderId} atualizado para ${newStatus} no backend.`);
                 openModal('Sucesso!', `Status do pedido ${orderId.substring(0,8).toUpperCase()} atualizado para "${getStatusDisplayName(newStatus)}"!`, () => {}, () => {}, 'alert');
                 
                 fetchOrders(); // Recarrega a lista de pedidos para refletir a mudança
             } catch (error) {
-                console.error("Erro ao atualizar status do pedido:", error);
+                console.error("Erro ao atualizar status:", error);
                 openModal('Erro de Atualização', `Não foi possível atualizar o status do pedido. Detalhes: ${error.message}`, () => {}, () => {}, 'alert');
             }
         }
@@ -670,7 +685,7 @@
                 const row = [
                     `"${order.id}"`,
                     `"${order.customerName}"`,
-                    `"${getStatusDisplayName(order.orderType)}"` , // Adjust to get readable type
+                    `"${order.orderType === 'mesa' ? `Mesa` : 'Balcão'}"`, // Simplified type
                     `"${order.tableNumber || ''}"`,
                     `"${order.deliveryAddress || ''}"`,
                     `"${order.paymentMethod || ''}"`,
@@ -696,22 +711,12 @@
             openModal('Exportar Dados', 'Os pedidos foram exportados com sucesso para "pedidos_restaurante.csv".', () => {}, () => {}, 'alert');
         }
 
-        // Initialize on page load
-        document.addEventListener('DOMContentLoaded', () => {
-            // Set default active tab
-            const defaultTabButton = document.getElementById('manage-tab-pending');
-            if (defaultTabButton) {
-                defaultTabButton.classList.add('active', 'border-yellow-500', 'text-yellow-600');
-                defaultTabButton.classList.remove('border-transparent', 'text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300');
-            }
-
-            // Attach event listeners
-            document.getElementById('auto-refresh-btn').addEventListener('click', toggleAutoRefresh);
-            document.getElementById('export-data-btn').addEventListener('click', exportData);
-
-            // Initial fetch of orders (start auto-refresh by default)
-            toggleAutoRefresh(); // Starts auto-refresh and fetches data
-        });
+        // Inicializa a aplicação ao carregar a página
+        window.onload = () => {
+            // No admin, o botão de cancelar pode ser reatribuído para funções específicas
+            // Se precisar de confirmações, a função `openModal` deve gerenciar o listener do confirmBtn
+            fetchOrders(); // Carrega os pedidos ao iniciar
+        };
     </script>
 </body>
 </html>
